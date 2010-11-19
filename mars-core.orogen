@@ -1,0 +1,29 @@
+name 'simulation'
+
+using_library "mars"
+
+task_context "Mars" do
+	needs_configuration
+
+	property('resource_dir','/std/string').
+	    doc("the full path to the resources directory")
+ 
+        property('plugin_dir', '/std/string').
+            doc("the full path to the plugin directory")
+
+        # Add a task context
+        # operation('addPlugin').
+        #       returns('int').
+        #       argument('taskcontext', '/
+        # method addPlugin(input: TaskContext ) return bool
+        # method removePlugin(input: TaskContext) return bool
+end
+
+deployment "simulation" do
+	add_default_logger
+        sim = task('mars_simulation', 'simulation::Mars').
+        start
+end
+
+
+

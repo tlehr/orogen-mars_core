@@ -1,0 +1,14 @@
+/home/roehr/workspace/rimres/software/install/lib/libConsole.so
+/home/roehr/workspace/rimres/software/install/lib/libAddPrimitive.so
+#/home/roehr/workspace/rimres/software/install/lib/libEditNode.so
+#/home/roehr/workspace/rimres/software/install/lib/libTreeView.so
+#/home/roehr/workspace/rimres/software/install/lib/libBlenderExport.so
+#/home/roehr/workspace/rimres/software/install/lib/libCameraConfigurator.so
+#/home/roehr/workspace/rimres/software/install/lib/libControllerConfig.so
+#/home/roehr/workspace/mars/dialogs/Console/libConsole.so
+#/home/roehr/workspace/mars/dialogs/AddPrimitive/libAddPrimitive.so
+#/home/roehr/workspace/mars/dialogs/EditNode/libEditNode.so
+#/home/roehr/workspace/mars/dialogs/TreeView/libTreeView.so
+#/home/roehr/workspace/mars/dialogs/BlenderExport/libBlenderExport.so
+#/home/roehr/workspace/mars/dialogs/CameraConfigurator/libCameraConfigurator.so
+#/home/roehr/workspace/mars/dialogs/ControllerConfig/libControllerConfig.so

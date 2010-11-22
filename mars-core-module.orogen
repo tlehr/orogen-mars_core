@@ -21,8 +21,7 @@ end
 
 deployment "simulation" do
 	add_default_logger
-        sim = task('mars_simulation', 'simulation::Mars').
-        start
+        sim = task('mars_simulation', 'simulation::Mars')
 end
 
 

@@ -4,12 +4,6 @@
 #include "simulation/MarsBase.hpp"
 #include <mars/SimulatorInterface.h>
 
-namespace RTT
-{
-    class NonPeriodicActivity;
-}
-
-
 namespace simulation {
     class Mars : public MarsBase
     {
@@ -27,8 +21,6 @@ namespace simulation {
 
     public:
         Mars(std::string const& name = "simulation::Mars");
-
-        RTT::NonPeriodicActivity* getNonPeriodicActivity();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the

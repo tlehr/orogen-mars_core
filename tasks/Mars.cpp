@@ -1,13 +1,6 @@
 #include "Mars.hpp"
 
-#include <rtt/NonPeriodicActivity.hpp>
-
-
 using namespace simulation;
-
-
-RTT::NonPeriodicActivity* Mars::getNonPeriodicActivity()
-{ return dynamic_cast< RTT::NonPeriodicActivity* >(getActivity().get()); }
 
 
 Mars::Mars(std::string const& name)

@@ -7,7 +7,7 @@ The mars-core module provides the base for other modules that require the simula
   <url>http://</url>
   <logo>http://</logo>
   <!-- Dependencies are resolved via osdep file in the autoproj configuration -->
-  <depend package ="mars" />
+  <depend package ="simulation/mars" />
   <versioncontrol type="git" url="" />
   <export>
     <cpp cflags="" lflags="" />

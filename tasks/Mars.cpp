@@ -1,4 +1,5 @@
 #include "Mars.hpp"
+#include <mars/ControlCenter.h>
 
 using namespace simulation;
 
@@ -20,10 +21,9 @@ void* Mars::startMarsFunc(void* a)
     
     Mars *mars = static_cast<simulation::Mars *>(a);
     mars->simulatorInterface = SimulatorInterface::getInstance();
-    
-    mars->initDone = true;
+   
+    // should be don after runSimulation
     mars->simulatorInterface->runSimulation(argc, argv);
-    
     return 0;
 }
 
@@ -36,9 +36,17 @@ void* Mars::startMarsFunc(void* a)
 
 bool Mars::configureHook()
 {
+     ControlCenter* controlCenter = simulatorInterface->getControlCenter();
+     if(!controlCenter->arg_no_gui)
+     {
+	 // wait until graphics has been initialized
+    	 while(!controlCenter->graphics)
+  	       usleep(10000);
+     }
 
-     while(!initDone)
-  	usleep(10000);
+    while(!controlCenter->nodes)
+  	      usleep(10000);
+
 /*
      ControlCenter* controlCenter = simulatorInterface->getControlCenter();
      PluginInterface* plugin = new RimresEnv(controlCenter);

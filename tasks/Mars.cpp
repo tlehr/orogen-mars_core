@@ -1,6 +1,8 @@
 #include "Mars.hpp"
 #include <mars/ControlCenter.h>
 
+#include <mars/multisim-plugin/MultiSimPlugin.h>
+
 using namespace simulation;
 
 
@@ -47,6 +49,21 @@ bool Mars::configureHook()
     while(!controlCenter->nodes)
   	      usleep(10000);
 
+    bool isDistributedSimulation = _distributed_simulation.get();
+
+    if(isDistributedSimulation)
+    {
+     ControlCenter* controlCenter = simulatorInterface->getControlCenter();
+     PluginInterface* plugin = new MultiSimPlugin(controlCenter);
+
+     pluginStruct pstruct;
+     pstruct.name = "MultiSimPlugin";
+     pstruct.p_interface = plugin;
+     pstruct.p_destroy = NULL;
+     
+     simulatorInterface->addPlugin(pstruct);
+
+    }
 /*
      ControlCenter* controlCenter = simulatorInterface->getControlCenter();
      PluginInterface* plugin = new RimresEnv(controlCenter);

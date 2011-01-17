@@ -1,6 +1,7 @@
 name 'simulation'
 
 using_library "mars"
+using_library "multisim-plugin"
 
 task_context "Mars" do
 	needs_configuration
@@ -10,6 +11,9 @@ task_context "Mars" do
  
         property('plugin_dir', '/std/string').
             doc("the full path to the plugin directory")
+
+	property('distributed_simulation', 'bool').
+	    doc("switch to active the distributed simulation if needed")
 
         # Add a task context
         # operation('addPlugin').

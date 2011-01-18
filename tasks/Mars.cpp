@@ -2,34 +2,28 @@
 #include <mars/ControlCenter.h>
 
 #include <mars/multisim-plugin/MultiSimPlugin.h>
+#include <mars/utils/pathes.h>
 
 using namespace simulation;
 
 
 Mars::Mars(std::string const& name)
-    : MarsBase(name), initDone(false)
+    : MarsBase(name), initDone(false), simulatorInterface(0)
 {
-    int ret = pthread_create(&thread_info, NULL, startMarsFunc, this); 
-    if(ret)
-	throw std::runtime_error("Failed to create MARS thread");
-
 }
-
 
 void* Mars::startMarsFunc(void* a)
 {
-    int argc = 0;
-    char **argv = 0; 
-    
-    Mars *mars = static_cast<simulation::Mars *>(a);
-    mars->simulatorInterface = SimulatorInterface::getInstance();
-   
-    // should be don after runSimulation
-    mars->simulatorInterface->runSimulation(argc, argv);
-    return 0;
+	int argc = 0;
+	char **argv = 0; 
+
+	Mars *mars = static_cast<simulation::Mars *>(a);
+	mars->simulatorInterface = SimulatorInterface::getInstance();
+
+	// should be don after runSimulation
+	mars->simulatorInterface->runSimulation(argc, argv);
+	return 0;
 }
-
-
 
 
 /// The following lines are template definitions for the various state machine
@@ -38,52 +32,119 @@ void* Mars::startMarsFunc(void* a)
 
 bool Mars::configureHook()
 {
-     ControlCenter* controlCenter = simulatorInterface->getControlCenter();
-     if(!controlCenter->arg_no_gui)
-     {
-	 // wait until graphics has been initialized
-    	 while(!controlCenter->graphics)
-  	       usleep(10000);
-     }
 
-    while(!controlCenter->nodes)
-  	      usleep(10000);
+	/*
+	 Configure the resource directories required by mars
+	 The resource dir servers as root and fallback to the
+	 default locations
+	 When a property is given, that path is used without
+	 any additional checks
 
-    bool isDistributedSimulation = _distributed_simulation.get();
+	 Prepare paths before starting Mars, otherwise they
+	 will not be set properly
+	*/
 
-    if(isDistributedSimulation)
-    {
-     ControlCenter* controlCenter = simulatorInterface->getControlCenter();
-     PluginInterface* plugin = new MultiSimPlugin(controlCenter);
+	std::string resource_dir = _resource_dir.get();
+	std::string stuff_path = _stuff_path.get();
+	std::string gui_path = _gui_path.get();
+	std::string tmp_path = _tmp_path.get();
+	std::string save_path = _save_path.get();
+	std::string plugin_path = _plugin_path.get();
+	std::string debug_path = _debug_path.get();
 
-     pluginStruct pstruct;
-     pstruct.name = "MultiSimPlugin";
-     pstruct.p_interface = plugin;
-     pstruct.p_destroy = NULL;
-     
-     simulatorInterface->addPlugin(pstruct);
+	if(resource_dir == "")
+		throw new  std::runtime_error("Resource directory is not set");	 
+	else if ( resource_dir.find_last_of("/") == resource_dir.size() -1 )
+	{
+		// do nothing / is last character
+	} else
+	{
+		// append folder separator ( not portable, yes)
+		resource_dir += "/";
+	}
 
-    }
-/*
-     ControlCenter* controlCenter = simulatorInterface->getControlCenter();
-     PluginInterface* plugin = new RimresEnv(controlCenter);
 
-     pluginStruct pstruct;
-     pstruct.name = "RimresPlugin";
-     pstruct.p_interface = plugin;
-     pstruct.p_destroy = NULL;
+	if(stuff_path == "")
+		stuff_path = resource_dir;
 
-     
-     simulatorInterface->addPlugin(pstruct);
-*/
-     return true;
+	if(gui_path == "")
+		gui_path = resource_dir;
 
+	if(tmp_path == "")
+		tmp_path = resource_dir + "tmp/";
+
+	if(save_path == "")
+		save_path = resource_dir + "save/";
+
+	if(plugin_path == "")
+		plugin_path = resource_dir + "plugins/";
+
+	if(debug_path == "")
+		debug_path = resource_dir + "debug/";
+
+	Pathes::setStuffPath(stuff_path);
+	Pathes::setGuiPath(gui_path);
+	Pathes::setTmpPath(tmp_path);
+	Pathes::setSavePath(save_path);
+	Pathes::setPluginPath(plugin_path);
+	Pathes::setDebugPath(debug_path);
+
+
+	// Startup of simulation after pathes have been read and configured
+	int ret = pthread_create(&thread_info, NULL, startMarsFunc, this); 
+	if(ret)
+		throw std::runtime_error("Failed to create MARS thread");
+
+	
+	ControlCenter* controlCenter = 0;
+	// Using pointer initialization to make sure
+	// the simulation has been started before trying to 
+	// access it
+	while(!controlCenter)
+	{
+		if(simulatorInterface)
+			controlCenter = simulatorInterface->getControlCenter();
+	}
+
+	// Dealing with couple of more time issues 
+	if(!controlCenter->arg_no_gui)
+	{
+		// wait until graphics has been initialized
+		while(!controlCenter->graphics)
+			usleep(10000);
+	}
+
+	while(!controlCenter->nodes)
+	      usleep(10000);
+
+	// Simulation is now up and running and plugins can be added
+
+
+	// Configure basic functionality of simulation
+	// Check if distributed simulation should be activated
+	bool isDistributedSimulation = _distributed_simulation.get();
+
+	if(isDistributedSimulation)
+	{
+		ControlCenter* controlCenter = simulatorInterface->getControlCenter();
+		PluginInterface* plugin = new MultiSimPlugin(controlCenter);
+
+		pluginStruct pstruct;
+		pstruct.name = "MultiSimPlugin";
+		pstruct.p_interface = plugin;
+		pstruct.p_destroy = NULL;
+
+		simulatorInterface->addPlugin(pstruct);
+
+	}
+
+	return true;
 }
 
 
 bool Mars::startHook()
 {
-    return true;
+	return true;
 }
 
 void Mars::updateHook()

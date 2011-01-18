@@ -5,6 +5,19 @@
 #include <mars/SimulatorInterface.h>
 
 namespace simulation {
+
+    /**
+    * Core module that brings up the mars simulation and
+    * makes it accessible as a orogen module
+    *
+    * use subclassing to derive robot specific modules, e.g.
+    * 
+    * task_context 'RobotSimulation' do
+    *         subclasses 'simulation::Mars'
+    * ..
+    * end
+    *
+    */
     class Mars : public MarsBase
     {
 	friend class MarsBase;

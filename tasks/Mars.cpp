@@ -8,16 +8,29 @@ using namespace simulation;
 
 
 Mars::Mars(std::string const& name)
-    : MarsBase(name), initDone(false), simulatorInterface(0)
+    : MarsBase(name), simulatorInterface(0), enableGui(false) 
 {
 }
 
-void* Mars::startMarsFunc(void* a)
+void* Mars::startMarsFunc(void* argument)
 {
 	int argc = 0;
 	char **argv = 0; 
 
-	Mars *mars = static_cast<simulation::Mars *>(a);
+	MarsArguments* marsArguments = static_cast<MarsArguments*>(argument);
+
+	// Using the 'command-line' interface to pass
+	// arguments use --nogui, i.e. -n from Mars interface
+	if(!marsArguments->enable_gui)
+	{
+		argc = 2;
+		argv = (char**) calloc(argc,sizeof(char**));
+		argv[0] = "mars_core";
+		argv[1] = "-n";
+	}
+
+
+	Mars *mars = marsArguments->mars; 
 	mars->simulatorInterface = SimulatorInterface::getInstance();
 
 	// should be don after runSimulation
@@ -89,9 +102,14 @@ bool Mars::configureHook()
 	Pathes::setPluginPath(plugin_path);
 	Pathes::setDebugPath(debug_path);
 
+	enableGui = _enable_gui.get();
 
 	// Startup of simulation after pathes have been read and configured
-	int ret = pthread_create(&thread_info, NULL, startMarsFunc, this); 
+	MarsArguments argument;
+	argument.mars = this;
+	argument.enable_gui = enableGui;
+
+	int ret = pthread_create(&thread_info, NULL, startMarsFunc, &argument);
 	if(ret)
 		throw std::runtime_error("Failed to create MARS thread");
 
@@ -144,6 +162,10 @@ bool Mars::configureHook()
 
 bool Mars::startHook()
 {
+	// start simulation automatically, when gui is not available
+	if(!enableGui)
+		simulatorInterface->startStopTrigger();
+
 	return true;
 }
 
@@ -161,5 +183,6 @@ void Mars::stopHook()
 
 void Mars::cleanupHook()
 {
+	exit(0);
 }
 

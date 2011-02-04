@@ -39,6 +39,9 @@ task_context "Mars" do
 	property('distributed_simulation', 'bool').
 	    doc('switch to active the distributed simulation if needed')
 
+	property('enable_gui', 'bool').
+	    doc('start the simulation graphical interface with this module')
+
         # Add a task context
         # operation('addPlugin').
         #       returns('int').

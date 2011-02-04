@@ -6,6 +6,15 @@
 
 namespace simulation {
 
+    class Mars;
+
+    // Argument to pass to startMarsFunc 
+    struct MarsArguments
+    {
+	    Mars* mars;
+	    bool enable_gui;
+    };
+
     /**
     * Core module that brings up the mars simulation and
     * makes it accessible as a orogen module
@@ -25,7 +34,8 @@ namespace simulation {
 
 	SimulatorInterface *simulatorInterface;
 	static void *startMarsFunc(void *);
-        bool initDone;
+        bool enableGui;
+
 
 	pthread_t thread_info; 
 

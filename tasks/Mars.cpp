@@ -125,7 +125,7 @@ bool Mars::configureHook()
 	}
 
 	// Dealing with couple of more time issues 
-	if(!controlCenter->arg_no_gui)
+	if(enableGui)
 	{
 		// wait until graphics has been initialized
 		while(!controlCenter->graphics)
@@ -163,8 +163,8 @@ bool Mars::configureHook()
 bool Mars::startHook()
 {
 	// start simulation automatically, when gui is not available
-	if(!enableGui)
-		simulatorInterface->startStopTrigger();
+//	if(!simulatorInterfaceenableGui)
+//               simulatorInterface->startStopTrigger();
 
 	return true;
 }

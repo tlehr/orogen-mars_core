@@ -14,6 +14,9 @@ using_library "multisim-plugin"
 
 task_context "Mars" do
 	needs_configuration
+	
+	property('config_dir','/std/string').
+	    doc('the full path to the main configuration folder')
 
 	property('resource_dir','/std/string').
 	    doc('the full path to the main resource directory, will be used as base for any defaults for other *_path')

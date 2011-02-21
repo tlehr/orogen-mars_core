@@ -6,10 +6,13 @@
 
 using namespace simulation;
 
+std::string Mars::configDir;
+bool Mars::marsRunning;
 
 Mars::Mars(std::string const& name)
     : MarsBase(name), simulatorInterface(0), enableGui(false) 
 {
+	Mars::marsRunning=false;
 }
 
 void* Mars::startMarsFunc(void* argument)
@@ -18,23 +21,28 @@ void* Mars::startMarsFunc(void* argument)
 	char **argv = 0; 
 
 	MarsArguments* marsArguments = static_cast<MarsArguments*>(argument);
-
+	char c_[Mars::configDir.length()+2];
+	strcpy(c_,Mars::configDir.c_str());
 	// Using the 'command-line' interface to pass
 	// arguments use --nogui, i.e. -n from Mars interface
 	if(!marsArguments->enable_gui)
 	{
-		argc = 2;
+		argc = 4;
 		argv = (char**) calloc(argc,sizeof(char**));
 		argv[0] = "mars_core";
 		argv[1] = "-n";
+		argv[2] = "-C";
+		argv[3] = c_;
+
 	}
 
 
 	Mars *mars = marsArguments->mars; 
 	mars->simulatorInterface = SimulatorInterface::getInstance();
-
+	Mars::marsRunning=true;
 	// should be don after runSimulation
 	mars->simulatorInterface->runSimulation(argc, argv);
+	Mars::marsRunning=false;
 	return 0;
 }
 
@@ -102,6 +110,9 @@ bool Mars::configureHook()
 	Pathes::setPluginPath(plugin_path);
 	Pathes::setDebugPath(debug_path);
 
+	
+	Mars::configDir = _config_dir.value();
+
 	enableGui = _enable_gui.get();
 
 	// Startup of simulation after pathes have been read and configured
@@ -113,7 +124,11 @@ bool Mars::configureHook()
 	if(ret)
 		throw std::runtime_error("Failed to create MARS thread");
 
-	
+	sleep(1);
+	while(!marsRunning){
+		printf("Mars is not completly started, we have to wait\n");
+		sleep(1);
+	}
 	ControlCenter* controlCenter = 0;
 	// Using pointer initialization to make sure
 	// the simulation has been started before trying to 

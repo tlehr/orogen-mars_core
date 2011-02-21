@@ -34,7 +34,9 @@ namespace simulation {
 
 	SimulatorInterface *simulatorInterface;
 	static void *startMarsFunc(void *);
-        bool enableGui;
+        static std::string configDir;
+	static bool marsRunning;
+	bool enableGui;
 
 
 	pthread_t thread_info; 

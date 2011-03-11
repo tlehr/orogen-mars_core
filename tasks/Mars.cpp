@@ -34,6 +34,12 @@ void* Mars::startMarsFunc(void* argument)
 		argv[2] = "-C";
 		argv[3] = c_;
 
+	}else{
+		argc = 3;
+		argv = (char**) calloc(argc,sizeof(char**));
+		argv[0] = "mars_core";
+		argv[1] = "-C";
+		argv[2] = c_;
 	}
 
 

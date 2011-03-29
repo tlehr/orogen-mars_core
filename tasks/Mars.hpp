@@ -15,6 +15,7 @@ namespace simulation {
 	    bool enable_gui;
     };
 
+
     /**
     * Core module that brings up the mars simulation and
     * makes it accessible as a orogen module

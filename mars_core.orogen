@@ -3,6 +3,8 @@ name 'simulation'
 using_library "mars"
 using_library "multisim-plugin"
 
+import_types_from "tasks/MarsControl.hpp"
+
 
 # Core orogen module that brings up the mars simulation and
 # makes it accessible as a orogen module
@@ -51,6 +53,8 @@ task_context "Mars" do
         #       argument('taskcontext', '/
         # method addPlugin(input: TaskContext ) return bool
         # method removePlugin(input: TaskContext) return bool
+
+        input_port('control_action', '/simulation/Control')
 end
 
 deployment "simulation" do

@@ -3,6 +3,7 @@
 
 #include <mars/multisim-plugin/MultiSimPlugin.h>
 #include <mars/utils/pathes.h>
+#include <simulation/tasks/MarsControl.hpp>
 
 using namespace simulation;
 
@@ -46,7 +47,7 @@ void* Mars::startMarsFunc(void* argument)
 	Mars *mars = marsArguments->mars; 
 	mars->simulatorInterface = SimulatorInterface::getInstance();
 	Mars::marsRunning=true;
-	// should be don after runSimulation
+	// should be done after runSimulation
 	mars->simulatorInterface->runSimulation(argc, argv);
 	Mars::marsRunning=false;
 	return 0;
@@ -145,7 +146,7 @@ bool Mars::configureHook()
 			controlCenter = simulatorInterface->getControlCenter();
 	}
 
-	// Dealing with couple of more time issues 
+	// Dealing with couple of more timing issues 
 	if(enableGui)
 	{
 		// wait until graphics has been initialized
@@ -183,15 +184,38 @@ bool Mars::configureHook()
 
 bool Mars::startHook()
 {
-	// start simulation automatically, when gui is not available
-//	if(!simulatorInterfaceenableGui)
-//               simulatorInterface->startStopTrigger();
-
+        // Simulation should be either started manually, 
+        // or by using the control_action input_port
 	return true;
 }
 
 void Mars::updateHook()
 {
+    simulation::Control controlAction;
+    if(_control_action.read(controlAction) == RTT::NewData)
+    {
+        switch(controlAction)
+        {
+            case START:
+                if(!simulatorInterface->isRunning())
+                    simulatorInterface->startStopTrigger();
+                break;
+            case PAUSE:
+                if(simulatorInterface->isRunning())
+                    simulatorInterface->startStopTrigger();
+                break;
+            case RESET:
+                simulatorInterface->spotReload();
+                break;
+            case STEP:
+                simulatorInterface->singleStep();
+                break;
+            default:
+                fprintf(stderr, "Simulation: Unknown control action %d received\n", controlAction);
+
+        }
+
+    }
 }
 
 void Mars::errorHook()

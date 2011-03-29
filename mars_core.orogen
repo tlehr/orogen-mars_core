@@ -47,6 +47,12 @@ task_context "Mars" do
 	property('enable_gui', 'bool').
 	    doc('start the simulation graphical interface with this module')
 
+        property('controller_port', 'int').
+            doc('set the controller port, e.g. 1600 for communication with monster')
+
+        property('raw_options', '/std/vector<simulation::Option>').
+            doc('forward the original mars arguments, such as -c 1600 for setting the ode port - option consists of name, here: -c and parameter: here 1600')
+
         # Add a task context
         # operation('addPlugin').
         #       returns('int').

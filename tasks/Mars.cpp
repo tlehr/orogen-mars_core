@@ -3,7 +3,6 @@
 
 #include <mars/multisim-plugin/MultiSimPlugin.h>
 #include <mars/utils/pathes.h>
-#include <simulation/tasks/MarsControl.hpp>
 
 using namespace simulation;
 
@@ -18,39 +17,102 @@ Mars::Mars(std::string const& name)
 
 void* Mars::startMarsFunc(void* argument)
 {
-	int argc = 0;
-	char **argv = 0; 
-
 	MarsArguments* marsArguments = static_cast<MarsArguments*>(argument);
 	char c_[Mars::configDir.length()+2];
 	strcpy(c_,Mars::configDir.c_str());
+
 	// Using the 'command-line' interface to pass
 	// arguments use --nogui, i.e. -n from Mars interface
+        // set the option to "" if it does not require further args
+        std::vector<Option> rawOptions = marsArguments->raw_options;
+
+        // Default arguments
+        if(!Mars::configDir.empty())
+        {
+            Option option("-C", std::string(c_));
+            rawOptions.push_back(option);
+        }
+
+        // Optional arguments
 	if(!marsArguments->enable_gui)
 	{
-		argc = 4;
-		argv = (char**) calloc(argc,sizeof(char**));
-		argv[0] = "mars_core";
-		argv[1] = "-n";
-		argv[2] = "-C";
-		argv[3] = c_;
-
-	}else{
-		argc = 3;
-		argv = (char**) calloc(argc,sizeof(char**));
-		argv[0] = "mars_core";
-		argv[1] = "-C";
-		argv[2] = c_;
+            Option noGuiOption("-n","");
+            rawOptions.push_back(noGuiOption);
 	}
-
+       
+        if(marsArguments->controller_port > 0)
+        {
+            char buffer[10];
+            sprintf(buffer, "%d", marsArguments->controller_port);
+            Option controllerPortOption("-c", std::string(buffer));
+            rawOptions.push_back(controllerPortOption);
+        }
 
 	Mars *mars = marsArguments->mars; 
 	mars->simulatorInterface = SimulatorInterface::getInstance();
 	Mars::marsRunning=true;
+
+        char** argv = mars->setOptions(rawOptions);
+        int count = mars->getOptionCount(rawOptions);
+        fprintf(stderr, "Simulator: arguments: \n");
+        // Plus one for executable name
+        for(int i = 0; i < count + 1; i++)
+        {
+            fprintf(stderr, "%s ", argv[i]);
+        }
+        fprintf(stderr, "\n");
+
+	mars->simulatorInterface->runSimulation(count + 1, argv);
+
 	// should be done after runSimulation
-	mars->simulatorInterface->runSimulation(argc, argv);
 	Mars::marsRunning=false;
 	return 0;
+}
+
+int Mars::getOptionCount(const std::vector<Option>& options)
+{
+        std::vector<Option>::const_iterator it;
+
+        // First just counting the number of arguments
+        int count = 0;
+        for(it = options.begin(); it != options.end(); it++)
+        {
+            Option option = *it;
+            // Differentiate between option with args and without
+            if(option.parameter != "")
+                count += 2;
+            else
+                count += 1;
+        }
+
+        return count;
+}
+
+char** Mars::setOptions(const std::vector<Option>& options)
+{
+        int count = getOptionCount(options)+ 1;
+	char** argv = (char **) calloc(count, sizeof(char**));
+
+        // Set executable name to mars_core
+        count = 0;
+	argv[count++] = "mars_core";
+
+        std::vector<Option>::const_iterator it;
+        for(it = options.begin(); it != options.end(); it++)
+        {
+            Option opt = *it;
+
+            if(opt.name == "")
+                continue;
+
+            argv[count++] = strdup(opt.name.c_str());
+            if(opt.parameter != "")
+            {
+                argv[count++] = strdup(opt.parameter.c_str());
+            }
+        }
+
+        return argv;
 }
 
 
@@ -126,6 +188,8 @@ bool Mars::configureHook()
 	MarsArguments argument;
 	argument.mars = this;
 	argument.enable_gui = enableGui;
+        argument.controller_port = _controller_port.get();
+        argument.raw_options = _raw_options.get();
 
 	int ret = pthread_create(&thread_info, NULL, startMarsFunc, &argument);
 	if(ret)

@@ -3,6 +3,8 @@
 
 #include "simulation/MarsBase.hpp"
 #include <mars/SimulatorInterface.h>
+#include <vector>
+#include <simulation/tasks/MarsControl.hpp>
 
 namespace simulation {
 
@@ -13,6 +15,11 @@ namespace simulation {
     {
 	    Mars* mars;
 	    bool enable_gui;
+            int controller_port;
+
+            // Raw command line option can be passed to mars
+            // using this option vector
+            std::vector<Option> raw_options;
     };
 
 
@@ -39,11 +46,14 @@ namespace simulation {
 	static bool marsRunning;
 	bool enableGui;
 
-
 	pthread_t thread_info; 
 
         // for testing only
         PluginInterface* plugin;
+
+        int getOptionCount(const std::vector<Option>& options);
+
+        char** setOptions(const std::vector<Option>& options);
 
     public:
         Mars(std::string const& name = "simulation::Mars");

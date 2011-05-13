@@ -57,6 +57,9 @@ namespace simulation {
 
     public:
         Mars(std::string const& name = "simulation::Mars");
+        Mars(std::string const& name, RTT::ExecutionEngine* engine);
+
+	~Mars();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the

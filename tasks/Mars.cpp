@@ -15,6 +15,16 @@ Mars::Mars(std::string const& name)
 	Mars::marsRunning=false;
 }
 
+Mars::Mars(std::string const& name, RTT::ExecutionEngine* engine)
+    : MarsBase(name, engine), simulatorInterface(0), enableGui(false) 
+{
+	Mars::marsRunning=false;
+}
+
+Mars::~Mars()
+{
+}
+
 void* Mars::startMarsFunc(void* argument)
 {
 	MarsArguments* marsArguments = static_cast<MarsArguments*>(argument);

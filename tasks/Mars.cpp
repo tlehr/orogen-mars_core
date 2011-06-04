@@ -153,7 +153,7 @@ bool Mars::configureHook()
 	std::string debug_path = _debug_path.get();
 
 	if(resource_dir == "")
-		throw new  std::runtime_error("Resource directory is not set");	 
+		throw std::runtime_error("Resource directory is not set");	 
 	else if ( resource_dir.find_last_of("/") == resource_dir.size() -1 )
 	{
 		// do nothing / is last character

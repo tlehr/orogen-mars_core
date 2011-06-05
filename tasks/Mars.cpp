@@ -6,19 +6,14 @@
 
 using namespace simulation;
 
-std::string Mars::configDir;
-bool Mars::marsRunning;
-
 Mars::Mars(std::string const& name)
-    : MarsBase(name), simulatorInterface(0), enableGui(false) 
+    : MarsBase(name), simulatorInterface(0) 
 {
-	Mars::marsRunning=false;
 }
 
 Mars::Mars(std::string const& name, RTT::ExecutionEngine* engine)
-    : MarsBase(name, engine), simulatorInterface(0), enableGui(false) 
+    : MarsBase(name, engine), simulatorInterface(0)
 {
-	Mars::marsRunning=false;
 }
 
 Mars::~Mars()
@@ -28,20 +23,11 @@ Mars::~Mars()
 void* Mars::startMarsFunc(void* argument)
 {
 	MarsArguments* marsArguments = static_cast<MarsArguments*>(argument);
-	char c_[Mars::configDir.length()+2];
-	strcpy(c_,Mars::configDir.c_str());
 
 	// Using the 'command-line' interface to pass
 	// arguments use --nogui, i.e. -n from Mars interface
         // set the option to "" if it does not require further args
         std::vector<Option> rawOptions = marsArguments->raw_options;
-
-        // Default arguments
-        if(!Mars::configDir.empty())
-        {
-            Option option("-C", std::string(c_));
-            rawOptions.push_back(option);
-        }
 
         // Optional arguments
 	if(!marsArguments->enable_gui)
@@ -60,7 +46,6 @@ void* Mars::startMarsFunc(void* argument)
 
 	Mars *mars = marsArguments->mars; 
 	mars->simulatorInterface = SimulatorInterface::getInstance();
-	Mars::marsRunning=true;
 
         char** argv = mars->setOptions(rawOptions);
         int count = mars->getOptionCount(rawOptions);
@@ -74,8 +59,6 @@ void* Mars::startMarsFunc(void* argument)
 
 	mars->simulatorInterface->runSimulation(count + 1, argv);
 
-	// should be done after runSimulation
-	Mars::marsRunning=false;
 	return 0;
 }
 
@@ -170,25 +153,17 @@ bool Mars::configureHook()
 
 	// Simulation is now up and running and plugins can be added
 
-
 	// Configure basic functionality of simulation
 	// Check if distributed simulation should be activated
-	bool isDistributedSimulation = _distributed_simulation.get();
-
-	if(isDistributedSimulation)
+	if(_distributed_simulation.get())
 	{
-		ControlCenter* controlCenter = simulatorInterface->getControlCenter();
 		PluginInterface* plugin = new MultiSimPlugin(controlCenter);
-
 		pluginStruct pstruct;
 		pstruct.name = "MultiSimPlugin";
 		pstruct.p_interface = plugin;
 		pstruct.p_destroy = NULL;
-
 		simulatorInterface->addPlugin(pstruct);
-
 	}
-
 	return true;
 }
 
@@ -225,7 +200,6 @@ void Mars::updateHook()
                 fprintf(stderr, "Simulation: Unknown control action %d received\n", controlAction);
 
         }
-
     }
 }
 

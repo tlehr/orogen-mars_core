@@ -44,7 +44,6 @@ namespace simulation {
 	static void *startMarsFunc(void *);
         static std::string configDir;
 	static bool marsRunning;
-	bool enableGui;
 
 	pthread_t thread_info; 
 

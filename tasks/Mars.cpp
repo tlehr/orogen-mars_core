@@ -136,14 +136,8 @@ bool Mars::configureHook()
 	if(ret)
 		throw std::runtime_error("Failed to create MARS thread");
 
-	ControlCenter* controlCenter = 0;
-	// Using pointer initialization to make sure
-	// the simulation has been started before trying to 
-	// access it
-        
         //wait until simulator is started
-        //because some one smart has overwritten isRunning we have to cast it to the base class 
-	for(int i=0;!simulatorInterface || !(dynamic_cast<QThread*>(simulatorInterface)->isRunning());++i)
+	for(int i=0;!simulatorInterface || !dynamic_cast<QThread*>(simulatorInterface)->isRunning();++i)
         {
                 //give up after 10 sec
                 if(i > 1000)
@@ -152,12 +146,11 @@ bool Mars::configureHook()
         }
 
 	// Simulation is now up and running and plugins can be added
-
 	// Configure basic functionality of simulation
 	// Check if distributed simulation should be activated
 	if(_distributed_simulation.get())
 	{
-		PluginInterface* plugin = new MultiSimPlugin(controlCenter);
+		PluginInterface* plugin = new MultiSimPlugin(simulatorInterface->getControlCenter());
 		pluginStruct pstruct;
 		pstruct.name = "MultiSimPlugin";
 		pstruct.p_interface = plugin;

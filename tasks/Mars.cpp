@@ -153,31 +153,20 @@ bool Mars::configureHook()
 	if(ret)
 		throw std::runtime_error("Failed to create MARS thread");
 
-	sleep(1);
-	while(!marsRunning){
-		printf("Mars is not completly started, we have to wait\n");
-		sleep(1);
-	}
 	ControlCenter* controlCenter = 0;
 	// Using pointer initialization to make sure
 	// the simulation has been started before trying to 
 	// access it
-	while(!controlCenter)
-	{
-		if(simulatorInterface)
-			controlCenter = simulatorInterface->getControlCenter();
-	}
-
-	// Dealing with couple of more timing issues 
-	if(enableGui)
-	{
-		// wait until graphics has been initialized
-		while(!controlCenter->graphics)
-			usleep(10000);
-	}
-
-	while(!controlCenter->nodes)
-	      usleep(10000);
+        
+        //wait until simulator is started
+        //because some one smart has overwritten isRunning we have to cast it to the base class 
+	for(int i=0;!simulatorInterface || !(dynamic_cast<QThread*>(simulatorInterface)->isRunning());++i)
+        {
+                //give up after 10 sec
+                if(i > 1000)
+                      throw std::runtime_error("Can not start mars thread!");
+		usleep(10000);
+        }
 
 	// Simulation is now up and running and plugins can be added
 

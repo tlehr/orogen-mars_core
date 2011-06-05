@@ -17,30 +17,9 @@ import_types_from "tasks/MarsControl.hpp"
 task_context "Mars" do
 	needs_configuration
 	
-	property('config_dir','/std/string').
+	property('config_dir', '/std/string',"#{ENV['AUTOPROJ_PROJECT_BASE']}/install/configuration/mars-default").
 	    doc('the full path to the main configuration folder')
 
-	property('resource_dir','/std/string').
-	    doc('the full path to the main resource directory, will be used as base for any defaults for other *_path')
-
-	property('stuff_path', '/std/string').
-	    doc('The full path to the stuff directory')
-
-	property('gui_path', '/std/string').
-	    doc('The full path to the gui directory')
-
-	property('tmp_path', '/std/string').
-	    doc('The full path to the tmp directory')
-
-	property('save_path', '/std/string').
-	    doc('The full path to the tmp directory')
-
-	property('plugin_path', '/std/string').
-	    doc('The full path to the tmp directory')
-
-	property('debug_path', '/std/string').
-	    doc('The full path to the tmp directory')
- 
 	property('distributed_simulation', 'bool').
 	    doc('switch to active the distributed simulation if needed')
 
@@ -64,8 +43,8 @@ task_context "Mars" do
 end
 
 deployment "simulation" do
-	add_default_logger
         sim = task('mars_simulation', 'simulation::Mars')
+	add_default_logger
 end
 
 

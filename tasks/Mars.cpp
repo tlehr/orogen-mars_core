@@ -125,79 +125,27 @@ char** Mars::setOptions(const std::vector<Option>& options)
         return argv;
 }
 
-
-/// The following lines are template definitions for the various state machine
-// hooks defined by Orocos::RTT. See Mars.hpp for more detailed
-// documentation about them.
-
 bool Mars::configureHook()
 {
+	if(_config_dir.get().empty())
+		throw std::runtime_error("Config directory is not set! Can not start mars");	 
 
-	/*
-	 Configure the resource directories required by mars
-	 The resource dir servers as root and fallback to the
-	 default locations
-	 When a property is given, that path is used without
-	 any additional checks
+        //check if the environemnt was sourced more than once and the path has more than one entry
+        int pos = _config_dir.get().rfind(":/");
+        if(pos != _config_dir.get().size()-1)
+            _config_dir.set(_config_dir.get().substr(pos+1));
 
-	 Prepare paths before starting Mars, otherwise they
-	 will not be set properly
-	*/
+        //mars is not setting the config path propper
+        //therfore we have to go into to the config folder
+            
+        
+        if(0 != chdir(_config_dir.get().c_str()))
+		throw std::runtime_error(string("Config directory ") +_config_dir.get() +" does not exist. Can not start mars.");	 
 
-	std::string resource_dir = _resource_dir.get();
-	std::string stuff_path = _stuff_path.get();
-	std::string gui_path = _gui_path.get();
-	std::string tmp_path = _tmp_path.get();
-	std::string save_path = _save_path.get();
-	std::string plugin_path = _plugin_path.get();
-	std::string debug_path = _debug_path.get();
-
-	if(resource_dir == "")
-		throw std::runtime_error("Resource directory is not set");	 
-	else if ( resource_dir.find_last_of("/") == resource_dir.size() -1 )
-	{
-		// do nothing / is last character
-	} else
-	{
-		// append folder separator ( not portable, yes)
-		resource_dir += "/";
-	}
-
-
-	if(stuff_path == "")
-		stuff_path = resource_dir;
-
-	if(gui_path == "")
-		gui_path = resource_dir;
-
-	if(tmp_path == "")
-		tmp_path = resource_dir + "tmp/";
-
-	if(save_path == "")
-		save_path = resource_dir + "save/";
-
-	if(plugin_path == "")
-		plugin_path = resource_dir + "plugins/";
-
-	if(debug_path == "")
-		debug_path = resource_dir + "debug/";
-
-	Pathes::setStuffPath(stuff_path);
-	Pathes::setGuiPath(gui_path);
-	Pathes::setTmpPath(tmp_path);
-	Pathes::setSavePath(save_path);
-	Pathes::setPluginPath(plugin_path);
-	Pathes::setDebugPath(debug_path);
-
-	
-	Mars::configDir = _config_dir.value();
-
-	enableGui = _enable_gui.get();
-
-	// Startup of simulation after pathes have been read and configured
+	// Startup of simulation
 	MarsArguments argument;
 	argument.mars = this;
-	argument.enable_gui = enableGui;
+	argument.enable_gui = _enable_gui.get();
         argument.controller_port = _controller_port.get();
         argument.raw_options = _raw_options.get();
 

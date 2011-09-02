@@ -6,6 +6,10 @@
 #include <vector>
 #include <simulation/tasks/MarsControl.hpp>
 
+namespace lib_manager {
+    class LibManager;
+}
+
 namespace simulation {
 
     class Mars;
@@ -16,6 +20,7 @@ namespace simulation {
 	    Mars* mars;
 	    bool enable_gui;
             int controller_port;
+	    std::string config_dir;
 
             // Raw command line option can be passed to mars
             // using this option vector
@@ -40,12 +45,13 @@ namespace simulation {
 	friend class MarsBase;
     protected:
 
-	SimulatorInterface *simulatorInterface;
-	static void *startMarsFunc(void *);
+	SimulatorInterface* simulatorInterface;
+	static void* startMarsFunc(void *);
         static std::string configDir;
 	static bool marsRunning;
 
 	pthread_t thread_info; 
+	static lib_manager::LibManager* libManager;
 
         // for testing only
         PluginInterface* plugin;

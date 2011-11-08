@@ -216,7 +216,7 @@ bool Mars::configureHook()
     // Check if distributed simulation should be activated
     if(_distributed_simulation.get())
     {
-        PluginInterface* plugin = new MultiSimPlugin(simulatorInterface->getControlCenter());
+        PluginInterface* plugin = new MultiSimPlugin(libManager);
         pluginStruct pstruct;
         pstruct.name = "MultiSimPlugin";
         pstruct.p_interface = plugin;

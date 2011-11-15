@@ -2,7 +2,7 @@
 #define SIMULATION_MARS_TASK_HPP
 
 #include "simulation/MarsBase.hpp"
-#include <mars/SimulatorInterface.h>
+#include <mars_sim/SimulatorInterface.h>
 #include <vector>
 #include <simulation/tasks/MarsControl.hpp>
 

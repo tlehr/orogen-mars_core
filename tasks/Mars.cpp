@@ -1,8 +1,8 @@
 #include "Mars.hpp"
-#include <mars/ControlCenter.h>
+#include <mars_sim/ControlCenter.h>
+#include <gui_core/GuiInterface.h>
 
 #include <mars/multisim-plugin/MultiSimPlugin.h>
-#include <mars/utils/pathes.h>
 
 #include <lib_manager/LibManager.h>
 #include <QApplication>
@@ -77,9 +77,6 @@ void* Mars::startMarsFunc(void* argument)
         RTT::log(RTT::Error) << "Current locale conflicts with mars" << RTT::endlog();
         exit(0);
     }
-
-    Pathes::loadPathes(marsArguments->config_dir);
-    app->setWindowIcon(QIcon(QString::fromStdString(Pathes::getGuiPath()) + "images/mars_icon.ico"));
 
     // Prepare the LibManager and required configuration files
     libManager = new lib_manager::LibManager();
@@ -242,11 +239,11 @@ void Mars::updateHook()
         switch(controlAction)
         {
             case START:
-                if(!simulatorInterface->isRunning())
+                if(!simulatorInterface->isSimRunning())
                     simulatorInterface->startStopTrigger();
                 break;
             case PAUSE:
-                if(simulatorInterface->isRunning())
+                if(simulatorInterface->isSimRunning())
                     simulatorInterface->startStopTrigger();
                 break;
             case RESET:
@@ -273,7 +270,7 @@ void Mars::stopHook()
 void Mars::cleanupHook()
 {
     simulatorInterface->exitMars();
-    while( simulatorInterface->isRunning()) ;
+    while( simulatorInterface->isSimRunning()) ;
 
     delete libManager;
 }

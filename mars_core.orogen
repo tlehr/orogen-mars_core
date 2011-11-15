@@ -1,6 +1,6 @@
 name 'simulation'
 
-using_library "mars"
+using_library "mars_sim"
 using_library "gui_core"
 using_library "lib_manager"
 using_library "multisim-plugin"

@@ -10,6 +10,7 @@ The mars-core module provides the base for other modules that require the simula
   <depend package="rtt" />
   <depend package="tools/logger" />
   <depend package="simulation/mars_sim" />
+  <depend package="simulation/mars_app" />
   <depend package="simulation/gui_core" />
   <depend package="simulation/mars-plugins/multisim_plugin" />
   <versioncontrol type="git" url="" />

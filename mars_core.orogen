@@ -1,6 +1,8 @@
 name 'simulation'
 
 using_library "mars_sim"
+using_library "mars_gui"
+using_library "mars_app"
 using_library "gui_core"
 using_library "lib_manager"
 using_library "multisim-plugin"
@@ -21,7 +23,7 @@ import_types_from "tasks/MarsControl.hpp"
 task_context "Mars" do
 	needs_configuration
 	
-	property('config_dir', '/std/string',"#{ENV['AUTOPROJ_PROJECT_BASE']}/install/configuration/mars-default").
+	property('config_dir', '/std/string',"#{ENV['AUTOPROJ_PROJECT_BASE']}/install/configuration/mars_default").
 	    doc('the full path to the main configuration folder')
 
 	property('distributed_simulation', 'bool').

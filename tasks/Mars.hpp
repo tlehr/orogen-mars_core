@@ -21,6 +21,7 @@ namespace simulation {
 	    bool enable_gui;
             int controller_port;
 	    std::string config_dir;
+            bool initialized;
 
             // Raw command line option can be passed to mars
             // using this option vector

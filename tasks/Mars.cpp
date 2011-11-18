@@ -21,12 +21,14 @@ lib_manager::LibManager* Mars::libManager = 0;
 Mars::Mars(std::string const& name)
     : MarsBase(name)
     , simulatorInterface(0) 
+    , multisimPlugin(0)
 {
 }
 
 Mars::Mars(std::string const& name, RTT::ExecutionEngine* engine)
     : MarsBase(name, engine)
     , simulatorInterface(0)
+    , multisimPlugin(0)
 {
 }
 
@@ -285,12 +287,7 @@ bool Mars::configureHook()
     // Check if distributed simulation should be activated
     if(_distributed_simulation.get())
     {
-        PluginInterface* plugin = new MultiSimPlugin(libManager);
-        pluginStruct pstruct;
-        pstruct.name = "MultiSimPlugin";
-        pstruct.p_interface = plugin;
-        pstruct.p_destroy = NULL;
-        simulatorInterface->addPlugin(pstruct);
+        multisimPlugin = new MultiSimPlugin(libManager);
     }
     return true;
 }
@@ -350,5 +347,6 @@ void Mars::cleanupHook()
     libManager->unloadLibrary("gui_core");
 
     delete libManager;
+    delete multisimPlugin;
 }
 

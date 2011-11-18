@@ -54,8 +54,7 @@ namespace simulation {
 	pthread_t thread_info; 
 	static lib_manager::LibManager* libManager;
 
-        // for testing only
-        PluginInterface* plugin;
+        PluginInterface* multisimPlugin;
 
         int getOptionCount(const std::vector<Option>& options);
 

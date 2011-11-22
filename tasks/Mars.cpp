@@ -141,7 +141,6 @@ void* Mars::startMarsFunc(void* argument)
 
         mars->simulatorInterface->runSimulation();
 
-
         GraphicsManager* marsGraphics = NULL;
         lib = libManager->getLibrary("mars_graphics");
         if(lib) 
@@ -308,21 +307,25 @@ void Mars::updateHook()
         switch(controlAction)
         {
             case START:
+                RTT::log(RTT::Info) << "ControlAction: Start received" << RTT::endlog();
                 if(!simulatorInterface->isSimRunning())
                     simulatorInterface->startStopTrigger();
                 break;
             case PAUSE:
+                RTT::log(RTT::Info) << "ControlAction: Pause received" << RTT::endlog();
                 if(simulatorInterface->isSimRunning())
                     simulatorInterface->startStopTrigger();
                 break;
             case RESET:
+                RTT::log(RTT::Info) << "ControlAction: Reset received" << RTT::endlog();
                 simulatorInterface->spotReload();
                 break;
             case STEP:
+                RTT::log(RTT::Info) << "ControlAction: Step received" << RTT::endlog();
                 simulatorInterface->singleStep();
                 break;
             default:
-                fprintf(stderr, "Simulation: Unknown control action %d received\n", controlAction);
+                RTT::log(RTT::Warning) << "Simulation: Unknown control action " << controlAction << " received" << RTT::endlog();
 
         }
     }

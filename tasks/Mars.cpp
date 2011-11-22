@@ -286,7 +286,9 @@ bool Mars::configureHook()
     // Check if distributed simulation should be activated
     if(_distributed_simulation.get())
     {
+        RTT::log(RTT::Info) << "Loading MultiSimPlugin" << RTT::endlog();
         multisimPlugin = new MultiSimPlugin(libManager);
+        RTT::log(RTT::Info) << "MultiSimPlugin loaded" << RTT::endlog();
     }
     return true;
 }

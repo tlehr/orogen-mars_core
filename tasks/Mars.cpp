@@ -81,7 +81,18 @@ void* Mars::startMarsFunc(void* argument)
 
     // Prepare the LibManager and required configuration files
     libManager = new lib_manager::LibManager();
-    std::string corelibsConfigPath = marsArguments->config_dir + "/core_libs.txt";
+    std::string corelibsConfigPath;
+
+    // If the graphical interface should be disabled, the configuration 
+    // needs to exclude the shared library with graphics options
+    // Thus, the nogui configuration file needs to be used for the startup 
+    if(marsArguments->enable_gui)
+    {
+        corelibsConfigPath = marsArguments->config_dir + "/core_libs.txt";
+    } else {
+        corelibsConfigPath = marsArguments->config_dir + "/core_libs-nogui.txt";
+    }
+
     libManager->loadConfigFile(corelibsConfigPath);
 
     lib_manager::LibInterface* lib = libManager->getLibrary("mars_sim");

@@ -122,6 +122,10 @@ void* Mars::startMarsFunc(void* argument)
 
     RTT::log(RTT::Info) << "Starting mars with: " << cmd << RTT::endlog();
 
+    // GraphicsTimer will be later called with the marsGraphics reference
+    // which can be also NULL for a disabled gui
+    GraphicsManager* marsGraphics = NULL;
+
     // if we have a main gui, show it 
     if(marsArguments->enable_gui)
     {
@@ -139,7 +143,6 @@ void* Mars::startMarsFunc(void* argument)
             exit(4);
         }
 
-
         gui_core::MainGUI* mainGui;
         lib = libManager->getLibrary("gui_core");
         if(lib && (mainGui = dynamic_cast<gui_core::MainGUI*>(lib)) )
@@ -152,7 +155,6 @@ void* Mars::startMarsFunc(void* argument)
 
         mars->simulatorInterface->runSimulation();
 
-        GraphicsManager* marsGraphics = NULL;
         lib = libManager->getLibrary("mars_graphics");
         if(lib) 
         {
@@ -176,15 +178,15 @@ void* Mars::startMarsFunc(void* argument)
 
         mainGui->show();
         
-        // GraphicsTimer allow to update the graphics interface
-        // every 10 ms
-        GraphicsTimer *graphicsTimer = NULL;
-        graphicsTimer = new GraphicsTimer(marsGraphics, mars->simulatorInterface);
-        graphicsTimer->run();
-        
     } else {
         mars->simulatorInterface->runSimulation();
     }
+
+    // GraphicsTimer allows to update the graphics interface 
+    // every 10 ms
+    GraphicsTimer *graphicsTimer = NULL;
+    graphicsTimer = new GraphicsTimer(marsGraphics, mars->simulatorInterface);
+    graphicsTimer->run();
 
     // Synchronize with configureHook
     marsArguments->initialized = true;

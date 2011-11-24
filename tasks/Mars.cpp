@@ -173,14 +173,15 @@ void* Mars::startMarsFunc(void* argument)
             }
         }
 
-        std::string addonsConfigPath = marsArguments->config_dir + "/other_libs.txt";
-        libManager->loadConfigFile(addonsConfigPath);
-
         mainGui->show();
         
     } else {
         mars->simulatorInterface->runSimulation();
     }
+
+    // Loading libraries that are specified in other_libs.txt
+    std::string addonsConfigPath = marsArguments->config_dir + "/other_libs.txt";
+    libManager->loadConfigFile(addonsConfigPath);
 
     // GraphicsTimer allows to update the graphics interface 
     // every 10 ms

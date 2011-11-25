@@ -81,8 +81,8 @@ void* Mars::startMarsFunc(void* argument)
 
     // Prepare the LibManager and required configuration files
     libManager = new lib_manager::LibManager();
-    std::string corelibsConfigPath;
 
+    std::string corelibsConfigPath;
     // If the graphical interface should be disabled, the configuration 
     // needs to exclude the shared library with graphics options
     // Thus, the nogui configuration file needs to be used for the startup 
@@ -95,7 +95,65 @@ void* Mars::startMarsFunc(void* argument)
 
     libManager->loadConfigFile(corelibsConfigPath);
 
-    lib_manager::LibInterface* lib = libManager->getLibrary("mars_sim");
+    // Setting the configuration directory and loading the preferences
+    lib_manager::LibInterface* lib = libManager->getLibrary(std::string("cfg_dfki"));
+    if(lib)
+    {
+ 	cfg_dfki::CFGInterface* cfg = 0;
+        if(cfg = dynamic_cast<cfg_dfki::CFGInterface*>(lib))
+        {
+
+            cfg_dfki::cfgPropertyStruct configPath;
+            configPath = cfg->getOrCreateProperty("Config", "config_path", marsArguments->config_dir);
+
+	    // overriding any defaults 
+            configPath.sValue = marsArguments->config_dir;
+            cfg->setProperty(configPath);
+ 	    /*
+            if(!cfg->setProperty(configPath))
+            {
+                RTT::log(RTT::Error) << "Configuration path property could not be set" << RTT::endlog();
+                exit(1);
+            } 
+            */
+            configPath = cfg->getOrCreateProperty("Config", "config_path", marsArguments->config_dir);
+
+            if(configPath.sValue != marsArguments->config_dir)
+            {
+		RTT::log(RTT::Error) << "Property was not set correctly: " << configPath.sValue << RTT::endlog();
+                exit(1);
+            } else {
+                RTT::log(RTT::Error) << "Configuration path property set to " << configPath.sValue << RTT::endlog();
+            }
+
+            string loadFile = configPath.sValue;
+            loadFile.append("/mars_Preferences.yaml");
+            cfg->loadConfig(loadFile.c_str());
+            loadFile = configPath.sValue;
+            loadFile.append("/mars_Simulator.yaml");
+            cfg->loadConfig(loadFile.c_str());
+
+            loadFile = configPath.sValue;
+            loadFile.append("/mars_Physics.yaml");
+            cfg->loadConfig(loadFile.c_str());
+            
+            bool loadLastSave = false;
+            cfg->getPropertyValue("Config", "loadLastSave", "value",
+                                           &loadLastSave);
+            if (loadLastSave) 
+            {
+                loadFile = configPath.sValue;
+                loadFile.append("/mars_saveOnClose.yaml");
+                cfg->loadConfig(loadFile.c_str());
+            }      
+        } else {
+            RTT::log(RTT::Error) << "Error casting to cfg_dfki" << RTT::endlog();
+        }
+    } else {
+        RTT::log(RTT::Error) << "Could not load library cfg_dfki" << RTT::endlog();
+    }
+
+    lib = libManager->getLibrary("mars_sim");
     if(!lib)
     {
         RTT::log(RTT::Error) << "Simulation library failed to load" << RTT::endlog();

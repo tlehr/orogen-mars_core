@@ -46,6 +46,8 @@ task_context "Mars" do
         # method removePlugin(input: TaskContext) return bool
 
         input_port('control_action', '/simulation/Control')
+
+        port_driven 'control_action'
 end
 
 deployment "simulation" do

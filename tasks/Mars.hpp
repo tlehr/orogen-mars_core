@@ -3,12 +3,14 @@
 
 #include "simulation/MarsBase.hpp"
 #include <mars_sim/SimulatorInterface.h>
+#include <mars_app/GraphicsTimer.h>
 #include <vector>
 #include <simulation/tasks/MarsControl.hpp>
 
 namespace lib_manager {
     class LibManager;
 }
+   
 
 namespace simulation {
 
@@ -45,7 +47,7 @@ namespace simulation {
     {
 	friend class MarsBase;
     protected:
-
+    	static GraphicsTimer *graphicsTimer;
 	SimulatorInterface* simulatorInterface;
 	static void* startMarsFunc(void *);
         static std::string configDir;

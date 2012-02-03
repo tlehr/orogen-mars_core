@@ -16,6 +16,8 @@
 
 using namespace simulation;
 
+
+GraphicsTimer *Mars::graphicsTimer = 0;
 lib_manager::LibManager* Mars::libManager = 0; 
 
 Mars::Mars(std::string const& name)
@@ -243,9 +245,8 @@ void* Mars::startMarsFunc(void* argument)
 
     // GraphicsTimer allows to update the graphics interface 
     // every 10 ms
-    GraphicsTimer *graphicsTimer = NULL;
-    graphicsTimer = new GraphicsTimer(marsGraphics, mars->simulatorInterface);
-    graphicsTimer->run();
+    Mars::graphicsTimer = new GraphicsTimer(marsGraphics, mars->simulatorInterface);
+    Mars::graphicsTimer->run();
 
     // Synchronize with configureHook
     marsArguments->initialized = true;

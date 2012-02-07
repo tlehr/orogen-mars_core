@@ -1,0 +1,21 @@
+#! /usr/bin/env ruby
+
+require 'tmpdir'
+require 'optparse'
+require './scene'
+require 'pp'
+
+input = ARGV.shift
+output = ARGV.shift
+
+scene = MarsScene.new(output, true)
+Tempfile.open('gdal_to_mars') do |io|
+    offsets, scale, size = MarsScene.convert_terrain_from_gdal(input, io.path)
+    data = File.read(io.path)
+    data_filename = File.basename(File.basename(input))
+
+    scene.add_terrain("terrain", data_filename, offsets, scale, size)
+    scene.add_file(data_filename, data)
+    scene.write
+end
+

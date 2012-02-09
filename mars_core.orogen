@@ -1,13 +1,13 @@
 name 'simulation'
 
-using_library "mars_sim"
-using_library "mars_gui"
-using_library "mars_app"
-using_library "gui_core"
-using_library "lib_manager"
-using_library "multisim-plugin"
-using_library "QtCore"
-using_library "QtGui"
+using_library "mars_sim", :typekit => false
+using_library "mars_gui", :typekit => false
+using_library "mars_app", :typekit => false
+using_library "gui_core", :typekit => false
+using_library "lib_manager", :typekit => false
+using_library "multisim-plugin", :typekit => false
+using_library "QtCore", :typekit => false
+using_library "QtGui", :typekit => false
 
 import_types_from "tasks/MarsControl.hpp"
 

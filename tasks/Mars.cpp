@@ -1,7 +1,9 @@
 #include "Mars.hpp"
 #include <mars_sim/Simulator.h>
 #include <mars_core/Thread.h>
+#include <mars_sim/SimulatorInterface.h>
 
+#include <simulation/tasks/MarsControl.hpp>
 #include <mars_gui/MarsGui.h>
 #include <gui_core/MainGUI.h>
 #include <gui_core/GuiInterface.h>

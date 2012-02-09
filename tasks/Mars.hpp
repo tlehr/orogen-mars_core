@@ -2,15 +2,16 @@
 #define SIMULATION_MARS_TASK_HPP
 
 #include "simulation/MarsBase.hpp"
-#include <mars_sim/SimulatorInterface.h>
-#include <mars_app/GraphicsTimer.h>
 #include <vector>
-#include <simulation/tasks/MarsControl.hpp>
 
 namespace lib_manager {
     class LibManager;
 }
    
+/** From MARS */
+class GraphicsTimer;
+class SimulatorInterface;
+class PluginInterface;
 
 namespace simulation {
 

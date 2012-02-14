@@ -30,13 +30,17 @@ scene = MarsScene.new(output, true)
 Tempfile.open('gdal_to_mars') do |io|
     offsets, scale, size = MarsScene.convert_terrain_from_gdal(input, io.path)
     data = File.read(io.path)
-    data_filename = File.basename(File.basename(input))
+    data_filename = File.basename(input)
 
-    scene.add_terrain("terrain", data_filename, offsets, scale, size, File.basename(texture_file))
     scene.add_file(data_filename, data)
     if texture_file
-	scene.add_file(File.basename(texture_file), File.read( texture_file ))
+	# need to flip the file first
+	tmp_file = "/tmp/#{File.basename(texture_file)}"
+	`convert -flip #{texture_file} #{tmp_file}`
+	scene.add_file(File.basename(tmp_file), File.read( tmp_file ))
     end
+
+    scene.add_terrain("terrain", data_filename, offsets, scale, size, File.basename(texture_file))
     scene.write
 end
 

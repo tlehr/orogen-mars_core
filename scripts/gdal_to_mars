@@ -5,8 +5,26 @@ require 'optparse'
 require './scene'
 require 'pp'
 
-input = ARGV.shift
-output = ARGV.shift
+texture_file = nil
+options = OptionParser.new do |opt|
+    opt.banner = "gdal_to_mars [options] dem_tif out_file"
+    opt.on('--texture FILE', String, 'An optional texture file') do |file|
+        texture_file = file
+    end
+    opt.on('--help') do
+        puts opt
+        exit 0
+    end
+end
+
+scenes = options.parse(ARGV)
+if scenes.size < 2
+    puts options
+    exit 1
+end
+
+input = scenes.shift
+output = scenes.shift
 
 scene = MarsScene.new(output, true)
 Tempfile.open('gdal_to_mars') do |io|
@@ -14,8 +32,11 @@ Tempfile.open('gdal_to_mars') do |io|
     data = File.read(io.path)
     data_filename = File.basename(File.basename(input))
 
-    scene.add_terrain("terrain", data_filename, offsets, scale, size)
+    scene.add_terrain("terrain", data_filename, offsets, scale, size, File.basename(texture_file))
     scene.add_file(data_filename, data)
+    if texture_file
+	scene.add_file(File.basename(texture_file), File.read( texture_file ))
+    end
     scene.write
 end
 

@@ -105,7 +105,10 @@ class MarsScene
     end
 
     def add_terrain(name, data_file, position, scale, size, texture_file = nil)
-        material_id = add_material
+	material_options = Hash.new
+	material_options[:texture] = texture_file if texture_file
+
+        material_id = add_material material_options
         new_node = add_node(name)
         new_node.add_element('origname').add_text("PRIMITIVE")
         new_node.add_element('filename').add_text(data_file.to_s)
@@ -114,6 +117,7 @@ class MarsScene
         new_node.add_element('movable').add_text("false")
         new_node.add_element('material_id').add_text(material_id.to_s)
         new_node.add_element('shadow_id').add_text("1")
+        new_node.add_element('t_tex_scale').add_text("0")
 
         position = [position.x + size.x / 2, position.y + size.y / 2, position.z]
         add_array(position,
@@ -199,10 +203,10 @@ class MarsScene
         add_color(new_material.add_element("specularFront"), *options[:specular])
         new_material.add_element("shininess").add_text(options[:shininess].to_s)
         if options[:texture]
-            new_material.add_element("texturename", options[:texture])
+            new_material.add_element("texturename").add_text(options[:texture])
         end
         if options[:bumpmap]
-            new_material.add_element("bumpmap", options[:bumpmap])
+            new_material.add_element("bumpmap").add_text(options[:bumpmap])
         end
         id
     end

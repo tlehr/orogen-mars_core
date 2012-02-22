@@ -1,0 +1,132 @@
+#! /usr/bin/env ruby
+
+require 'tmpdir'
+require 'optparse'
+require './scene'
+
+def terrain_to_envire(scene, dest_path)
+    FileUtils.mkdir_p dest_path
+
+    puts dest_path
+    puts scene
+    result = []
+    scene.each_terrain do |terrain, pos, size|
+        puts "#{terrain} #{pos} #{size}"
+
+        tif_file = scene.get_file(terrain).read
+        min_value = 0
+        max_value = 65535
+        Tempfile.open("mars_to_envire.tif") do |io|
+            io.write tif_file
+            io.flush
+
+            result_path = File.join(dest_path, terrain)
+
+            scale  = ['-scale', min_value, max_value, pos.z, pos.z + size.z]
+            # WARN: X is inverted between image and mars (i.e. X forward in the
+            # image is X backwards in mars). The Y axis are OK.
+            bounds = ['-a_ullr', pos.x + size.x / 2, pos.y - size.y / 2, pos.x - size.x / 2, pos.y + size.y / 2]
+            args = ['gdal_translate', '-ot', 'Float64', '-b', '1'] +
+                scale.map(&:to_s) +
+                bounds.map(&:to_s) +
+                [io.path, result_path]
+            if !system(*args)
+                raise 'failed to georeference the input data'
+            end
+            result << result_path
+        end
+    end
+    result
+end
+
+target_dir = nil
+env_dir = nil
+remove = false
+options = OptionParser.new do |opt|
+    opt.banner = "mars_to_envire [options] scene_files"
+    opt.on('--dir DIR', String, 'the directory into which to save the processed GeoTIFF files') do |dir|
+        target_dir = dir
+    end
+    opt.on('--env DIR', String, 'a directory containing an envire environment in which the grids should be added. If provided, the GeoTIFF files will not be saved separately unless --dir is given') do |dir|
+        env_dir = dir
+    end
+    opt.on('--remove', 'if given, only keep the MLS in the target environment (only meaningful when there is a target environment)') do |flag|
+        remove = flag
+    end
+    opt.on('--help') do
+        puts opt
+        exit 0
+    end
+end
+
+scenes = options.parse(ARGV)
+if scenes.empty?
+    puts options
+    exit 1
+end
+scenes = scenes.map { |d| File.expand_path(d) }
+
+if !target_dir && !env_dir
+    target_dir = Dir.pwd
+end
+if target_dir
+    target_dir = File.expand_path(target_dir)
+end
+if env_dir
+    env_dir = File.expand_path(env_dir)
+    if !File.directory?(env_dir)
+        FileUtils.mkdir_p env_dir
+    end
+    if !File.file?(File.join(env_dir, "scene.yml"))
+        if !system('env_create', env_dir)
+            raise "failed to create an empty envire environment in #{env_dir}"
+        end
+    end
+end
+
+def process_scene(sc, target_dir, env_dir, remove = false)
+    terrain_to_envire(sc, target_dir).each do |result|
+        if env_dir
+            output = `env_add_grid #{env_dir} #{result} elevation_max envire::ElevationGrid`
+            if $?.exitstatus != 0
+                STDERR.puts output
+                raise "failed to add new grid to environment"
+            end
+            grid_id = Integer(output.split.last)
+
+            output = `env_create_grid #{env_dir} envire::MLSGrid -map #{grid_id}`
+            if $?.exitstatus != 0
+                STDERR.puts output
+                raise "failed to add new grid to environment"
+            end
+            mls_id = Integer(output.split.last)
+
+            output = `env_grid_to_mls #{env_dir} #{grid_id} elevation_max #{mls_id}`
+            if $?.exitstatus != 0
+                STDERR.puts output
+                raise "failed to process the grid into the MLS"
+            end
+            op_id = Integer(output.split.last)
+
+            if remove
+                system("env_delete_item", env_dir, grid_id.to_s, op_id.to_s)
+            end
+        end
+    end
+end
+
+def process_all_scenes(scenes, target_dir, env_dir, remove)
+    scenes.each do |sc|
+        sc = MarsScene.new(sc)
+        process_scene(sc, target_dir, env_dir, remove)
+    end
+end
+
+if !target_dir
+    Dir.mktmpdir do |target_dir|
+        process_all_scenes(scenes, target_dir, env_dir, remove)
+    end
+else
+    process_all_scenes(scenes, target_dir, env_dir, remove)
+end
+

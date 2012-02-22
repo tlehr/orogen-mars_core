@@ -1,7 +1,13 @@
 name 'simulation'
 
-using_library "mars"
-using_library "multisim-plugin"
+using_library "mars_sim", :typekit => false
+using_library "mars_gui", :typekit => false
+using_library "mars_app", :typekit => false
+using_library "gui_core", :typekit => false
+using_library "lib_manager", :typekit => false
+using_library "multisim-plugin", :typekit => false
+using_library "QtCore", :typekit => false
+using_library "QtGui", :typekit => false
 
 import_types_from "tasks/MarsControl.hpp"
 
@@ -17,30 +23,9 @@ import_types_from "tasks/MarsControl.hpp"
 task_context "Mars" do
 	needs_configuration
 	
-	property('config_dir','/std/string').
+	property('config_dir', '/std/string',"#{ENV['AUTOPROJ_PROJECT_BASE']}/install/configuration/mars_default").
 	    doc('the full path to the main configuration folder')
 
-	property('resource_dir','/std/string').
-	    doc('the full path to the main resource directory, will be used as base for any defaults for other *_path')
-
-	property('stuff_path', '/std/string').
-	    doc('The full path to the stuff directory')
-
-	property('gui_path', '/std/string').
-	    doc('The full path to the gui directory')
-
-	property('tmp_path', '/std/string').
-	    doc('The full path to the tmp directory')
-
-	property('save_path', '/std/string').
-	    doc('The full path to the tmp directory')
-
-	property('plugin_path', '/std/string').
-	    doc('The full path to the tmp directory')
-
-	property('debug_path', '/std/string').
-	    doc('The full path to the tmp directory')
- 
 	property('distributed_simulation', 'bool').
 	    doc('switch to active the distributed simulation if needed')
 
@@ -61,11 +46,13 @@ task_context "Mars" do
         # method removePlugin(input: TaskContext) return bool
 
         input_port('control_action', '/simulation/Control')
+
+        port_driven 'control_action'
 end
 
 deployment "simulation" do
-	add_default_logger
         sim = task('mars_simulation', 'simulation::Mars')
+	add_default_logger
 end
 
 

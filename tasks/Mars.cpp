@@ -215,7 +215,6 @@ void* Mars::startMarsFunc(void* argument)
             exit(5);
         }
 
-        mars->simulatorInterface->runSimulation();
 
         lib = libManager->getLibrary("mars_graphics");
         if(lib) 
@@ -234,6 +233,8 @@ void* Mars::startMarsFunc(void* argument)
                 }     
             }
         }
+        
+        mars->simulatorInterface->runSimulation();
 
         mainGui->show();
         

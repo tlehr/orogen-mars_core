@@ -396,7 +396,7 @@ void Mars::updateHook()
                 break;
             case RESET:
                 RTT::log(RTT::Info) << "ControlAction: Reset received" << RTT::endlog();
-                simulatorInterface->spotReload();
+                simulatorInterface->resetSim();
                 break;
             case STEP:
                 RTT::log(RTT::Info) << "ControlAction: Step received" << RTT::endlog();

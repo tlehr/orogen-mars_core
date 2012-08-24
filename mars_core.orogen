@@ -11,6 +11,7 @@ using_library "QtGui", :typekit => false
 
 import_types_from "tasks/MarsControl.hpp"
 
+using_task_library "interfaces"
 
 # Core orogen module that brings up the mars simulation and
 # makes it accessible as a orogen module
@@ -49,6 +50,28 @@ task_context "Mars" do
 
         port_driven 'control_action'
 end
+
+task_context "MarsServo" do
+    subclasses "interfaces::Servo"
+    
+    property('name', '/std/string', 'servo_motor').
+	doc('name of the motor in the scene file, which should be handled as a servo')
+end
+
+task_context "MarsLaserRangeFinder" do
+    subclasses "interfaces::LaserRangeFinder"
+    
+    property('name', '/std/string', 'laser_scanner').
+	doc('name of the sensor in the scene file')
+end
+
+task_context "MarsIMU" do
+    subclasses "interfaces::IMU"
+    
+    property('name', '/std/string', 'imu').
+	doc('name of the node in the scene file from which to get the orientation')
+end
+    
 
 deployment "simulation" do
         sim = task('mars_simulation', 'simulation::Mars')

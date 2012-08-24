@@ -18,26 +18,29 @@
 
 using namespace simulation;
 
-
+SimulatorInterface *Mars::simulatorInterface = 0;
 GraphicsTimer *Mars::graphicsTimer = 0;
 lib_manager::LibManager* Mars::libManager = 0; 
 
 Mars::Mars(std::string const& name)
     : MarsBase(name)
-    , simulatorInterface(0) 
     , multisimPlugin(0)
 {
 }
 
 Mars::Mars(std::string const& name, RTT::ExecutionEngine* engine)
     : MarsBase(name, engine)
-    , simulatorInterface(0)
     , multisimPlugin(0)
 {
 }
 
 Mars::~Mars()
 {
+}
+
+SimulatorInterface* Mars::getSimulatorInterface()
+{
+    return simulatorInterface;
 }
 
 void* Mars::startMarsFunc(void* argument)

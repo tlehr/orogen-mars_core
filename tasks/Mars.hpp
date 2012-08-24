@@ -49,7 +49,7 @@ namespace simulation {
 	friend class MarsBase;
     protected:
     	static GraphicsTimer *graphicsTimer;
-	SimulatorInterface* simulatorInterface;
+	static SimulatorInterface* simulatorInterface;
 	static void* startMarsFunc(void *);
         static std::string configDir;
 	static bool marsRunning;
@@ -64,6 +64,10 @@ namespace simulation {
         char** setOptions(const std::vector<Option>& options);
 
     public:
+	/** get the singleton instance of the simulator interface
+	 */
+	static SimulatorInterface* getSimulatorInterface();
+
         Mars(std::string const& name = "simulation::Mars");
         Mars(std::string const& name, RTT::ExecutionEngine* engine);
 

@@ -28,7 +28,8 @@ struct IMUPlugin : public MarsPlugin
 	rbs.time = getTime();
 	rbs.sourceFrame = task._imu_frame.value();
 	rbs.targetFrame = task._world_frame.value();
-	rbs.orientation = control->nodes->getRotation( node_id );
+	rbs.orientation = control->nodes->getRotation( node_id ).normalized();
+	rbs.cov_orientation = base::Matrix3d::Ones() * 1e-6;
 
 	task._orientation_samples.write( rbs );
     }

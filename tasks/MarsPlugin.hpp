@@ -39,7 +39,8 @@ public:
      */
     base::Time getTime()
     {
-	return base::Time::fromSeconds( simTime );
+	//return base::Time::fromSeconds( simTime );
+	return base::Time::now();
     }
 
     void connect()

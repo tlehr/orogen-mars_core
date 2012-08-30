@@ -24,16 +24,19 @@ struct LaserRangeFinderPlugin : public MarsPlugin
 	scan.time = getTime();
 	std::vector<double> ranges = sensor->getSensorData();
 	scan.ranges.resize( ranges.size() );
+	scan.minRange = 10;
+	scan.maxRange = sensor->getConfig().maxDistance * 1000;
 	for( size_t i=0; i<ranges.size(); i++ )
-	    scan.ranges[i] = ranges[i] * 1000;
+	{
+	    const long range = ranges[i] * 1000;
+	    scan.ranges[i] = ( range < scan.maxRange ) ? range : base::samples::TOO_FAR;
+	}
 	// assume scan to be centered
 	if( !scan.ranges.empty() )
 	{
 	    const double opening_width = sensor->getConfig().opening_width; 
 	    scan.start_angle = -opening_width / 2.0;
 	    scan.angular_resolution = opening_width / scan.ranges.size();
-	    scan.minRange = 10;
-	    scan.maxRange = sensor->getConfig().maxDistance * 1000;
 	    port.write( scan );
 	}
     }

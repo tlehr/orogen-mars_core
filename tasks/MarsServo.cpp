@@ -1,10 +1,12 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
 
 #include "MarsServo.hpp"
-#include <mars_sim/SimulatorInterface.h>
-#include <mars_sim/ControlCenter.h>
+#include <interfaces/SimulatorInterface.h>
+//#include <mars_sim/ControlCenter.h>
 #include "MarsPlugin.hpp"
-#include <mars_sim/SimMotor.h>
+#include <sim/SimMotor.h>
+#include <interfaces/MotorManagerInterface.h>
+#include <interfaces/NodeManagerInterface.h>
 
 using namespace simulation;
 
@@ -23,7 +25,7 @@ struct ServoPlugin : public MarsPlugin
 	desired_velocity(0.1) 
     {}
 
-    void update( sReal time )
+    void update( double time )
     {
 	control->motors->getSimMotor( motor_id )->setMaximumVelocity( desired_velocity ); 
 	control->motors->setMotorValue( motor_id, target_pos );

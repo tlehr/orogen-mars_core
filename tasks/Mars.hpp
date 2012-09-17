@@ -4,14 +4,21 @@
 #include "simulation/MarsBase.hpp"
 #include <vector>
 
-namespace lib_manager {
-    class LibManager;
-}
    
 /** From MARS */
-class GraphicsTimer;
-class SimulatorInterface;
-class PluginInterface;
+//
+namespace mars{
+    namespace interfaces{
+        class SimulatorInterface;
+        class PluginInterface;
+    };
+    namespace app{
+        class GraphicsTimer;
+    };
+    namespace lib_manager {
+        class LibManager;
+    }
+};
 
 namespace simulation {
 
@@ -48,16 +55,16 @@ namespace simulation {
     {
 	friend class MarsBase;
     protected:
-    	static GraphicsTimer *graphicsTimer;
-	static SimulatorInterface* simulatorInterface;
+    	static mars::app::GraphicsTimer *graphicsTimer;
+	static mars::interfaces::SimulatorInterface* simulatorInterface;
 	static void* startMarsFunc(void *);
         static std::string configDir;
 	static bool marsRunning;
 
 	pthread_t thread_info; 
-	static lib_manager::LibManager* libManager;
+	static mars::lib_manager::LibManager* libManager;
 
-        PluginInterface* multisimPlugin;
+        mars::interfaces::PluginInterface* multisimPlugin;
 
         int getOptionCount(const std::vector<Option>& options);
 
@@ -66,7 +73,7 @@ namespace simulation {
     public:
 	/** get the singleton instance of the simulator interface
 	 */
-	static SimulatorInterface* getSimulatorInterface();
+	static mars::interfaces::SimulatorInterface* getSimulatorInterface();
 
         Mars(std::string const& name = "simulation::Mars");
         Mars(std::string const& name, RTT::ExecutionEngine* engine);

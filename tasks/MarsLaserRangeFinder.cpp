@@ -2,15 +2,17 @@
 
 #include "MarsLaserRangeFinder.hpp"
 #include "MarsPlugin.hpp"
-#include <mars_sim/RaySensor.h>
+#include <sim/RaySensor.h>
 #include <base/time.h>
+#include <interfaces/SensorManagerInterface.h>
+
 
 using namespace simulation;
 
 namespace simulation {
 struct LaserRangeFinderPlugin : public MarsPlugin
 {
-    RaySensor* sensor;
+    mars::sim::RaySensor* sensor;
     base::samples::LaserScan scan;
     RTT::OutputPort< base::samples::LaserScan >& port;
 
@@ -19,7 +21,7 @@ struct LaserRangeFinderPlugin : public MarsPlugin
     {
     }
 
-    void update( sReal time )
+    void update( double time )
     {
 	scan.time = getTime();
 	std::vector<double> ranges = sensor->getSensorData();
@@ -47,7 +49,7 @@ struct LaserRangeFinderPlugin : public MarsPlugin
 	if( !sensor_id )
 	    throw std::runtime_error("There is no sensor by the name of " + name + " in the scene");
 
-	sensor = dynamic_cast<RaySensor*>( control->sensors->getSimSensor( sensor_id ) );
+	sensor = dynamic_cast<mars::sim::RaySensor*>( control->sensors->getSimSensor( sensor_id ) );
 	if( !sensor )
 	    throw std::runtime_error("The sensor with " + name + " is not of the correct type (RaySensor)");
 

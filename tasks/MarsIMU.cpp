@@ -2,6 +2,8 @@
 
 #include "MarsIMU.hpp"
 #include "MarsPlugin.hpp"
+#include <interfaces/MotorManagerInterface.h>
+#include <interfaces/NodeManagerInterface.h>
 
 using namespace simulation;
 
@@ -23,7 +25,7 @@ struct IMUPlugin : public MarsPlugin
 	rbs.position.setZero();
     }
 
-    void update( sReal time )
+    void update( double time )
     {
 	rbs.time = getTime();
 	rbs.sourceFrame = task._imu_frame.value();

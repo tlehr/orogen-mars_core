@@ -3,18 +3,21 @@
 
 #include "tasks/Mars.hpp"
 #include <lib_manager/LibManager.h>
-#include <mars_sim/SimulatorInterface.h>
-#include <mars_sim/ControlCenter.h>
-#include <data_broker/ReceiverInterface.h>
+#include <interfaces/SimulatorInterface.h>
+#include <interfaces/ControlCenter.h>
+#include <interfaces/ReceiverInterface.h>
+
+
+using namespace mars;
 
 namespace simulation
 {
 
 /** helper class, which implements a mars plugin interface.
  */
-class MarsPlugin : public PluginInterface, public data_broker::ReceiverInterface
+class MarsPlugin : public mars::interfaces::PluginInterface, public mars::data_broker::ReceiverInterface
 {
-    SimulatorInterface* sim;
+    mars::interfaces::SimulatorInterface* sim;
     double simTime;
 
 public:
@@ -56,9 +59,9 @@ public:
 	}
 
 	// register as plugin
-	pluginStruct newplugin;
+        mars::interfaces::pluginStruct newplugin;
 	newplugin.name = "RockPlugin";
-	newplugin.p_interface = dynamic_cast<PluginInterface*>(this);
+	newplugin.p_interface = dynamic_cast<mars::interfaces::PluginInterface*>(this);
 	newplugin.p_destroy = 0;
 	sim->addPlugin(newplugin);
 

@@ -1,14 +1,15 @@
 #include "Mars.hpp"
-#include <mars_sim/Simulator.h>
-#include <mars_core/Thread.h>
-#include <mars_sim/SimulatorInterface.h>
+#include <sim/Simulator.h>
+#include <utils/Thread.h>
+#include <interfaces/SimulatorInterface.h>
 
 #include <simulation/tasks/MarsControl.hpp>
-#include <mars_gui/MarsGui.h>
-#include <gui_core/MainGUI.h>
-#include <gui_core/GuiInterface.h>
-#include <mars_graphics/GraphicsManager.h>
-#include <mars_app/GraphicsTimer.h>
+#include <gui/MarsGui.h>
+#include <main_gui/MainGUI.h>
+#include <interfaces/GuiInterface.h>
+#include <interfaces/CFGManagerInterface.h>
+#include <graphics/GraphicsManager.h>
+#include <app/GraphicsTimer.h>
 
 #include <mars/multisim-plugin/MultiSimPlugin.h>
 
@@ -17,10 +18,11 @@
 #include <QPlastiqueStyle>
 
 using namespace simulation;
+using namespace mars;
 
-SimulatorInterface *Mars::simulatorInterface = 0;
-GraphicsTimer *Mars::graphicsTimer = 0;
-lib_manager::LibManager* Mars::libManager = 0; 
+mars::interfaces::SimulatorInterface *Mars::simulatorInterface = 0;
+mars::app::GraphicsTimer *Mars::graphicsTimer = 0;
+mars::lib_manager::LibManager* Mars::libManager = 0; 
 
 Mars::Mars(std::string const& name)
     : MarsBase(name)
@@ -38,7 +40,7 @@ Mars::~Mars()
 {
 }
 
-SimulatorInterface* Mars::getSimulatorInterface()
+mars::interfaces::SimulatorInterface* Mars::getSimulatorInterface()
 {
     return simulatorInterface;
 }
@@ -87,7 +89,7 @@ void* Mars::startMarsFunc(void* argument)
     }
 
     // Prepare the LibManager and required configuration files
-    libManager = new lib_manager::LibManager();
+    libManager = new mars::lib_manager::LibManager();
 
     std::string corelibsConfigPath;
     // If the graphical interface should be disabled, the configuration 
@@ -103,14 +105,14 @@ void* Mars::startMarsFunc(void* argument)
     libManager->loadConfigFile(corelibsConfigPath);
 
     // Setting the configuration directory and loading the preferences
-    lib_manager::LibInterface* lib = libManager->getLibrary(std::string("cfg_dfki"));
+    mars::lib_manager::LibInterface* lib = libManager->getLibrary(std::string("cfg_manager"));
     if(lib)
     {
- 	cfg_dfki::CFGInterface* cfg = 0;
-        if(cfg = dynamic_cast<cfg_dfki::CFGInterface*>(lib))
+ 	cfg_manager::CFGManagerInterface* cfg = 0;
+        if(cfg = dynamic_cast<cfg_manager::CFGManagerInterface*>(lib))
         {
 
-            cfg_dfki::cfgPropertyStruct configPath;
+            cfg_manager::cfgPropertyStruct configPath;
             configPath = cfg->getOrCreateProperty("Config", "config_path", marsArguments->config_dir);
 
 	    // overriding any defaults 
@@ -170,7 +172,7 @@ void* Mars::startMarsFunc(void* argument)
 
 
     // Prepare the simulation instance, load the argument and run
-    mars->simulatorInterface = dynamic_cast<Simulator*>(lib); 
+    mars->simulatorInterface = dynamic_cast<sim::Simulator*>(lib); 
     if(!mars->simulatorInterface)
     {
         RTT::log(RTT::Error) << "Simulation could not be retrieved via lib_manager" << RTT::endlog();
@@ -189,17 +191,17 @@ void* Mars::startMarsFunc(void* argument)
 
     // GraphicsTimer will be later called with the marsGraphics reference
     // which can be also NULL for a disabled gui
-    GraphicsManager* marsGraphics = NULL;
+    graphics::GraphicsManager* marsGraphics = NULL;
 
     // if we have a main gui, show it 
     if(marsArguments->enable_gui)
     {
 
-        MarsGui *marsGui = NULL;
+        gui::MarsGui *marsGui = NULL;
         lib = libManager->getLibrary("mars_gui");
         if(lib)
         {
-            if( (marsGui = dynamic_cast<MarsGui*>(lib)) )
+            if( (marsGui = dynamic_cast<gui::MarsGui*>(lib)) )
             {
                 marsGui->setupGui();
             }
@@ -208,9 +210,9 @@ void* Mars::startMarsFunc(void* argument)
             exit(4);
         }
 
-        gui_core::MainGUI* mainGui;
+        main_gui::MainGUI* mainGui;
         lib = libManager->getLibrary("gui_core");
-        if(lib && (mainGui = dynamic_cast<gui_core::MainGUI*>(lib)) )
+        if(lib && (mainGui = dynamic_cast<main_gui::MainGUI*>(lib)) )
         {
             // all good
         } else {
@@ -222,7 +224,7 @@ void* Mars::startMarsFunc(void* argument)
         lib = libManager->getLibrary("mars_graphics");
         if(lib) 
         {
-            if( (marsGraphics = dynamic_cast<GraphicsManager*>(lib)) )
+            if( (marsGraphics = dynamic_cast<graphics::GraphicsManager*>(lib)) )
             {
                 // init osg
                 //initialize graphicsFactory
@@ -251,7 +253,7 @@ void* Mars::startMarsFunc(void* argument)
 
     // GraphicsTimer allows to update the graphics interface 
     // every 10 ms
-    Mars::graphicsTimer = new GraphicsTimer(marsGraphics, mars->simulatorInterface);
+    Mars::graphicsTimer = new app::GraphicsTimer(marsGraphics, mars->simulatorInterface);
     Mars::graphicsTimer->run();
 
     // Synchronize with configureHook

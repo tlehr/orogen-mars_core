@@ -4,7 +4,7 @@
 #include "MarsPlugin.hpp"
 #include <sim/RaySensor.h>
 #include <base/time.h>
-#include <interfaces/SensorManagerInterface.h>
+#include <sim/SensorManagerInterface.h>
 
 
 using namespace simulation;

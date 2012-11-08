@@ -3,9 +3,9 @@
 
 #include "tasks/Mars.hpp"
 #include <lib_manager/LibManager.h>
-#include <interfaces/SimulatorInterface.h>
-#include <interfaces/ControlCenter.h>
-#include <interfaces/ReceiverInterface.h>
+#include <sim/SimulatorInterface.h>
+#include <sim/ControlCenter.h>
+#include <data_broker/ReceiverInterface.h>
 
 
 using namespace mars;

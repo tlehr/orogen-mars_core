@@ -1,12 +1,12 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
 
 #include "MarsServo.hpp"
-#include <interfaces/SimulatorInterface.h>
+#include <sim/SimulatorInterface.h>
 //#include <mars_sim/ControlCenter.h>
 #include "MarsPlugin.hpp"
 #include <sim/SimMotor.h>
-#include <interfaces/MotorManagerInterface.h>
-#include <interfaces/NodeManagerInterface.h>
+#include <sim/MotorManagerInterface.h>
+#include <sim/NodeManagerInterface.h>
 
 using namespace simulation;
 

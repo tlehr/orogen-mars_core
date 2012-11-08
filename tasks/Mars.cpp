@@ -1,13 +1,13 @@
 #include "Mars.hpp"
 #include <sim/Simulator.h>
 #include <utils/Thread.h>
-#include <interfaces/SimulatorInterface.h>
+#include <sim/SimulatorInterface.h>
 
 #include <simulation/tasks/MarsControl.hpp>
 #include <gui/MarsGui.h>
 #include <main_gui/MainGUI.h>
-#include <interfaces/GuiInterface.h>
-#include <interfaces/CFGManagerInterface.h>
+#include <main_gui/GuiInterface.h>
+#include <cfg_manager/CFGManagerInterface.h>
 #include <graphics/GraphicsManager.h>
 #include <app/GraphicsTimer.h>
 

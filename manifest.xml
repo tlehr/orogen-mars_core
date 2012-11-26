@@ -1,6 +1,6 @@
 <package>
   <description brief="Mars Core module for simulation purposes">
-The mars-core module provides the base for other modules that require the simulation mars. 
+The mars-core module provides the base for other modules that require the simulation mars.
   </description>
   <author>Thomas Roehr/thomas.roehr@dfki.de</author>
   <license></license>
@@ -10,8 +10,11 @@ The mars-core module provides the base for other modules that require the simula
   <depend package="rtt" />
   <depend package="tools/logger" />
   <depend package="base/orogen/interfaces" />
-  <depend package="simulation/mars" /> 
-  <depend package="simulation/mars-plugins/multisim_plugin" /> 
+  <depend package="simulation/mars/app" />
+  <depend package="simulation/mars/gui" />
+  <depend package="simulation/mars/graphics" />
+  <depend package="simulation/mars/sim" />
+  <depend package="simulation/mars/scene_loader" />
   <versioncontrol type="git" url="" />
   <export>
     <cpp cflags="" lflags="" />

@@ -2,8 +2,8 @@
 
 #include "MarsIMU.hpp"
 #include "MarsPlugin.hpp"
-#include <sim/MotorManagerInterface.h>
-#include <sim/NodeManagerInterface.h>
+#include <mars/interfaces/sim/MotorManagerInterface.h>
+#include <mars/interfaces/sim/NodeManagerInterface.h>
 
 using namespace simulation;
 

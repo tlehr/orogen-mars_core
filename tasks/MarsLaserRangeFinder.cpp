@@ -2,9 +2,9 @@
 
 #include "MarsLaserRangeFinder.hpp"
 #include "MarsPlugin.hpp"
-#include <sim/RaySensor.h>
+#include <mars/sim/RaySensor.h>
 #include <base/time.h>
-#include <sim/SensorManagerInterface.h>
+#include <mars/interfaces/sim/SensorManagerInterface.h>
 
 
 using namespace simulation;

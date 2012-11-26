@@ -2,10 +2,10 @@
 #define MARS_CORE_MARS_PLUGIN__
 
 #include "tasks/Mars.hpp"
-#include <lib_manager/LibManager.h>
-#include <sim/SimulatorInterface.h>
-#include <sim/ControlCenter.h>
-#include <data_broker/ReceiverInterface.h>
+#include <mars/lib_manager/LibManager.h>
+#include <mars/interfaces/sim/SimulatorInterface.h>
+#include <mars/interfaces/sim/ControlCenter.h>
+#include <mars/data_broker/ReceiverInterface.h>
 
 
 using namespace mars;

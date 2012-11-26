@@ -1,12 +1,12 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
 
 #include "MarsServo.hpp"
-#include <sim/SimulatorInterface.h>
+#include <mars/interfaces/sim/SimulatorInterface.h>
 //#include <mars_sim/ControlCenter.h>
 #include "MarsPlugin.hpp"
-#include <sim/SimMotor.h>
-#include <sim/MotorManagerInterface.h>
-#include <sim/NodeManagerInterface.h>
+#include <mars/sim/SimMotor.h>
+#include <mars/interfaces/sim/MotorManagerInterface.h>
+#include <mars/interfaces/sim/NodeManagerInterface.h>
 
 using namespace simulation;
 
@@ -19,24 +19,27 @@ struct ServoPlugin : public MarsPlugin
     double desired_velocity;
 
     ServoPlugin()
-	: motor_id(0),
-	motor_pos(0.0),
-	target_pos(0.0),
-	desired_velocity(0.1) 
+        : motor_id(0),
+        motor_pos(0.0),
+        target_pos(0.0),
+        desired_velocity(0.1)
     {}
 
     void update( double time )
     {
-	control->motors->getSimMotor( motor_id )->setMaximumVelocity( desired_velocity ); 
-	control->motors->setMotorValue( motor_id, target_pos );
-	motor_pos = control->motors->getMotorValue( motor_id );
+        mars::sim::SimMotor *theMotor = control->motors->getSimMotor(motor_id);
+
+        theMotor->setMaximumVelocity( desired_velocity );
+        theMotor->setValue( target_pos );
+        // todo: is it desired to get the target_pos back from the motor?
+        motor_pos = theMotor->getValue( );
     }
 
     void setMotorName( const std::string& name )
     {
-	motor_id = control->motors->getID( name ); 
-	if( !motor_id )
-	    throw std::runtime_error("There is no motor by the name of " + name + " in the scene");
+        motor_id = control->motors->getID( name );
+        if( !motor_id )
+            throw std::runtime_error("There is no motor by the name of " + name + " in the scene");
     }
 };
 }
@@ -110,4 +113,3 @@ void MarsServo::stopHook()
 // {
 //     MarsServoBase::cleanupHook();
 // }
-

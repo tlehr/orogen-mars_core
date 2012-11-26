@@ -1,19 +1,19 @@
 #include "Mars.hpp"
-#include <sim/Simulator.h>
-#include <utils/Thread.h>
-#include <sim/SimulatorInterface.h>
+#include <mars/sim/Simulator.h>
+#include <mars/utils/Thread.h>
+#include <mars/interfaces/sim/SimulatorInterface.h>
 
 #include <simulation/tasks/MarsControl.hpp>
-#include <gui/MarsGui.h>
-#include <main_gui/MainGUI.h>
-#include <main_gui/GuiInterface.h>
-#include <cfg_manager/CFGManagerInterface.h>
-#include <graphics/GraphicsManager.h>
-#include <app/GraphicsTimer.h>
+#include <mars/gui/MarsGui.h>
+#include <mars/main_gui/MainGUI.h>
+#include <mars/main_gui/GuiInterface.h>
+#include <mars/cfg_manager/CFGManagerInterface.h>
+#include <mars/graphics/GraphicsManager.h>
+#include <mars/app/GraphicsTimer.h>
 
-#include <mars/multisim-plugin/MultiSimPlugin.h>
+//#include <mars/multisim-plugin/MultiSimPlugin.h>
 
-#include <lib_manager/LibManager.h>
+#include <mars/lib_manager/LibManager.h>
 #include <QApplication>
 #include <QPlastiqueStyle>
 
@@ -365,12 +365,16 @@ bool Mars::configureHook()
     // Simulation is now up and running and plugins can be added
     // Configure basic functionality of simulation
     // Check if distributed simulation should be activated
+
+    // todo: should be loaded via lib_manager
+    /*
     if(_distributed_simulation.get())
     {
         RTT::log(RTT::Info) << "Loading MultiSimPlugin" << RTT::endlog();
         multisimPlugin = new MultiSimPlugin(libManager);
         RTT::log(RTT::Info) << "MultiSimPlugin loaded" << RTT::endlog();
     }
+    */
     return true;
 }
 
@@ -433,6 +437,6 @@ void Mars::cleanupHook()
     libManager->unloadLibrary("gui_core");
 
     delete libManager;
-    delete multisimPlugin;
+    if(multisimPlugin) delete multisimPlugin;
 }
 

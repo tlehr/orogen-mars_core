@@ -211,7 +211,7 @@ void* Mars::startMarsFunc(void* argument)
         }
 
         main_gui::MainGUI* mainGui;
-        lib = libManager->getLibrary("gui_core");
+        lib = libManager->getLibrary("main_gui");
         if(lib && (mainGui = dynamic_cast<main_gui::MainGUI*>(lib)) )
         {
             // all good

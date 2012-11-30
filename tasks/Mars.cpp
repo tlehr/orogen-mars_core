@@ -135,7 +135,7 @@ void* Mars::startMarsFunc(void* argument)
                 RTT::log(RTT::Error) << "Configuration path property set to " << configPath.sValue << RTT::endlog();
             }
 
-            string loadFile = configPath.sValue;
+            std::string loadFile = configPath.sValue;
             loadFile.append("/mars_Preferences.yaml");
             cfg->loadConfig(loadFile.c_str());
             loadFile = configPath.sValue;
@@ -330,7 +330,7 @@ bool Mars::configureHook()
     if(0 != chdir(_config_dir.get().c_str()))
     {
         RTT::log(RTT::Error) << "Config directory " << _config_dir.get() << " does not exist. Cannot start mars." << RTT::endlog();
-        throw std::runtime_error(string("Config directory ") +_config_dir.get() +" does not exist. Can not start mars.");    
+        throw std::runtime_error(std::string("Config directory ") +_config_dir.get() +" does not exist. Can not start mars.");    
     }
 
     // Startup of simulation

@@ -1,7 +1,7 @@
 #ifndef MARS_CORE_MARS_PLUGIN__
 #define MARS_CORE_MARS_PLUGIN__
 
-#include "tasks/Mars.hpp"
+#include "Mars.hpp"
 #include <mars/lib_manager/LibManager.h>
 #include <mars/interfaces/sim/SimulatorInterface.h>
 #include <mars/interfaces/sim/ControlCenter.h>

@@ -29,10 +29,10 @@ struct ServoPlugin : public MarsPlugin
     {
         mars::sim::SimMotor *theMotor = control->motors->getSimMotor(motor_id);
 
-        theMotor->setMaximumVelocity( desired_velocity );
+//        theMotor->setMaximumVelocity( desired_velocity );
         theMotor->setValue( target_pos );
         // todo: is it desired to get the target_pos back from the motor?
-        motor_pos = theMotor->getValue( );
+        motor_pos = theMotor->getActualPosition( );
     }
 
     void setMotorName( const std::string& name )
@@ -40,6 +40,9 @@ struct ServoPlugin : public MarsPlugin
         motor_id = control->motors->getID( name );
         if( !motor_id )
             throw std::runtime_error("There is no motor by the name of " + name + " in the scene");
+        
+//        mars::sim::SimMotor *theMotor = control->motors->getSimMotor(motor_id);
+//        desired_velocity = theMotor->getMaximumVelocity();
     }
 };
 }

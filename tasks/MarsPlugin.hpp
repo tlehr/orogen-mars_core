@@ -46,6 +46,10 @@ public:
 	return base::Time::now();
     }
 
+    double getSimTime(){
+        return simTime; 
+    }
+
     void connect()
     {
 	// get simulator interface from singleton
@@ -67,7 +71,6 @@ public:
 
 	// get controlcenter
 	control = sim->getControlCenter();
-
     }
 
     void disconnect()

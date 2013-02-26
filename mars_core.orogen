@@ -24,7 +24,10 @@ using_task_library "interfaces"
 
 task_context "Mars" do
 	needs_configuration
-	
+
+        operation("loadScene").
+            argument("path","/std/string")
+
 	property('config_dir', '/std/string',"#{ENV['AUTOPROJ_PROJECT_BASE']}/install/configuration/mars_default").
 	    doc('the full path to the main configuration folder')
 
@@ -48,6 +51,8 @@ task_context "Mars" do
         # method removePlugin(input: TaskContext) return bool
 
         input_port('control_action', '/simulation/Control')
+        
+        output_port('time', 'double')
 
         port_driven 'control_action'
 end

@@ -10,6 +10,7 @@
 #include <mars/cfg_manager/CFGManagerInterface.h>
 #include <mars/graphics/GraphicsManager.h>
 #include <mars/app/GraphicsTimer.h>
+#include <mars/interfaces/sim/NodeManagerInterface.h>
 
 //#include <mars/multisim-plugin/MultiSimPlugin.h>
 
@@ -38,6 +39,15 @@ Mars::Mars(std::string const& name, RTT::ExecutionEngine* engine)
 
 Mars::~Mars()
 {
+}
+
+
+void Mars::loadScene(::std::string const & path)
+{
+    if(simulatorInterface)
+        simulatorInterface->loadScene(path.c_str(), 0);
+    else
+        RTT::log(RTT::Error) << "Simulator not yet started cout not load scenefile" << RTT::endlog();        
 }
 
 mars::interfaces::SimulatorInterface* Mars::getSimulatorInterface()
@@ -256,6 +266,11 @@ void* Mars::startMarsFunc(void* argument)
     Mars::graphicsTimer = new app::GraphicsTimer(marsGraphics, mars->simulatorInterface);
     Mars::graphicsTimer->run();
 
+    unsigned long boden_id = simulatorInterface->getControlCenter()->nodes->createPrimitiveNode("Boden",mars::interfaces::NODE_TYPE_PLANE,false,mars::utils::Vector(0,0,0.0),mars::utils::Vector(600,600,0));
+//    mars->dbSimTimeId = simulatorInterface->getControlCenter()->dataBroker->getDataID("mars_sim", "simTime");
+    simulatorInterface->getControlCenter()->dataBroker->registerSyncReceiver(mars,"mars_sim", "simTime",1);
+    
+    
     // Synchronize with configureHook
     marsArguments->initialized = true;
     app->exec();
@@ -416,6 +431,8 @@ void Mars::updateHook()
 
         }
     }
+    //_time.write(simulatorInterface->getControlCenter()->dataBroker->getDataPackage(dbSimTimeId)[0].d);
+    _time.write(simTime);
 }
 
 void Mars::errorHook()
@@ -440,3 +457,11 @@ void Mars::cleanupHook()
     if(multisimPlugin) delete multisimPlugin;
 }
 
+void Mars::receiveData(
+        const data_broker::DataInfo& info,
+        const data_broker::DataPackage& package,
+        int id) 
+{
+    package.get("simTime", &simTime);
+    trigger();
+}

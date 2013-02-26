@@ -3,7 +3,7 @@
 
 #include "simulation/MarsBase.hpp"
 #include <vector>
-
+#include <mars/data_broker/ReceiverInterface.h>
    
 /** From MARS */
 //
@@ -51,7 +51,8 @@ namespace simulation {
     * end
     *
     */
-    class Mars : public MarsBase
+    class Mars : public MarsBase, public mars::data_broker::ReceiverInterface
+
     {
 	friend class MarsBase;
     protected:
@@ -60,7 +61,8 @@ namespace simulation {
 	static void* startMarsFunc(void *);
         static std::string configDir;
 	static bool marsRunning;
-
+    //    unsigned int dbSimTimeId; //Id for the simulation time
+        double simTime;
 	pthread_t thread_info; 
 	static mars::lib_manager::LibManager* libManager;
 
@@ -69,6 +71,10 @@ namespace simulation {
         int getOptionCount(const std::vector<Option>& options);
 
         char** setOptions(const std::vector<Option>& options);
+
+        /* Handler for the loadScene operation
+         */
+        virtual void loadScene(::std::string const & path);
 
     public:
 	/** get the singleton instance of the simulator interface
@@ -139,6 +145,8 @@ namespace simulation {
          * before calling start() again.
          */
          void cleanupHook();
+    
+         void receiveData(const mars::data_broker::DataInfo& info,const mars::data_broker::DataPackage& package,int id);
     };
 }
 

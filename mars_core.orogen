@@ -57,6 +57,30 @@ task_context "Mars" do
         port_driven 'control_action'
 end
 
+task_context "MarsCamera" do
+    needs_configuration
+
+    property('name', '/std/string').
+	doc('name of the camera in the scene file')
+
+    output_port 'frame', ro_ptr('base::samples::frame::Frame')
+
+    property('fps', 'int',10).
+        doc 'frames per second'
+end
+
+task_context "MarsDepthCamera" do
+    needs_configuration
+
+    property('name', '/std/string').
+	doc('name of the camera in the scene file')
+
+    output_port 'distance_image', ro_ptr('base::samples::DistanceImage')
+
+    property('fps', 'int',10).
+        doc 'frames per second'
+end
+
 task_context "MarsActuator" do
     subclasses "interfaces::Actuator"
     
@@ -91,6 +115,7 @@ end
 deployment "simulation" do
         sim = task('mars_simulation', 'simulation::Mars')
         acc = task('mars_actuator', 'simulation::MarsActuator')
+        acc = task('mars_camera', 'simulation::MarsCamera')
 	add_default_logger
 end
 

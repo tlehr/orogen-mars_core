@@ -57,6 +57,15 @@ task_context "Mars" do
         port_driven 'control_action'
 end
 
+task_context "MarsActuator" do
+    subclasses "interfaces::Actuator"
+    
+    property('names', 'std/vector</std/string>').
+	doc('Array of names of the motor in the scene file. The names get mapped to motor ids starting from zero')
+
+    port_driven
+end
+
 task_context "MarsServo" do
     subclasses "interfaces::Servo"
     
@@ -81,6 +90,7 @@ end
 
 deployment "simulation" do
         sim = task('mars_simulation', 'simulation::Mars')
+        acc = task('mars_actuator', 'simulation::MarsActuator')
 	add_default_logger
 end
 

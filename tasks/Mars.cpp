@@ -118,8 +118,8 @@ void* Mars::startMarsFunc(void* argument)
     mars::lib_manager::LibInterface* lib = libManager->getLibrary(std::string("cfg_manager"));
     if(lib)
     {
- 	cfg_manager::CFGManagerInterface* cfg = 0;
-        if(cfg = dynamic_cast<cfg_manager::CFGManagerInterface*>(lib))
+ 	cfg_manager::CFGManagerInterface* cfg = dynamic_cast<cfg_manager::CFGManagerInterface*>(lib);
+        if(cfg)
         {
 
             cfg_manager::cfgPropertyStruct configPath;

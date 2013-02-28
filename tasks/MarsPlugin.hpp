@@ -8,8 +8,6 @@
 #include <mars/data_broker/ReceiverInterface.h>
 
 
-using namespace mars;
-
 namespace simulation
 {
 
@@ -82,8 +80,8 @@ public:
     void reset() {};
 
     void receiveData(
-	    const data_broker::DataInfo& info,
-	    const data_broker::DataPackage& package,
+	    const mars::data_broker::DataInfo& info,
+	    const mars::data_broker::DataPackage& package,
 	    int id) 
     {
 	package.get("simTime", &simTime);

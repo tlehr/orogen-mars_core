@@ -266,7 +266,9 @@ void* Mars::startMarsFunc(void* argument)
     Mars::graphicsTimer = new app::GraphicsTimer(marsGraphics, mars->simulatorInterface);
     Mars::graphicsTimer->run();
 
-    unsigned long boden_id = simulatorInterface->getControlCenter()->nodes->createPrimitiveNode("Boden",mars::interfaces::NODE_TYPE_PLANE,false,mars::utils::Vector(0,0,0.0),mars::utils::Vector(600,600,0));
+    if(marsArguments->add_floor){
+        unsigned long boden_id = simulatorInterface->getControlCenter()->nodes->createPrimitiveNode("Boden",mars::interfaces::NODE_TYPE_PLANE,false,mars::utils::Vector(0,0,0.0),mars::utils::Vector(600,600,0));
+    }
 //    mars->dbSimTimeId = simulatorInterface->getControlCenter()->dataBroker->getDataID("mars_sim", "simTime");
     simulatorInterface->getControlCenter()->dataBroker->registerSyncReceiver(mars,"mars_sim", "simTime",1);
     
@@ -356,6 +358,7 @@ bool Mars::configureHook()
     argument.raw_options = _raw_options.get();
     argument.config_dir = _config_dir.get();
     argument.initialized = false;
+    argument.add_floor = _add_floor.get();
 
     int ret = pthread_create(&thread_info, NULL, startMarsFunc, &argument);
     if(ret)

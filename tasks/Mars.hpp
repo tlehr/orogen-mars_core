@@ -32,6 +32,7 @@ namespace simulation {
             int controller_port;
 	    std::string config_dir;
             bool initialized;
+            bool add_floor;
 
             // Raw command line option can be passed to mars
             // using this option vector

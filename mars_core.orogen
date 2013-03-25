@@ -28,6 +28,8 @@ task_context "Mars" do
         operation("loadScene").
             argument("path","/std/string")
 
+        property('add_floor',"/bool",false)
+
 	property('config_dir', '/std/string',"#{ENV['AUTOPROJ_PROJECT_BASE']}/install/configuration/mars_default").
 	    doc('the full path to the main configuration folder')
 

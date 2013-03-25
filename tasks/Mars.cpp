@@ -44,10 +44,11 @@ Mars::~Mars()
 
 void Mars::loadScene(::std::string const & path)
 {
-    if(simulatorInterface)
-        simulatorInterface->loadScene(path.c_str(), 0);
-    else
+    if(simulatorInterface){
+        simulatorInterface->loadScene(path, path,true,true);
+    }else{
         RTT::log(RTT::Error) << "Simulator not yet started cout not load scenefile" << RTT::endlog();        
+    }
 }
 
 mars::interfaces::SimulatorInterface* Mars::getSimulatorInterface()
@@ -339,16 +340,16 @@ bool Mars::configureHook()
     int pos = _config_dir.get().rfind(":/");
     if(pos != _config_dir.get().size()-1)
         _config_dir.set(_config_dir.get().substr(pos+1));
-
+    
     RTT::log(RTT::Info) << "Calling configure: with " << _config_dir.get() << RTT::endlog();
 
     //mars is not setting the config path properly
     //therefore we have to go into to the config folder
-    if(0 != chdir(_config_dir.get().c_str()))
-    {
-        RTT::log(RTT::Error) << "Config directory " << _config_dir.get() << " does not exist. Cannot start mars." << RTT::endlog();
-        throw std::runtime_error(std::string("Config directory ") +_config_dir.get() +" does not exist. Can not start mars.");    
-    }
+    //if(0 != chdir(_config_dir.get().c_str()))
+    //{
+    //    RTT::log(RTT::Error) << "Config directory " << _config_dir.get() << " does not exist. Cannot start mars." << RTT::endlog();
+    //    throw std::runtime_error(std::string("Config directory ") +_config_dir.get() +" does not exist. Can not start mars.");    
+    //}
 
     // Startup of simulation
     MarsArguments argument;
@@ -393,6 +394,11 @@ bool Mars::configureHook()
         RTT::log(RTT::Info) << "MultiSimPlugin loaded" << RTT::endlog();
     }
     */
+    if(!_initial_scene.get().empty()){
+        printf("name: %s",_initial_scene.get().c_str());
+        simulatorInterface->loadScene(_initial_scene.get(), std::string("initial"),true,true);
+    }
+
     return true;
 }
 

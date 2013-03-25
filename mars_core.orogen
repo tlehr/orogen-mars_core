@@ -29,8 +29,11 @@ task_context "Mars" do
             argument("path","/std/string")
 
         property('add_floor',"/bool",false)
-
-	property('config_dir', '/std/string',"#{ENV['AUTOPROJ_PROJECT_BASE']}/install/configuration/mars_default").
+	
+        property('initial_scene', '/std/string').
+	    doc('the full path to the initial scene, this is needed because operations are not accessible during configuration within syskit (deadlock)')
+	
+        property('config_dir', '/std/string',"#{ENV['AUTOPROJ_PROJECT_BASE']}/install/configuration/mars_default").
 	    doc('the full path to the main configuration folder')
 
 	property('distributed_simulation', 'bool').
@@ -94,13 +97,16 @@ end
 
 task_context "MarsServo" do
     subclasses "interfaces::Servo"
-    
+    needs_configuration
+
     property('name', '/std/string', 'servo_motor').
 	doc('name of the motor in the scene file, which should be handled as a servo')
+
 end
 
 task_context "MarsLaserRangeFinder" do
     subclasses "interfaces::LaserRangeFinder"
+    needs_configuration
     
     property('name', '/std/string', 'laser_scanner').
 	doc('name of the sensor in the scene file')
@@ -108,6 +114,7 @@ end
 
 task_context "MarsIMU" do
     subclasses "interfaces::IMU"
+    needs_configuration
     
     property('name', '/std/string', 'imu').
 	doc('name of the node in the scene file from which to get the orientation')

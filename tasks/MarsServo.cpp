@@ -33,13 +33,22 @@ struct ServoPlugin : public MarsPlugin
         theMotor->setValue( target_pos );
         // todo: is it desired to get the target_pos back from the motor?
         motor_pos = theMotor->getActualPosition( );
+        
+        //printf("Got an update from the simulation %f %f\n",time,motor_pos);
     }
 
     void setMotorName( const std::string& name )
     {
         motor_id = control->motors->getID( name );
-        if( !motor_id )
+        if( !motor_id ){
+            std::vector<mars::interfaces::core_objects_exchange> motorList;
+            control->motors->getListMotors(&motorList);
+            std::cerr << "Availible Motors:" << std::endl;
+            for(int i=0;i<motorList.size();i++){
+                std::cerr << motorList[i].name << std::endl;
+            }
             throw std::runtime_error("There is no motor by the name of " + name + " in the scene");
+        }
         
 //        mars::sim::SimMotor *theMotor = control->motors->getSimMotor(motor_id);
 //        desired_velocity = theMotor->getMaximumVelocity();

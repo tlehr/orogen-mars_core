@@ -15,6 +15,7 @@ public:
 	: CameraPlugin(name, fps), task( task )
     {
 	image = new base::samples::DistanceImage(width, height);
+	image->setSize(width, height);
 	ro_ptr.reset(image);
     }
 
@@ -24,6 +25,12 @@ public:
 	image = ro_ptr.write_access();
 
 	camera->getDepthImage(image->data);
+
+	// get the camera info for the intrinsic parameters of the virtual camera
+	mars::interfaces::cameraStruct camInfo;
+	camera->getCameraInfo(&camInfo);
+	image->setIntrinsic(camInfo.scale_x, camInfo.scale_y, 
+			    camInfo.center_x, camInfo.center_y );
 
 	//TODO camera might be rotated
 

@@ -33,8 +33,6 @@ struct ServoPlugin : public MarsPlugin
         theMotor->setValue( target_pos );
         // todo: is it desired to get the target_pos back from the motor?
         motor_pos = theMotor->getActualPosition( );
-        
-        //printf("Got an update from the simulation %f %f\n",time,motor_pos);
     }
 
     void setMotorName( const std::string& name )

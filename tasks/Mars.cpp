@@ -271,7 +271,7 @@ void* Mars::startMarsFunc(void* argument)
         unsigned long boden_id = simulatorInterface->getControlCenter()->nodes->createPrimitiveNode("Boden",mars::interfaces::NODE_TYPE_PLANE,false,mars::utils::Vector(0,0,0.0),mars::utils::Vector(600,600,0));
     }
 //    mars->dbSimTimeId = simulatorInterface->getControlCenter()->dataBroker->getDataID("mars_sim", "simTime");
-    simulatorInterface->getControlCenter()->dataBroker->registerTriggeredReceiver(mars,"mars_sim", "simTime","postPhysicsUpdate",1);
+    assert(simulatorInterface->getControlCenter()->dataBroker->registerTriggeredReceiver(mars,"mars_sim", "simTime","mars_sim/postPhysicsUpdate",1));
     
     
     // Synchronize with configureHook

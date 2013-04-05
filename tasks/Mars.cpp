@@ -472,6 +472,6 @@ void Mars::receiveData(
         int id) 
 {
     package.get("simTime", &simTime);
-    printf("Recive Data aufgrufen!!\n");
-    trigger();
+    //printf("Recive Data aufgrufen!!\n");
+    //trigger();
 }

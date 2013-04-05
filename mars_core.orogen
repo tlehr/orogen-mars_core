@@ -104,6 +104,13 @@ task_context "MarsServo" do
 
 end
 
+task_context "MarsTrigger" do
+    property "do_step","bool",false
+    doc("This components triggeres the mars simulation cycle if the update-hook is called, 
+        this is useful if an sequence between componentes is needed, like it is possible with the
+        trigger_component")
+end
+
 task_context "MarsLaserRangeFinder" do
     subclasses "interfaces::LaserRangeFinder"
     needs_configuration

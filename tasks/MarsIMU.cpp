@@ -34,6 +34,9 @@ struct IMUPlugin : public MarsPlugin
 	rbs.cov_orientation = base::Matrix3d::Ones() * 1e-6;
 
 	task._orientation_samples.write( rbs );
+	
+    rbs.position = control->nodes->getPosition( node_id );
+    task._pose_samples.write( rbs );
     }
 };
 }

@@ -21,7 +21,9 @@ using_task_library "interfaces"
 # task_context 'RobotSimulation' do
 #         subclasses 'simulation::Mars'
 # end
-
+#
+# Pay attention that all these tasks have to be started within 
+# one deployment to be able to share their static resources.
 task_context "Mars" do
 	needs_configuration
 
@@ -36,10 +38,10 @@ task_context "Mars" do
         property('config_dir', '/std/string',"#{ENV['AUTOPROJ_PROJECT_BASE']}/install/configuration/mars_default").
 	    doc('the full path to the main configuration folder')
 
-	property('distributed_simulation', 'bool').
+        property('distributed_simulation', 'bool').
 	    doc('switch to active the distributed simulation if needed')
 
-	property('enable_gui', 'bool').
+        property('enable_gui', 'bool').
 	    doc('start the simulation graphical interface with this module')
 
         property('controller_port', 'int').
@@ -86,6 +88,12 @@ task_context "MarsDepthCamera" do
         doc 'frames per second'
 end
 
+# E.g. (ruby script): Two actuators 'rear_left' and 'rear_right' with scene indices 1 and 9
+# actuator_names = ["rear_left", "rear_right"]
+# actuator_indices = [1, 9]  <- Using a negative index to invert, using 0 to deactivate
+# actuators = TaskContext.get 'mars_actuator'
+# actuators.names = actuator_names
+# actuators.dispatch("name_of_the_actuator_set", actuator_indices)  <- Has to be done before configure and start!
 task_context "MarsActuator" do
     subclasses "interfaces::Actuator"
     
@@ -124,14 +132,14 @@ task_context "MarsIMU" do
     needs_configuration
     
     property('name', '/std/string', 'imu').
-	doc('name of the node in the scene file from which to get the orientation')
+	doc('name of the node in the scene file from which to get the imu data')
 end
     
 
 deployment "simulation" do
         sim = task('mars_simulation', 'simulation::Mars')
         acc = task('mars_actuator', 'simulation::MarsActuator')
-        acc = task('mars_camera', 'simulation::MarsCamera')
+        cam = task('mars_camera', 'simulation::MarsCamera')
 	add_default_logger
 end
 

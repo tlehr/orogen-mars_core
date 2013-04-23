@@ -268,10 +268,10 @@ void* Mars::startMarsFunc(void* argument)
     Mars::graphicsTimer->run();
 
     if(marsArguments->add_floor){
-        unsigned long boden_id = simulatorInterface->getControlCenter()->nodes->createPrimitiveNode("Boden",mars::interfaces::NODE_TYPE_PLANE,false,mars::utils::Vector(0,0,0.0),mars::utils::Vector(600,600,0));
+        unsigned long boden_id = mars->simulatorInterface->getControlCenter()->nodes->createPrimitiveNode("Boden",mars::interfaces::NODE_TYPE_PLANE,false,mars::utils::Vector(0,0,0.0),mars::utils::Vector(600,600,0));
     }
 //    mars->dbSimTimeId = simulatorInterface->getControlCenter()->dataBroker->getDataID("mars_sim", "simTime");
-    assert(simulatorInterface->getControlCenter()->dataBroker->registerTriggeredReceiver(mars,"mars_sim", "simTime","mars_sim/postPhysicsUpdate",1));
+    assert(mars->simulatorInterface->getControlCenter()->dataBroker->registerTriggeredReceiver(mars,"mars_sim", "simTime","mars_sim/postPhysicsUpdate",1));
     
     
     // Synchronize with configureHook
@@ -457,12 +457,15 @@ void Mars::cleanupHook()
     simulatorInterface->exitMars();
     while( simulatorInterface->isSimRunning()) ;
 
-    libManager->unloadLibrary("mars_sim");
-    libManager->unloadLibrary("mars_gui");
-    libManager->unloadLibrary("mars_graphics");
-    libManager->unloadLibrary("gui_core");
 
     delete libManager;
+    
+    libManager->releaseLibrary("mars_sim");
+    libManager->releaseLibrary("mars_gui");
+    libManager->releaseLibrary("mars_graphics");
+    libManager->releaseLibrary("gui_core");
+
+
     if(multisimPlugin) delete multisimPlugin;
 }
 

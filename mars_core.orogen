@@ -133,6 +133,9 @@ task_context "MarsIMU" do
     
     property('name', '/std/string', 'imu').
 	doc('name of the node in the scene file from which to get the imu data')
+
+    output_port('pose_samples', '/base/samples/RigidBodyState').
+        doc 'provides timestamped IMUReading samples containing the complete pose'
 end
     
 

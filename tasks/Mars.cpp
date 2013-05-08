@@ -22,6 +22,7 @@ using namespace simulation;
 using namespace mars;
 
 mars::interfaces::SimulatorInterface *Mars::simulatorInterface = 0;
+Mars *Mars::taskInterface = 0;
 mars::app::GraphicsTimer *Mars::graphicsTimer = 0;
 mars::lib_manager::LibManager* Mars::libManager = 0; 
 
@@ -29,12 +30,14 @@ Mars::Mars(std::string const& name)
     : MarsBase(name)
     , multisimPlugin(0)
 {
+    Mars::taskInterface = this;
 }
 
 Mars::Mars(std::string const& name, RTT::ExecutionEngine* engine)
     : MarsBase(name, engine)
     , multisimPlugin(0)
 {
+    Mars::taskInterface = this;
 }
 
 Mars::~Mars()
@@ -54,6 +57,10 @@ void Mars::loadScene(::std::string const & path)
 mars::interfaces::SimulatorInterface* Mars::getSimulatorInterface()
 {
     return simulatorInterface;
+}
+	
+Mars* Mars::getSimulatorInterface(){
+    return taskInterface;
 }
 
 void* Mars::startMarsFunc(void* argument)
@@ -451,20 +458,37 @@ void Mars::updateHook()
 
         }
     }
+
+    if(simulatorInterface->hasSimFault()){
+        exception(PHYSICS_ERROR);
+ //       QCoreApplication::quit(); //Quitting QApplication too
+    }
     //_time.write(simulatorInterface->getControlCenter()->dataBroker->getDataPackage(dbSimTimeId)[0].d);
     _time.write(simTime);
 }
 
 void Mars::errorHook()
 {
+    std::cout << "ERROR HOOK" << std::endl;
 }
 
 void Mars::stopHook()
 {
+    std::cout << "STOP HOOK" << std::endl;
+}
+        
+void Mars::registerPlugin(MarsPlugin* plugin){
+    plugins.push_back(plugin);
+}
+
+void Mars::unregisterPlugin(MarsPlugin* plugin){
+    plugins.push_back(plugin);
 }
 
 void Mars::cleanupHook()
 {
+    std::cout << "CLEANUP HOOK" << std::endl;
+    
     simulatorInterface->exitMars();
     while( simulatorInterface->isSimRunning()) ;
 
@@ -479,6 +503,20 @@ void Mars::cleanupHook()
 
     if(multisimPlugin) delete multisimPlugin;
 }
+/*
+bool Mars::recover(){
+    std::cout << "RECOVER HOOK" << std::endl;
+    return MarsBase::recover();
+}
+void Mars::fatal(){
+    std::cout << "FATAL HOOK" << std::endl;
+    MarsBase::fatal();
+}
+void Mars::exception(){
+    std::cout << "EXCEPTION HOOK" << std::endl;
+    MarsBase::exception();
+}
+*/
 
 void Mars::receiveData(
         const data_broker::DataInfo& info,

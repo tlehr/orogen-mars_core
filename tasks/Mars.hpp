@@ -59,6 +59,7 @@ namespace simulation {
     protected:
     	static mars::app::GraphicsTimer *graphicsTimer;
 	static mars::interfaces::SimulatorInterface* simulatorInterface;
+	static Mars* marsInterface;
 	static void* startMarsFunc(void *);
         static std::string configDir;
 	static bool marsRunning;
@@ -77,15 +78,21 @@ namespace simulation {
          */
         virtual void loadScene(::std::string const & path);
 
+        std::vector<MarsPlugin*> plugins;
+
     public:
 	/** get the singleton instance of the simulator interface
 	 */
 	static mars::interfaces::SimulatorInterface* getSimulatorInterface();
+	static Mars* getTaskInterface();
 
         Mars(std::string const& name = "simulation::Mars");
         Mars(std::string const& name, RTT::ExecutionEngine* engine);
 
 	~Mars();
+
+        void registerPlugin(MarsPlugin* plugin);
+        void unregisterPlugin(MarsPlugin* plugin);
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the
@@ -148,6 +155,7 @@ namespace simulation {
          void cleanupHook();
     
          void receiveData(const mars::data_broker::DataInfo& info,const mars::data_broker::DataPackage& package,int id);
+        
     };
 }
 

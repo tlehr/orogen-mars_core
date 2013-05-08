@@ -62,6 +62,15 @@ task_context "Mars" do
         output_port('time', 'double')
 
         port_driven 'control_action'
+
+        exception_states :PHYSICS_ERROR
+end
+
+task_context "MarsPlugin" do
+    needs_configuration
+
+    error_states "LOST_MARS_CONNECTION"
+    
 end
 
 task_context "MarsCamera" do
@@ -95,7 +104,8 @@ end
 # actuators.names = actuator_names
 # actuators.dispatch("name_of_the_actuator_set", actuator_indices)  <- Has to be done before configure and start!
 task_context "MarsActuator" do
-    subclasses "interfaces::Actuator"
+    #subclasses "interfaces::Actuator"
+    subclasses "MarsPlugin"
     
     property('names', 'std/vector</std/string>').
 	doc('Array of names of the motor in the scene file. The names get mapped to motor ids starting from zero')
@@ -104,7 +114,8 @@ task_context "MarsActuator" do
 end
 
 task_context "MarsServo" do
-    subclasses "interfaces::Servo"
+    #subclasses "interfaces::Servo"
+    subclasses "MarsPlugin"
     needs_configuration
 
     property('name', '/std/string', 'servo_motor').
@@ -128,7 +139,9 @@ task_context "MarsLaserRangeFinder" do
 end
 
 task_context "MarsIMU" do
-    subclasses "interfaces::IMU"
+    #subclasses "interfaces::IMU"
+    subclasses "MarsPlugin"
+    
     needs_configuration
     
     property('name', '/std/string', 'imu').

@@ -96,7 +96,8 @@ void* Mars::startMarsFunc(void* argument)
     if( *(locale->decimal_point) != '.')
     {
         RTT::log(RTT::Error) << "Current locale conflicts with mars" << RTT::endlog();
-        exit(1);
+        marsArguments->failed_to_init = true;
+        return 0;
     }
 
     // Prepare the LibManager and required configuration files
@@ -140,8 +141,9 @@ void* Mars::startMarsFunc(void* argument)
 
             if(configPath.sValue != marsArguments->config_dir)
             {
-		RTT::log(RTT::Error) << "Property was not set correctly: " << configPath.sValue << RTT::endlog();
-                exit(1);
+		RTT::log(RTT::Error) << "CRITICAL (cause abort): Property was not set correctly: " << configPath.sValue << RTT::endlog();
+                marsArguments->failed_to_init = true;
+                return 0;
             } else {
                 RTT::log(RTT::Error) << "Configuration path property set to " << configPath.sValue << RTT::endlog();
             }
@@ -176,9 +178,10 @@ void* Mars::startMarsFunc(void* argument)
     lib = libManager->getLibrary("mars_sim");
     if(!lib)
     {
-        RTT::log(RTT::Error) << "Simulation library failed to load" << RTT::endlog();
+        RTT::log(RTT::Error) << "CRITICAL (cause abort) Simulation library failed to load" << RTT::endlog();
         RTT::log(RTT::Error) << "Configuration loaded from " << corelibsConfigPath << RTT::endlog();
-        exit(2);
+        marsArguments->failed_to_init = true;
+        return 0;
     }
 
 
@@ -186,8 +189,9 @@ void* Mars::startMarsFunc(void* argument)
     mars->simulatorInterface = dynamic_cast<sim::Simulator*>(lib); 
     if(!mars->simulatorInterface)
     {
-        RTT::log(RTT::Error) << "Simulation could not be retrieved via lib_manager" << RTT::endlog();
-        exit(3);
+        RTT::log(RTT::Error) << "CRITICAL (cause abort) Simulation could not be retrieved via lib_manager" << RTT::endlog();
+        marsArguments->failed_to_init = true;
+        return 0;
     }
 
     mars->simulatorInterface->readArguments(count + 1, argv);
@@ -217,8 +221,9 @@ void* Mars::startMarsFunc(void* argument)
                 marsGui->setupGui();
             }
         } else {
-            RTT::log(RTT::Error) << "Simulator: mars_gui not found, cannot show GUI" << RTT::endlog();
-            exit(4);
+            RTT::log(RTT::Error) << "CRITICAL (cause abort) Simulator: mars_gui not found, cannot show GUI" << RTT::endlog();
+            marsArguments->failed_to_init = true;
+            return 0;
         }
 
         main_gui::MainGUI* mainGui;
@@ -227,8 +232,9 @@ void* Mars::startMarsFunc(void* argument)
         {
             // all good
         } else {
-            RTT::log(RTT::Error) << "Simulator: gui_core not found, cannot show GUI" << RTT::endlog();
-            exit(5);
+            RTT::log(RTT::Error) << "CRITICAL (cause abort) Simulator: gui_core not found, cannot show GUI" << RTT::endlog();
+            marsArguments->failed_to_init = true;
+            return 0;
         }
 
 
@@ -360,6 +366,7 @@ bool Mars::configureHook()
     argument.config_dir = _config_dir.get();
     argument.initialized = false;
     argument.add_floor = _add_floor.get();
+    argument.failed_to_init=false;
 
     int ret = pthread_create(&thread_info, NULL, startMarsFunc, &argument);
     if(ret)
@@ -368,7 +375,7 @@ bool Mars::configureHook()
         throw std::runtime_error("Failed to create MARS thread");
     }
 
-    for(int i=0; !argument.initialized;++i)
+    for(int i=0; !argument.initialized && !argument.failed_to_init;++i)
     {
         //give up after 10 sec
         if(i > 1000)
@@ -377,6 +384,10 @@ bool Mars::configureHook()
             throw std::runtime_error("Cannot start mars thread!");
         }
         usleep(10000);
+    }
+    if(argument.failed_to_init){
+            RTT::log(RTT::Error) << "Mars failed to start, see Error above" << RTT::endlog();
+            return false;
     }
 
     RTT::log(RTT::Info) << "Mars running" << RTT::endlog();

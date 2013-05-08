@@ -33,7 +33,7 @@ namespace simulation {
 	    std::string config_dir;
             bool initialized;
             bool add_floor;
-
+            bool failed_to_init;
             // Raw command line option can be passed to mars
             // using this option vector
             std::vector<Option> raw_options;

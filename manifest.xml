@@ -9,7 +9,7 @@ The mars-core module provides the base for other modules that require the simula
   <!-- Dependencies are resolved via osdep file in the autoproj configuration -->
   <depend package="rtt" />
   <depend package="tools/logger" />
-  <!--depend package="base/orogen/interfaces" /-->
+  <depend package="drivers/actuator_dispatcher"/>
   <depend package="simulation/mars/app" />
   <depend package="simulation/mars/gui" />
   <depend package="simulation/mars/graphics" />

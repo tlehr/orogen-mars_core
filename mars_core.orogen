@@ -13,7 +13,7 @@ using_library "QtGui", :typekit => false
 import_types_from "tasks/MarsControl.hpp"
 import_types_from "servoTypes.hpp"
 
-using_library "base-interfaces"
+using_library "actuator_dispatcher"
 
 # Core orogen module that brings up the mars simulation and
 # makes it accessible as a orogen module

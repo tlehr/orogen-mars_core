@@ -4,7 +4,7 @@
 #define SIMULATION_MARSACTUATOR_TASK_HPP
 
 #include "simulation/MarsActuatorBase.hpp"
-#include "Actuator.hpp"
+#include "actuator_dispatcher/Actuator.hpp"
 
 namespace simulation {
 

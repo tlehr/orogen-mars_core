@@ -4,7 +4,8 @@
 #include "simulation/MarsBase.hpp"
 #include <vector>
 #include <mars/data_broker/ReceiverInterface.h>
-   
+#include "MarsPlugin.hpp"  
+
 /** From MARS */
 //
 namespace mars{
@@ -59,7 +60,7 @@ namespace simulation {
     protected:
     	static mars::app::GraphicsTimer *graphicsTimer;
 	static mars::interfaces::SimulatorInterface* simulatorInterface;
-	static Mars* marsInterface;
+	static simulation::Mars* taskInterface;
 	static void* startMarsFunc(void *);
         static std::string configDir;
 	static bool marsRunning;
@@ -84,7 +85,7 @@ namespace simulation {
 	/** get the singleton instance of the simulator interface
 	 */
 	static mars::interfaces::SimulatorInterface* getSimulatorInterface();
-	static Mars* getTaskInterface();
+	static simulation::Mars* getTaskInterface();
 
         Mars(std::string const& name = "simulation::Mars");
         Mars(std::string const& name, RTT::ExecutionEngine* engine);

@@ -1,6 +1,6 @@
 include(simulationTaskLib)
 ADD_LIBRARY(${SIMULATION_TASKLIB_NAME} SHARED 
-    CameraPlugin.cpp
+    Actuator.cpp
     ${SIMULATION_TASKLIB_SOURCES})
 
 add_dependencies(${SIMULATION_TASKLIB_NAME}

@@ -22,7 +22,7 @@ using namespace simulation;
 using namespace mars;
 
 mars::interfaces::SimulatorInterface *Mars::simulatorInterface = 0;
-Mars *Mars::taskInterface = 0;
+simulation::Mars *Mars::taskInterface = 0;
 mars::app::GraphicsTimer *Mars::graphicsTimer = 0;
 mars::lib_manager::LibManager* Mars::libManager = 0; 
 
@@ -59,7 +59,7 @@ mars::interfaces::SimulatorInterface* Mars::getSimulatorInterface()
     return simulatorInterface;
 }
 	
-Mars* Mars::getSimulatorInterface(){
+simulation::Mars* Mars::getTaskInterface(){
     return taskInterface;
 }
 
@@ -281,7 +281,7 @@ void* Mars::startMarsFunc(void* argument)
     Mars::graphicsTimer->run();
 
     if(marsArguments->add_floor){
-        unsigned long boden_id = mars->simulatorInterface->getControlCenter()->nodes->createPrimitiveNode("Boden",mars::interfaces::NODE_TYPE_PLANE,false,mars::utils::Vector(0,0,0.0),mars::utils::Vector(600,600,0));
+        mars->simulatorInterface->getControlCenter()->nodes->createPrimitiveNode("Boden",mars::interfaces::NODE_TYPE_PLANE,false,mars::utils::Vector(0,0,0.0),mars::utils::Vector(600,600,0));
     }
 //    mars->dbSimTimeId = simulatorInterface->getControlCenter()->dataBroker->getDataID("mars_sim", "simTime");
     assert(mars->simulatorInterface->getControlCenter()->dataBroker->registerTriggeredReceiver(mars,"mars_sim", "simTime","mars_sim/postPhysicsUpdate",1));
@@ -460,6 +460,9 @@ void Mars::updateHook()
     }
 
     if(simulatorInterface->hasSimFault()){
+        for(unsigned int i=0;i<plugins.size();i++){
+            plugins[i]->handleMarsShudown();
+        }
         exception(PHYSICS_ERROR);
  //       QCoreApplication::quit(); //Quitting QApplication too
     }
@@ -489,6 +492,11 @@ void Mars::cleanupHook()
 {
     std::cout << "CLEANUP HOOK" << std::endl;
     
+    for(unsigned int i=0;i<plugins.size();i++){
+        plugins[i]->handleMarsShudown();
+    }
+    plugins.clear();
+
     simulatorInterface->exitMars();
     while( simulatorInterface->isSimRunning()) ;
 

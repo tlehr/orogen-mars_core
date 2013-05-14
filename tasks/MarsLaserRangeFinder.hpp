@@ -4,10 +4,14 @@
 #define SIMULATION_MARSLASERRANGEFINDER_TASK_HPP
 
 #include "simulation/MarsLaserRangeFinderBase.hpp"
+        
+namespace mars{
+    namespace sim{
+        class  RaySensor;
+    };
+};
 
 namespace simulation {
-
-    class LaserRangeFinderPlugin;
 
     /*! \class MarsLaserRangeFinder 
      * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
@@ -27,10 +31,10 @@ namespace simulation {
     {
 	friend class MarsLaserRangeFinderBase;
     protected:
+        base::samples::LaserScan scan;
+        mars::sim::RaySensor* sensor;
 
-	LaserRangeFinderPlugin* plugin;
-
-
+        void update( double time );
     public:
         /** TaskContext constructor for MarsLaserRangeFinder
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.

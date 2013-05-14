@@ -25,7 +25,7 @@ MarsActuator::~MarsActuator()
 }
 
 namespace simulation {
-struct ActuatorPlugin : public MarsPlugin
+struct ActuatorPlugin 
 {
     MarsActuator *task;
     //actuator id in the task.
@@ -34,13 +34,21 @@ struct ActuatorPlugin : public MarsPlugin
     base::actuators::DRIVE_MODE mode;
     double value;
     bool gotCommand;
-    
+    std::string name;
+   
+
     ActuatorPlugin(const std::string& name, MarsActuator *task, int actuatorId)
-        : task(task), actuatorId(actuatorId), marsMotorId(0), gotCommand(false)
+        : task(task), actuatorId(actuatorId), marsMotorId(0), gotCommand(false),name(name)
     {
-        marsMotorId = control->motors->getID( name );
-        if( !marsMotorId )
-            throw std::runtime_error("There is no motor by the name of " + name + " in the scene");	
+    }
+
+    bool init(){
+        marsMotorId = task->control->motors->getID( name );
+        if( !marsMotorId ){
+            std::cerr << "There is no motor by the name of " + name + " in the scene";	
+            return false;
+        }
+        return true;
     }
 
     void setCommand(base::actuators::DRIVE_MODE mode, double value)
@@ -52,7 +60,7 @@ struct ActuatorPlugin : public MarsPlugin
     
     void update( double time )
     {
-        mars::sim::SimMotor *motor = control->motors->getSimMotor(marsMotorId);
+        mars::sim::SimMotor *motor = task->control->motors->getSimMotor(marsMotorId);
 
 	if(gotCommand)
 	{
@@ -91,7 +99,6 @@ struct ActuatorPlugin : public MarsPlugin
 void MarsActuator::setCommand(int32_t actuatorId, base::actuators::DRIVE_MODE mode, double value)
 {
     ActuatorPlugin *plugin = plugins[actuatorId];
-    
     plugin->setCommand(mode, value);
 }
 
@@ -105,9 +112,8 @@ void MarsActuator::statusDispatchAdded(int dispatchId, std::vector< int > actuat
 bool MarsActuator::configureHook()
 {
     
-    if (! ::interfaces::Actuator::configureHook())
+    if (!::simulation::MarsPlugin::configureHook())
         return false;
-        
     return true;
     
 }
@@ -117,10 +123,9 @@ bool MarsActuator::configureHook()
 bool MarsActuator::startHook()
 {
     std::cout << "ACTUATOR START HOOK" << std::endl;
-    if (! ::interfaces::Actuator::startHook())
+    if (! ::simulation::MarsPlugin::startHook())
         return false;
     
-
     std::vector<std::string> motorNames = _names.get();    
     
     for(std::vector<OrocosCommandDispatcher *>::const_iterator it = cmdDispatches.begin();
@@ -136,11 +141,8 @@ bool MarsActuator::startHook()
 	    }
 
 	    ActuatorPlugin *plugin;
-	    try {
-		plugin = new ActuatorPlugin(motorNames[*id], this, *id);
-	    } catch (std::runtime_error e)
-	    {
-		std::cout << e.what() << std::endl;
+	    plugin = new ActuatorPlugin(motorNames[*id], this, *id);
+	    if(!plugin->init()){	
 		//TODO CLEANUP MEMORY
 		return false;
 	    }
@@ -156,52 +158,37 @@ bool MarsActuator::startHook()
 
 
 
-void MarsActuator::updateHook()
-{
-    ::interfaces::Actuator::updateHook();
-    
 
-    processDispatched();
+//    processDispatched();
 
     
+
+void MarsActuator::update(double delta_t){
+	for(int i=0;i<plugins.size();i++){
+            plugins[i]->update(delta_t);
+        }
 }
 
-
+void MarsActuator::updateHook()
+{
+    simulation::MarsPlugin::updateHook();
+}
 
 void MarsActuator::errorHook()
 {
-    
-    ::interfaces::Actuator::errorHook();
-    
-
-    
-
-    
+    simulation::MarsPlugin::errorHook();
 }
-
-
 
 void MarsActuator::stopHook()
 {
-    
-    ::interfaces::Actuator::stopHook();
-    
-
-    
-
-    
+    simulation::MarsPlugin::stopHook();
 }
-
-
 
 void MarsActuator::cleanupHook()
 {
-    
-    ::interfaces::Actuator::cleanupHook();
-    
-
-    
-
-    
+    simulation::MarsPlugin::cleanupHook();
 }
 
+bool MarsActuator::dispatch(::std::string const & name, ::std::vector< boost::int32_t > const & actuatorMap){
+    return Actuator::dispatch(name,actuatorMap,this);    
+}

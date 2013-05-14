@@ -3,9 +3,7 @@
 #ifndef SIMULATION_MARSTRIGGER_TASK_HPP
 #define SIMULATION_MARSTRIGGER_TASK_HPP
 
-#include "Mars.hpp"
 #include "simulation/MarsTriggerBase.hpp"
-#include <mars/data_broker/ReceiverInterface.h>
 #include <pthread.h>
 
 namespace simulation {
@@ -26,7 +24,7 @@ namespace simulation {
      \endverbatim
      *  It can be dynamically adapted when the deployment is called with a prefix argument. 
      */
-    class MarsTrigger : public MarsTriggerBase, public mars::data_broker::ReceiverInterface
+    class MarsTrigger : public MarsTriggerBase
     {
 	friend class MarsTriggerBase;
     protected:
@@ -36,19 +34,20 @@ namespace simulation {
          void receiveData(const mars::data_broker::DataInfo& info,const mars::data_broker::DataPackage& package,int id);
 
 
+
     public:
         /** TaskContext constructor for MarsTrigger
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
          * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
          */
-        MarsTrigger(std::string const& name = "simulation::MarsTrigger", TaskCore::TaskState initial_state = Stopped);
+        MarsTrigger(std::string const& name = "simulation::MarsTrigger");
 
         /** TaskContext constructor for MarsTrigger 
          * \param name Name of the task. This name needs to be unique to make it identifiable for nameservices. 
          * \param engine The RTT Execution engine to be used for this task, which serialises the execution of all commands, programs, state machines and incoming events for a task. 
-         * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
+         * 
          */
-        MarsTrigger(std::string const& name, RTT::ExecutionEngine* engine, TaskCore::TaskState initial_state = Stopped);
+        MarsTrigger(std::string const& name, RTT::ExecutionEngine* engine);
 
         /** Default deconstructor of MarsTrigger
          */

@@ -4,6 +4,7 @@
 #define SIMULATION_MARSACTUATOR_TASK_HPP
 
 #include "simulation/MarsActuatorBase.hpp"
+#include "Actuator.hpp"
 
 namespace simulation {
 
@@ -23,7 +24,7 @@ namespace simulation {
      \endverbatim
      *  It can be dynamically adapted when the deployment is called with a prefix argument. 
      */
-    class MarsActuator : public MarsActuatorBase
+    class MarsActuator : public MarsActuatorBase, public interfaces::Actuator
     {
 	friend class MarsActuatorBase;
 	friend class ActuatorPlugin;
@@ -31,6 +32,10 @@ namespace simulation {
 	std::vector<ActuatorPlugin *> plugins;
 	virtual void setCommand(int32_t actuatorId, base::actuators::DRIVE_MODE mode, double value);
 	virtual void statusDispatchAdded(int dispatchId, std::vector< int > actuatorIds);
+        
+        /* creates an output port of actuator status and an input port for setting actuator commands
+         */
+        virtual bool dispatch(::std::string const & name, ::std::vector< boost::int32_t > const & actuatorMap);
 
     public:
         /** TaskContext constructor for MarsActuator
@@ -107,6 +112,8 @@ namespace simulation {
          * before calling start() again.
          */
         void cleanupHook();
+
+        virtual void update(double delta_t);
     };
 }
 

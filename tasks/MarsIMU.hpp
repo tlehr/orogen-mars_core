@@ -26,10 +26,11 @@ namespace simulation {
     class MarsIMU : public MarsIMUBase
     {
 	friend class MarsIMUBase;
-	friend class IMUPlugin;
-    protected:
 
-	IMUPlugin* plugin;
+    protected:
+        long node_id;
+        base::samples::RigidBodyState rbs;
+        void update( double time );
 
 
     public:

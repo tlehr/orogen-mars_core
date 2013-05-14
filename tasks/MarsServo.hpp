@@ -8,7 +8,7 @@
 
 namespace simulation {
 
-    class ServoPlugin;
+//    class ServoPlugin;
 
     /*! \class MarsServo 
      * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
@@ -28,11 +28,18 @@ namespace simulation {
     {
 	friend class MarsServoBase;
     protected:
-	ServoPlugin* plugin;
+//	ServoPlugin* plugin;
+        int motor_id;
+        double motor_pos;
+        double target_pos;
+        double desired_velocity;
+        base::samples::RigidBodyState upper2lower;
+        double last_angle;
+        double target_angle;
 
 	bool set_angle( double angle );
 	double get_angle();
-	base::Time getTime();
+        void update( double time );
 
     public:
         /** TaskContext constructor for MarsServo

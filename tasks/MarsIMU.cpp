@@ -7,47 +7,13 @@
 
 using namespace simulation;
 
-namespace simulation {
-struct IMUPlugin : public MarsPlugin
-{
-    MarsIMU &task;
-    long node_id;
-    base::samples::RigidBodyState rbs;
-
-    IMUPlugin( MarsIMU& task, const std::string& name )
-	: task( task )
-    {
-	node_id = control->nodes->getID( name );
-	if( !node_id )
-	    throw std::runtime_error("There is no node by the name of " + name + " in the scene");
-
-	rbs.initSane();
-	rbs.position.setZero();
-    }
-
-    void update( double time )
-    {
-	rbs.time = getTime();
-	rbs.sourceFrame = task._imu_frame.value();
-	rbs.targetFrame = task._world_frame.value();
-	rbs.orientation = control->nodes->getRotation( node_id ).normalized();
-	rbs.cov_orientation = base::Matrix3d::Ones() * 1e-6;
-
-	task._orientation_samples.write( rbs );
-	
-    rbs.position = control->nodes->getPosition( node_id );
-    task._pose_samples.write( rbs );
-    }
-};
-}
-
-MarsIMU::MarsIMU(std::string const& name)
-    : MarsIMUBase(name), plugin(0)
+    MarsIMU::MarsIMU(std::string const& name)
+    : MarsIMUBase(name)
 {
 }
 
 MarsIMU::MarsIMU(std::string const& name, RTT::ExecutionEngine* engine)
-    : MarsIMUBase(name, engine), plugin(0)
+    : MarsIMUBase(name, engine)
 {
 }
 
@@ -72,7 +38,14 @@ bool MarsIMU::startHook()
     if (! MarsIMUBase::startHook())
         return false;
 
-    plugin = new IMUPlugin( *this, _name.value() );
+    node_id = control->nodes->getID( _name.value() );
+    if( !node_id ){
+        std::cerr << "There is no node by the name of " << _name .value() << " in the scene" << std::endl;
+        return false;
+    }
+
+    rbs.initSane();
+    rbs.position.setZero();
 
     return true;
 }
@@ -86,12 +59,24 @@ void MarsIMU::updateHook()
 // }
 void MarsIMU::stopHook()
 {
-    delete plugin;
-
     MarsIMUBase::stopHook();
 }
 // void MarsIMU::cleanupHook()
 // {
 //     MarsIMUBase::cleanupHook();
 // }
+
+void MarsIMU::update( double time )
+{
+    rbs.time = getTime();
+    rbs.sourceFrame = _imu_frame.value();
+    rbs.targetFrame = _world_frame.value();
+    rbs.orientation = control->nodes->getRotation( node_id ).normalized();
+    rbs.cov_orientation = base::Matrix3d::Ones() * 1e-6;
+
+    _orientation_samples.write( rbs );
+    
+    rbs.position = control->nodes->getPosition( node_id );
+    _pose_samples.write( rbs );
+}
 

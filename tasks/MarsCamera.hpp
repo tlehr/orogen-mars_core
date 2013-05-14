@@ -5,9 +5,7 @@
 
 #include "simulation/MarsCameraBase.hpp"
 
-class MarsCameraPlugin;
 namespace simulation {
-
 
     /*! \class MarsCamera 
      * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
@@ -26,10 +24,10 @@ namespace simulation {
     class MarsCamera : public MarsCameraBase
     {
 	friend class MarsCameraBase;
-	friend class ::MarsCameraPlugin;
     protected:
-	::MarsCameraPlugin *cameraPlugin;
-
+        base::samples::frame::Frame *image;
+        std::vector<mars::sim::Pixel> marsImage;
+        RTT::extras::ReadOnlyPointer<base::samples::frame::Frame> ro_ptr;
 
     public:
         /** TaskContext constructor for MarsCamera
@@ -106,6 +104,8 @@ namespace simulation {
          * before calling start() again.
          */
         void cleanupHook();
+
+        virtual void getData();
     };
 }
 

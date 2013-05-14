@@ -26,10 +26,13 @@ namespace simulation {
      \endverbatim
      *  It can be dynamically adapted when the deployment is called with a prefix argument. 
      */
-    class MarsPlugin : public MarsPluginBase
+    class MarsPlugin : public MarsPluginBase, public mars::interfaces::PluginInterface, public mars::data_broker::ReceiverInterface
     {
 	friend class MarsPluginBase;
     protected:
+        mars::interfaces::SimulatorInterface *sim;
+//        mars::interfaces::ControlCenter *control;
+        double simTime;
 
 
 
@@ -114,8 +117,10 @@ namespace simulation {
         bool connect();
         void disconnect();
         virtual void reset();
-        virtual void receiveData();
+        virtual void receiveData(const mars::data_broker::DataInfo& info,const mars::data_broker::DataPackage& package,int id);
         virtual void handleMarsShudown();
+        virtual void init();
+        virtual void update(double delta_t);
     };
 };
 

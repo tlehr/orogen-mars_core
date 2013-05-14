@@ -5,7 +5,6 @@
 
 #include "simulation/MarsDepthCameraBase.hpp"
 
-class DepthCameraPlugin;
 namespace simulation {
 
     /*! \class MarsDepthCamera 
@@ -25,9 +24,10 @@ namespace simulation {
     class MarsDepthCamera : public MarsDepthCameraBase
     {
 	friend class MarsDepthCameraBase;
-	friend class ::DepthCameraPlugin;
     protected:
-	::DepthCameraPlugin *camera;
+        base::samples::DistanceImage *image;
+        RTT::extras::ReadOnlyPointer<base::samples::DistanceImage> ro_ptr;
+
 
 
     public:
@@ -105,6 +105,8 @@ namespace simulation {
          * before calling start() again.
          */
         void cleanupHook();
+
+        virtual void getData();
     };
 }
 

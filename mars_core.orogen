@@ -219,6 +219,7 @@ task_context "MarsIMU" do
 end
 
 task_context "Actuators" do
+    subclasses "MarsPlugin"
     needs_configuration
     
     property('node_name', 'std/string')

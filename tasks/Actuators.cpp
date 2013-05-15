@@ -8,92 +8,8 @@ using namespace simulation;
 using namespace mars::utils;
 
 
-
-namespace simulation {
-struct ThrusterPlugin : public MarsPlugin {
-
-	unsigned long vehicle_id;
-	const unsigned int amountOfActuators;
-	std::vector <double> max_thruster_force;
-	std::vector <mars::utils::Vector> thruster_pos;
-	std::vector <mars::utils::Vector> thruster_dir;
-	std::vector <mars::interfaces::sReal> thruster_force;
-	pthread_mutex_t* node_update_mutex;
-
-	unsigned int RATE;
-
-	ThrusterPlugin(std::string node_name, unsigned int amountOfActuators,
-					std::vector <double> max_thruster_force,
-					std::vector <mars::utils::Vector> thruster_pos,
-					std::vector <mars::utils::Vector> thruster_dir)
-		: amountOfActuators(amountOfActuators), max_thruster_force(max_thruster_force), thruster_pos(thruster_pos), thruster_dir(thruster_dir), node_update_mutex(new pthread_mutex_t)
-	{
-		vehicle_id = control->nodes->getID(node_name);
-		if( !vehicle_id )
-			throw std::runtime_error("There is no node by the name of " + node_name + " in the scene");
-
-		std::string groupName, dataName;
-		control->nodes->getDataBrokerNames(vehicle_id, &groupName, &dataName);
-		control->dataBroker->registerTimedReceiver(this, groupName, dataName, "mars_sim/simTimer", RATE,vehicle_id);
-		RATE = 10;
-		thruster_force.resize(amountOfActuators);
-		for (unsigned int i=0; i<amountOfActuators; i++) {
-			thruster_force[i] = 0.0;
-		}
-	}
-
-	bool getPose(Eigen::Vector3d &pos, Eigen::Quaterniond &orientation){
-		pthread_mutex_lock(node_update_mutex);
-		mars::utils::Vector vehicle_pos = control->nodes->getPosition(vehicle_id);
-		mars::utils::Quaternion vehicle_rot = control->nodes->getRotation(vehicle_id);
-		pos = Eigen::Vector3d(vehicle_pos.x(),vehicle_pos.y(),vehicle_pos.z());
-		orientation = Eigen::Quaterniond(vehicle_rot.w(),vehicle_rot.x(),vehicle_rot.y(),vehicle_rot.z());
-		pthread_mutex_unlock(node_update_mutex);
-		return true;
-	}
-
-	bool getVelocities(Eigen::Vector3d &lin_vel, Eigen::Vector3d &ang_vel){
-		pthread_mutex_lock(node_update_mutex);
-		mars::utils::Vector vehicle_lin_vel = control->nodes->getLinearVelocity(vehicle_id);
-		mars::utils::Vector vehicle_ang_vel = control->nodes->getAngularVelocity(vehicle_id);
-		lin_vel = Eigen::Vector3d(vehicle_lin_vel.x(),vehicle_lin_vel.y(),vehicle_lin_vel.z());
-		ang_vel = Eigen::Vector3d(vehicle_ang_vel.x(),vehicle_ang_vel.y(),vehicle_ang_vel.z());
-		pthread_mutex_unlock(node_update_mutex);
-		return true;
-	}
-
-	void setTarget(const std::vector<double> &target){
-		if(target.size() != amountOfActuators) {
-			char buffer[50];
-			sprintf(buffer, "Object has %d motors!!!", amountOfActuators);
-			throw std::runtime_error(buffer);
-		}
-
-		pthread_mutex_lock(node_update_mutex);
-		for(unsigned int i=0;i<amountOfActuators;i++)
-			thruster_force[i] = target[i];
-		pthread_mutex_unlock(node_update_mutex);
-	}
-
-	void update(double time) {
-		mars::utils::Quaternion vehicle_rot = control->nodes->getRotation(vehicle_id);
-		mars::utils::Vector tmp1, tmp2;
-		for(unsigned int i=0; i<amountOfActuators;++i) {
-			tmp1 = vehicle_rot * thruster_pos[i];
-			tmp1 += control->nodes->getPosition(vehicle_id);
-			tmp2 = vehicle_rot *thruster_dir[i];
-			tmp2 *= std::max(-max_thruster_force[i],std::min(max_thruster_force[i],thruster_force[i]*max_thruster_force[i]));
-			control->nodes->applyForce(vehicle_id, tmp2, tmp1);
-		}
-	}
-};
-}
-
-
-
 Actuators::Actuators(std::string const& name)
     : ActuatorsBase(name){}
-
 
 Actuators::Actuators(std::string const& name, RTT::ExecutionEngine* engine)
     : ActuatorsBase(name, engine){}
@@ -134,7 +50,18 @@ bool Actuators::startHook()
 		thruster_direction[i].z() = thruster_dir(2,0);
 	}
 
-	thruster_plugin = new simulation::ThrusterPlugin(node_name, amount_of_actuators, maximum_thruster_force, thruster_position, thruster_direction);
+	vehicle_id = control->nodes->getID(node_name);
+	if( !vehicle_id )
+		throw std::runtime_error("There is no node by the name of " + node_name + " in the scene");
+
+	std::string groupName, dataName;
+	control->nodes->getDataBrokerNames(vehicle_id, &groupName, &dataName);
+	control->dataBroker->registerTimedReceiver(this, groupName, dataName, "mars_sim/simTimer", RATE,vehicle_id);
+	RATE = 10;
+	thruster_force.resize(amount_of_actuators);
+	for (unsigned int i=0; i<amount_of_actuators; i++) {
+		thruster_force[i] = 0.0;
+	}
 
     return true;
 }
@@ -193,3 +120,52 @@ void Actuators::errorHook()
 {
     ActuatorsBase::errorHook();
 }
+
+
+
+void Actuators::update(double time) {
+	mars::utils::Quaternion vehicle_rot = control->nodes->getRotation(vehicle_id);
+	mars::utils::Vector tmp1, tmp2;
+	for(unsigned int i=0; i<amount_of_actuators;++i) {
+		tmp1 = vehicle_rot * thruster_position[i];
+		tmp1 += control->nodes->getPosition(vehicle_id);
+		tmp2 = vehicle_rot *thruster_direction[i];
+		tmp2 *= std::max(-maximum_thruster_force[i],std::min(maximum_thruster_force[i],thruster_force[i]*maximum_thruster_force[i]));
+		control->nodes->applyForce(vehicle_id, tmp2, tmp1);
+	}
+}
+
+
+
+	bool Actuators::getPose(Eigen::Vector3d &pos, Eigen::Quaterniond &orientation){
+		pthread_mutex_lock(node_update_mutex);
+		mars::utils::Vector vehicle_pos = control->nodes->getPosition(vehicle_id);
+		mars::utils::Quaternion vehicle_rot = control->nodes->getRotation(vehicle_id);
+		pos = Eigen::Vector3d(vehicle_pos.x(),vehicle_pos.y(),vehicle_pos.z());
+		orientation = Eigen::Quaterniond(vehicle_rot.w(),vehicle_rot.x(),vehicle_rot.y(),vehicle_rot.z());
+		pthread_mutex_unlock(node_update_mutex);
+		return true;
+	}
+
+	bool Actuators::getVelocities(Eigen::Vector3d &lin_vel, Eigen::Vector3d &ang_vel){
+		pthread_mutex_lock(node_update_mutex);
+		mars::utils::Vector vehicle_lin_vel = control->nodes->getLinearVelocity(vehicle_id);
+		mars::utils::Vector vehicle_ang_vel = control->nodes->getAngularVelocity(vehicle_id);
+		lin_vel = Eigen::Vector3d(vehicle_lin_vel.x(),vehicle_lin_vel.y(),vehicle_lin_vel.z());
+		ang_vel = Eigen::Vector3d(vehicle_ang_vel.x(),vehicle_ang_vel.y(),vehicle_ang_vel.z());
+		pthread_mutex_unlock(node_update_mutex);
+		return true;
+	}
+
+	void Actuators::setTarget(const std::vector<double> &target){
+		if(target.size() != amountOfActuators) {
+			char buffer[50];
+			sprintf(buffer, "Object has %d motors!!!", amountOfActuators);
+			throw std::runtime_error(buffer);
+		}
+
+		pthread_mutex_lock(node_update_mutex);
+		for(unsigned int i=0;i<amountOfActuators;i++)
+			thruster_force[i] = target[i];
+		pthread_mutex_unlock(node_update_mutex);
+	}

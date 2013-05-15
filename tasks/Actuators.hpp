@@ -8,14 +8,22 @@
 #include "simulation/ActuatorsBase.hpp"
 
 namespace simulation {
-    class ThrusterPlugin;
 
     class Actuators : public ActuatorsBase
     {
 	friend class ActuatorsBase;
 
     protected:
-		simulation::ThrusterPlugin* thruster_plugin;
+
+	unsigned long vehicle_id;
+	const unsigned int amount_of_actuators;
+	std::vector <double> maximum_thruster_force;
+	std::vector <mars::utils::Vector> thruster_position;
+	std::vector <mars::utils::Vector> thruster_direction;
+	std::vector <mars::interfaces::sReal> thruster_force;
+	pthread_mutex_t* node_update_mutex;
+
+	unsigned int RATE;
 
 
     public:
@@ -55,9 +63,6 @@ namespace simulation {
          * Call recover() to go back in the Runtime state.
          */
          void errorHook();
-
-        private:
-		unsigned int amount_of_actuators;
     };
 }
 

@@ -4,7 +4,6 @@
 #define SIMULATION_ACTUATORS_TASK_HPP
 
 #include "Mars.hpp"
-#include "simulation/MarsPlugin.hpp"
 #include "simulation/ActuatorsBase.hpp"
 
 namespace simulation {
@@ -14,17 +13,17 @@ namespace simulation {
 	friend class ActuatorsBase;
 
     protected:
+		unsigned long vehicle_id;
+		unsigned int amount_of_actuators;
+		std::vector <double> maximum_thruster_force;
+		std::vector <mars::utils::Vector> thruster_position;
+		std::vector <mars::utils::Vector> thruster_direction;
+		std::vector <mars::interfaces::sReal> thruster_force;
+		pthread_mutex_t* node_update_mutex;
 
-	unsigned long vehicle_id;
-	const unsigned int amount_of_actuators;
-	std::vector <double> maximum_thruster_force;
-	std::vector <mars::utils::Vector> thruster_position;
-	std::vector <mars::utils::Vector> thruster_direction;
-	std::vector <mars::interfaces::sReal> thruster_force;
-	pthread_mutex_t* node_update_mutex;
+		unsigned int RATE;
 
-	unsigned int RATE;
-
+        void update( double time );
 
     public:
         Actuators(std::string const& name = "simulation::Actuators");

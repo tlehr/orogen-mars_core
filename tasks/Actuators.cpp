@@ -100,8 +100,16 @@ void Actuators::updateHook()
 			pwm.push_back(command.target[i]);
         }
 
-        thruster_plugin->setTarget(pwm);
+		if(pwm.size() != amount_of_actuators) {
+			char buffer[50];
+			sprintf(buffer, "Object has %d motors!!!", amount_of_actuators);
+			throw std::runtime_error(buffer);
+		}
 
+		pthread_mutex_lock(node_update_mutex);
+		for(unsigned int i=0;i<amount_of_actuators;i++)
+			thruster_force[i] = pwm[i];
+		pthread_mutex_unlock(node_update_mutex);
 
         // write actuator status
         base::actuators::Status status;
@@ -134,38 +142,3 @@ void Actuators::update(double time) {
 		control->nodes->applyForce(vehicle_id, tmp2, tmp1);
 	}
 }
-
-
-
-	bool Actuators::getPose(Eigen::Vector3d &pos, Eigen::Quaterniond &orientation){
-		pthread_mutex_lock(node_update_mutex);
-		mars::utils::Vector vehicle_pos = control->nodes->getPosition(vehicle_id);
-		mars::utils::Quaternion vehicle_rot = control->nodes->getRotation(vehicle_id);
-		pos = Eigen::Vector3d(vehicle_pos.x(),vehicle_pos.y(),vehicle_pos.z());
-		orientation = Eigen::Quaterniond(vehicle_rot.w(),vehicle_rot.x(),vehicle_rot.y(),vehicle_rot.z());
-		pthread_mutex_unlock(node_update_mutex);
-		return true;
-	}
-
-	bool Actuators::getVelocities(Eigen::Vector3d &lin_vel, Eigen::Vector3d &ang_vel){
-		pthread_mutex_lock(node_update_mutex);
-		mars::utils::Vector vehicle_lin_vel = control->nodes->getLinearVelocity(vehicle_id);
-		mars::utils::Vector vehicle_ang_vel = control->nodes->getAngularVelocity(vehicle_id);
-		lin_vel = Eigen::Vector3d(vehicle_lin_vel.x(),vehicle_lin_vel.y(),vehicle_lin_vel.z());
-		ang_vel = Eigen::Vector3d(vehicle_ang_vel.x(),vehicle_ang_vel.y(),vehicle_ang_vel.z());
-		pthread_mutex_unlock(node_update_mutex);
-		return true;
-	}
-
-	void Actuators::setTarget(const std::vector<double> &target){
-		if(target.size() != amountOfActuators) {
-			char buffer[50];
-			sprintf(buffer, "Object has %d motors!!!", amountOfActuators);
-			throw std::runtime_error(buffer);
-		}
-
-		pthread_mutex_lock(node_update_mutex);
-		for(unsigned int i=0;i<amountOfActuators;i++)
-			thruster_force[i] = target[i];
-		pthread_mutex_unlock(node_update_mutex);
-	}

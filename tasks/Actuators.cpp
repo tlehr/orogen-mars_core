@@ -9,12 +9,14 @@ using namespace mars::utils;
 
 
 Actuators::Actuators(std::string const& name)
-    : ActuatorsBase(name){}
+    : ActuatorsBase(name), node_update_mutex(new pthread_mutex_t) {}
 
 Actuators::Actuators(std::string const& name, RTT::ExecutionEngine* engine)
-    : ActuatorsBase(name, engine){}
+    : ActuatorsBase(name, engine), node_update_mutex(new pthread_mutex_t) {}
 
-Actuators::~Actuators(){}
+Actuators::~Actuators(){
+	pthread_mutex_destroy(node_update_mutex);
+}
 
 
 /// The following lines are template definitions for the various state machine
@@ -26,10 +28,11 @@ bool Actuators::startHook()
     if(!Mars::getSimulatorInterface())
         throw std::runtime_error("Cannot start Actuators. The simulator is not running in the same process.");
 
+	pthread_mutex_init(node_update_mutex, NULL);
 	std::string node_name;
-	std::vector <double> maximum_thruster_force;
-	std::vector <mars::utils::Vector> thruster_position;
-	std::vector <mars::utils::Vector> thruster_direction;
+	//std::vector <double> maximum_thruster_force;
+	//std::vector <mars::utils::Vector> thruster_position;
+	//std::vector <mars::utils::Vector> thruster_direction;
 
 	node_name = _node_name.get();
 	amount_of_actuators = _amount_of_actuators.get();

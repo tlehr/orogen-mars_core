@@ -54,9 +54,9 @@ namespace simulation
     protected:
 		base::samples::SonarBeam sonar_beam;
 		unsigned long node_id;
-        simulation::SonarConfig sonar_config;
+        simulation::SonarConfig *sonar_config;
         int sonar_motor_direction;
-        //pthread_mutex_t* sonar_update_mutex;
+        pthread_mutex_t* sonar_update_mutex;
 
         void update( double time );
 

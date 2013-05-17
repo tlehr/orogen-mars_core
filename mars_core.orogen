@@ -243,6 +243,29 @@ task_context "Actuators" do
     output_port("status", "base/actuators/Status")
     port_driven :command
 end
+
+task_context "Sonar" do
+    subclasses "MarsPlugin"
+    needs_configuration
+    
+    property('node_name', 'std/string')
+	doc 'the name of the vehicle in the scene file'
+        
+    property("left_limit","double")
+	doc 'maximum left angle'
+    property("right_limit","double")
+	doc 'maximum right angle'
+    property("resolution","double")
+	doc 'resolution of the sonar beam'
+    property("maximum_distance","double")
+	doc 'maximum distance of the sonar beam'
+    property("ping_pong_mode","bool").
+        doc('if true ping pong mode is activated')
+	    
+	
+    output_port("sonar_beam","base::samples::SonarBeam").
+        doc('top sonar beam')
+end
     
 #
 #deployment "simulation" do

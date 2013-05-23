@@ -1,31 +1,5 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
 
-/*
-
-task_context "SonarTop" do
-        output_port("sonar_beam","base::samples::SonarBeam").
-            doc('top sonar beam')
-
-        property("left_limit","double",Math::PI)
-        property("right_limit","double",-Math::PI)
-        property("resolution","double",0.1)
-        property("maximum_distance","double",100.0)
-        property("ping_pong_mode","bool",false).
-            doc('if true ping pong mode is activated')
-end
-
-task_context "SonarRear" do
-        output_port("sonar_beam","base::samples::SonarBeam").
-            doc('rear sonar beam')
-
-        property("left_limit","double",0.7*Math::PI)
-        property("right_limit","double",0.3*Math::PI)
-        property("resolution","double",0.1)
-        property("maximum_distance","double",50.0)
-        property("ping_pong_mode","bool",true).
-            doc('if true ping pong mode is activated')
-end
-*/
 #include "Sonar.hpp"
 #include <mars/sim/ScanningSonar.h>
 #include <mars/interfaces/sim/NodeManagerInterface.h>
@@ -64,12 +38,6 @@ void Sonar::updateHook()
     SonarBase::updateHook();
 
     simulation::SonarConfig *config = new simulation::SonarConfig();
-
-    config->start_angle = _left_limit.get();
-    config->end_angle = _right_limit.get();
-    config->max_distance = _maximum_distance.get();
-    config->distance_resolution = _resolution.get();
-    config->ping_pong_mode = _ping_pong_mode.get();
 
     pthread_mutex_lock(sonar_update_mutex);
     sonar_config = config;
@@ -171,4 +139,45 @@ bool Sonar::getSonarData(base::samples::SonarBeam &sonar_beam){
 }
 
 void Sonar::update( double time ) {
+}
+
+
+bool Sonar::setLeft_limit(double value)
+{
+	sonar_config->start_angle = value;
+
+  	//Call the base function, DO-NOT Remove
+	return(SonarBase::setLeft_limit(value));
+}
+
+bool Sonar::setMaximum_distance(double value)
+{
+    sonar_config->max_distance = value;
+
+  	//Call the base function, DO-NOT Remove
+	return(SonarBase::setMaximum_distance(value));
+}
+
+bool Sonar::setPing_pong_mode(bool value)
+{
+    sonar_config->ping_pong_mode = value;
+
+  	//Call the base function, DO-NOT Remove
+	return(SonarBase::setPing_pong_mode(value));
+}
+
+bool Sonar::setResolution(double value)
+{
+    sonar_config->distance_resolution = value;
+
+  	//Call the base function, DO-NOT Remove
+	return(SonarBase::setResolution(value));
+}
+
+bool Sonar::setRight_limit(double value)
+{
+	sonar_config->end_angle = value;
+
+  	//Call the base function, DO-NOT Remove
+	return(SonarBase::setRight_limit(value));
 }

@@ -69,6 +69,27 @@ namespace simulation
         void updateTopSonarPosition();
 
         bool getSonarData(base::samples::SonarBeam &sonar_beam);
+
+
+        /* Dynamic Property setter of left_limit
+         */
+        virtual bool setLeft_limit(double value);
+
+        /* Dynamic Property setter of maximum_distance
+         */
+        virtual bool setMaximum_distance(double value);
+
+        /* Dynamic Property setter of ping_pong_mode
+         */
+        virtual bool setPing_pong_mode(bool value);
+
+        /* Dynamic Property setter of resolution
+         */
+        virtual bool setResolution(double value);
+
+        /* Dynamic Property setter of right_limit
+         */
+        virtual bool setRight_limit(double value);
 	~Sonar();
 
         /** This hook is called by Orocos when the state machine transitions

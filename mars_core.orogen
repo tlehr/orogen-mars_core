@@ -248,18 +248,18 @@ task_context "Sonar" do
     subclasses "MarsPlugin"
     needs_configuration
     
-    property('node_name', 'std/string')
+    property('node_name', 'std/string').
 	doc 'the name of the vehicle in the scene file'
         
-    property("left_limit","double")
+    property("left_limit","double").dynamic.
 	doc 'maximum left angle'
-    property("right_limit","double")
+    property("right_limit","double").dynamic.
 	doc 'maximum right angle'
-    property("resolution","double")
+    property("resolution","double").dynamic.
 	doc 'resolution of the sonar beam'
-    property("maximum_distance","double")
+    property("maximum_distance","double").dynamic.
 	doc 'maximum distance of the sonar beam'
-    property("ping_pong_mode","bool").
+    property("ping_pong_mode","bool").dynamic.
         doc('if true ping pong mode is activated')
 	    
 	
@@ -275,5 +275,3 @@ end
 #	add_default_logger
 #end
 #
-
-

@@ -275,3 +275,10 @@ end
 #	add_default_logger
 #end
 #
+
+
+deployment "simulation" do
+	task('simulation', 'simulation::Mars')
+	task('actuators', 'simulation::Actuators')
+	add_default_logger
+end

@@ -32,7 +32,10 @@ task_context "Mars" do
             argument("path","/std/string")
 
         property('add_floor',"/bool",false)
-	
+
+        property("show_coordinate_system","bool",false).
+            dynamic
+
         property('initial_scene', '/std/string').
 	    doc('the full path to the initial scene, this is needed because operations are not accessible during configuration within syskit (deadlock)')
 	

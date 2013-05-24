@@ -211,9 +211,6 @@ void* Mars::startMarsFunc(void* argument)
 
     RTT::log(RTT::Info) << "Starting mars with: " << cmd << RTT::endlog();
 
-    // GraphicsTimer will be later called with the marsGraphics reference
-    // which can be also NULL for a disabled gui
-    graphics::GraphicsManager* marsGraphics = NULL;
 
     // if we have a main gui, show it 
     if(marsArguments->enable_gui)
@@ -248,12 +245,12 @@ void* Mars::startMarsFunc(void* argument)
         lib = libManager->getLibrary("mars_graphics");
         if(lib) 
         {
-            if( (marsGraphics = dynamic_cast<graphics::GraphicsManager*>(lib)) )
+            if( (Mars::getTaskInterface()->marsGraphics = dynamic_cast<graphics::GraphicsManager*>(lib)) )
             {
                 // init osg
                 //initialize graphicsFactory
-                marsGraphics->initializeOSG(NULL);
-                void* widget = marsGraphics->getQTWidget(1);	
+                Mars::getTaskInterface()->marsGraphics->initializeOSG(NULL);
+                void* widget = Mars::getTaskInterface()->marsGraphics->getQTWidget(1);	
                 if (widget && mainGui) 
                 {
                     //control->gui->addDockWidget((void*)newWidget,1);
@@ -277,7 +274,7 @@ void* Mars::startMarsFunc(void* argument)
 
     // GraphicsTimer allows to update the graphics interface 
     // every 10 ms
-    Mars::graphicsTimer = new app::GraphicsTimer(marsGraphics, mars->simulatorInterface);
+    Mars::graphicsTimer = new app::GraphicsTimer(Mars::getTaskInterface()->marsGraphics, mars->simulatorInterface);
     Mars::graphicsTimer->run();
 
     if(marsArguments->add_floor){
@@ -312,6 +309,26 @@ int Mars::getOptionCount(const std::vector<Option>& options)
 
     return count;
 }
+
+bool Mars::setShow_coordinate_system(bool value)
+{
+        printf("Hook called with: %s\n",value?"true":"false");
+
+	//TODO Add your code here 
+        if(!marsGraphics){
+            fprintf(stderr,"Could not change view of coordinate systems without an Graphics interface\n");
+            return false;
+        }
+
+  	//Call the base function, DO-NOT Remove
+        if(value)
+            marsGraphics->hideCoords();
+        else
+            marsGraphics->showCoords();
+
+	return(simulation::MarsBase::setShow_coordinate_system(value));
+}
+
 
 char** Mars::setOptions(const std::vector<Option>& options)
 {
@@ -416,8 +433,8 @@ bool Mars::configureHook()
         printf("name: %s",_initial_scene.get().c_str());
         simulatorInterface->loadScene(_initial_scene.get(), std::string("initial"),true,true);
     }
-
-    return true;
+    
+    return updateDynamicProperties();
 }
 
 

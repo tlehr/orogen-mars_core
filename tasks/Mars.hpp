@@ -19,7 +19,12 @@ namespace mars{
     namespace lib_manager {
         class LibManager;
     }
+    namespace graphics{
+        class GraphicsManager;
+    };
 };
+
+
 
 namespace simulation {
 
@@ -80,6 +85,15 @@ namespace simulation {
         virtual void loadScene(::std::string const & path);
 
         std::vector<MarsPlugin*> plugins;
+        
+        /* Dynamic Property setter of show_coordinate_system
+         */
+        virtual bool setShow_coordinate_system(bool value);
+    
+        
+        // GraphicsTimer will be later called with the marsGraphics reference
+        // which can be also NULL for a disabled gui
+        mars::graphics::GraphicsManager* marsGraphics;
 
     public:
 	/** get the singleton instance of the simulator interface

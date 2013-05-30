@@ -27,9 +27,9 @@ bool Actuators::startHook()
         throw std::runtime_error("Cannot start Actuators. The simulator is not running in the same process.");
 
 	std::string node_name;
-	std::vector <double> maximum_thruster_force;
-	std::vector <mars::utils::Vector> thruster_position;
-	std::vector <mars::utils::Vector> thruster_direction;
+//	std::vector <double> maximum_thruster_force;
+//	std::vector <mars::utils::Vector> thruster_position;
+//	std::vector <mars::utils::Vector> thruster_direction;
 
 	node_name = _node_name.get();
 	amount_of_actuators = _amount_of_actuators.get();

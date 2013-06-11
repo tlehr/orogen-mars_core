@@ -21,7 +21,7 @@ Actuators::Actuators(std::string const& name, RTT::ExecutionEngine* engine)
 }
 
 Actuators::~Actuators(){
-	pthread_mutex_destroy(node_update_mutex);
+	pthread_mutex_destroy(&node_update_mutex);
 }
 
 
@@ -33,8 +33,6 @@ bool Actuators::startHook()
 
     if(!Mars::getSimulatorInterface())
         throw std::runtime_error("Cannot start Actuators. The simulator is not running in the same process.");
-
-	pthread_mutex_init(node_update_mutex, NULL);
 	std::string node_name;
 
 	node_name = _node_name.get();

@@ -19,7 +19,7 @@ namespace simulation {
 		std::vector <mars::utils::Vector> thruster_position;
 		std::vector <mars::utils::Vector> thruster_direction;
 		std::vector <mars::interfaces::sReal> thruster_force;
-		pthread_mutex_t* node_update_mutex;
+		pthread_mutex_t node_update_mutex;
 
 		unsigned int RATE;
 

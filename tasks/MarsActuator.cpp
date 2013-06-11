@@ -172,6 +172,7 @@ void MarsActuator::update(double delta_t){
 void MarsActuator::updateHook()
 {
     simulation::MarsPlugin::updateHook();
+    processDispatched();
 }
 
 void MarsActuator::errorHook()

@@ -9,10 +9,16 @@ using namespace mars::utils;
 
 
 Actuators::Actuators(std::string const& name)
-    : ActuatorsBase(name), node_update_mutex(new pthread_mutex_t) {}
+    : ActuatorsBase(name){
+
+    pthread_mutex_init(&node_update_mutex, NULL);
+}
+
 
 Actuators::Actuators(std::string const& name, RTT::ExecutionEngine* engine)
-    : ActuatorsBase(name, engine), node_update_mutex(new pthread_mutex_t) {}
+    : ActuatorsBase(name, engine){
+    pthread_mutex_init(&node_update_mutex, NULL);
+}
 
 Actuators::~Actuators(){
 	pthread_mutex_destroy(node_update_mutex);
@@ -30,9 +36,6 @@ bool Actuators::startHook()
 
 	pthread_mutex_init(node_update_mutex, NULL);
 	std::string node_name;
-	//std::vector <double> maximum_thruster_force;
-	//std::vector <mars::utils::Vector> thruster_position;
-	//std::vector <mars::utils::Vector> thruster_direction;
 
 	node_name = _node_name.get();
 	amount_of_actuators = _amount_of_actuators.get();
@@ -109,10 +112,10 @@ void Actuators::updateHook()
 			throw std::runtime_error(buffer);
 		}
 
-		pthread_mutex_lock(node_update_mutex);
+		pthread_mutex_lock(&node_update_mutex);
 		for(unsigned int i=0;i<amount_of_actuators;i++)
 			thruster_force[i] = pwm[i];
-		pthread_mutex_unlock(node_update_mutex);
+		pthread_mutex_unlock(&node_update_mutex);
 
         // write actuator status
         base::actuators::Status status;

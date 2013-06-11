@@ -12,11 +12,13 @@ using namespace simulation;
 Sonar::Sonar(std::string const& name)
     : SonarBase(name), sonar_update_mutex(new pthread_mutex_t)
 {
+	sonar_config = new simulation::SonarConfig();
 }
 
 Sonar::Sonar(std::string const& name, RTT::ExecutionEngine* engine)
     : SonarBase(name, engine), sonar_update_mutex(new pthread_mutex_t)
 {
+	sonar_config = new simulation::SonarConfig();
 }
 
 Sonar::~Sonar()
@@ -37,12 +39,9 @@ void Sonar::updateHook()
 {
     SonarBase::updateHook();
 
-    simulation::SonarConfig *config = new simulation::SonarConfig();
-
     pthread_mutex_lock(sonar_update_mutex);
-    sonar_config = config;
     mars::sim::ScanningSonar* sonar = dynamic_cast<mars::sim::ScanningSonar*>(control->sensors->getSimSensor(node_id));
-    sonar->setPingPongConfig(config->ping_pong_mode, config->start_angle, config->end_angle);
+    sonar->setPingPongConfig(sonar_config->ping_pong_mode, sonar_config->start_angle, sonar_config->end_angle);
     pthread_mutex_unlock(sonar_update_mutex);
 
     if(getSonarData(sonar_beam)){

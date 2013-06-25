@@ -6,10 +6,14 @@ require './scene'
 require 'pp'
 
 texture_file = nil
+supersampling = 1
 options = OptionParser.new do |opt|
     opt.banner = "gdal_to_mars [options] dem_tif out_file"
     opt.on('--texture FILE', String, 'An optional texture file') do |file|
         texture_file = file
+    end
+    opt.on('--supersampling SCALE', Integer, "Supersampling level") do |level|
+        supersampling = level
     end
     opt.on('--help') do
         puts opt
@@ -27,20 +31,19 @@ input = scenes.shift
 output = scenes.shift
 
 scene = MarsScene.new(output, true)
-Tempfile.open('gdal_to_mars') do |io|
-    offsets, scale, size = MarsScene.convert_terrain_from_gdal(input, io.path)
-    data = File.read(io.path)
-    data_filename = File.basename(input)
+offsets, scale, size = MarsScene.convert_terrain_from_gdal(input, "__gdal_to_mars__.tif", supersampling)
+data = File.read("__gdal_to_mars__.tif")
+data_filename = File.basename(input)
 
-    scene.add_file(data_filename, data)
-    if texture_file
-	# need to flip the file first
-	tmp_file = "/tmp/#{File.basename(texture_file)}"
-	`convert -flip #{texture_file} #{tmp_file}`
-	scene.add_file(File.basename(tmp_file), File.read( tmp_file ))
-    end
-
-    scene.add_terrain("terrain", data_filename, offsets, scale, size, File.basename(texture_file))
-    scene.write
+scene.add_file(data_filename, data)
+if texture_file
+    # need to flip the file first
+    tmp_file = "/tmp/#{File.basename(texture_file)}"
+    `convert -flip #{texture_file} #{tmp_file}`
+    scene.add_file(File.basename(tmp_file), File.read( tmp_file ))
+    texture_file_basename = File.basename(texture_file)
 end
+
+scene.add_terrain("terrain", data_filename, offsets, scale, size, texture_file_basename)
+scene.write
 

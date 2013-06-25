@@ -359,7 +359,6 @@ char** Mars::setOptions(const std::vector<Option>& options)
 
 bool Mars::configureHook()
 {
-
     if(_config_dir.get().empty())
     {
         RTT::log(RTT::Error) << "Config directory is not set! Cannot start mars." << RTT::endlog();

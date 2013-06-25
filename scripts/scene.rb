@@ -137,7 +137,7 @@ class MarsScene
 
     # Takes a georeferenced GDAL terrain file as input and formats it in a way
     # that can be used by Mars
-    def self.convert_terrain_from_gdal(input_path, output_path)
+    def self.convert_terrain_from_gdal(input_path, output_path, supersampling = 1)
         source_map = Gdal::Gdal.open(input_path)
         source_data = source_map.read_band(1)
         min, max = [source_data.min, source_data.max]
@@ -152,7 +152,21 @@ class MarsScene
 
         x0, y0, x_scale, y_scale = transform[0], transform[3], transform[1], transform[5]
         mapped_data = source_data.map { |v| Integer((v - min) * scale) }.
-            each_slice(source_map.xsize).map(&:reverse).inject([], &:concat)
+            each_slice(source_map.xsize).map(&:reverse).flatten
+
+        pixel_arrays = []
+        if supersampling > 1
+            line_counter = 0
+            mapped_data = mapped_data.enum_for(:each_slice, source_map.xsize).
+               map do |line|
+                   line = line.map do |pixel|
+                       pixel_arrays[pixel] ||= [pixel] * supersampling
+                   end
+
+                   (1..supersampling).map { line }
+               end
+            mapped_data = mapped_data.flatten
+        end
 
         # GDAL-Ruby does not offer a way to delete a dataset (that I know of),
         # but that's the only way to make sure that the data is completely
@@ -160,21 +174,29 @@ class MarsScene
         #
         # Fork to generate the dataset
         pid = fork do
-            driver = Gdal::Gdal.get_driver_by_name('GTiff')
-            target_map = driver.create(output_path, source_map.xsize, source_map.xsize, 3, Gdal::Gdalconst::GDT_UINT16, ["PHOTOMETRIC=RGB"])
-            3.times do |i|
-                band = target_map.band(i + 1)
-                target_map.write_band(i + 1, mapped_data)
+            begin
+                driver = Gdal::Gdal.get_driver_by_name('GTiff')
+                target_map = driver.create(output_path,
+                    source_map.xsize * supersampling,
+                    source_map.ysize * supersampling, 3,
+                    Gdal::Gdalconst::GDT_UINT16, ["PHOTOMETRIC=RGB"])
+
+                3.times do |i|
+                    band = target_map.band(i + 1)
+                    target_map.write_band(i + 1, mapped_data)
+                end
+            rescue Exception => e
+                puts "ERROR: #{e}"
             end
         end
         Process.wait(pid)
 
         x_size = source_map.xsize * x_scale
-        y_size = source_map.xsize * y_scale
+        y_size = source_map.ysize * y_scale
         z_size = max - min
 
         return Eigen::Vector3.new(x0, y0, min),
-            Eigen::Vector3.new(x_scale, y_scale, 1.0 / (max - min)),
+            Eigen::Vector3.new(x_scale / supersampling, y_scale / supersampling, 1.0 / (max - min)),
             Eigen::Vector3.new(x_size, y_size, z_size)
     end
 

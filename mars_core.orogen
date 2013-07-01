@@ -101,9 +101,9 @@ task_context "MarsDepthCamera" do
     output_port 'distance_image', ro_ptr('base::samples::DistanceImage')
 end
 
-# E.g. (ruby script): Two actuators 'rear_left' and 'rear_right' with scene indices 1 and 9
+# E.g. (ruby script): Two actuators 'rear_left' and 'rear_right'.
 # actuator_names = ["rear_left", "rear_right"]
-# actuator_indices = [1, 9]  <- Using a negative index to invert, using 0 to deactivate
+# actuator_indices = [1, 2]  <- Using a negative index to invert, using 0 to deactivate
 # actuators = TaskContext.get 'mars_actuator'
 # actuators.names = actuator_names
 # actuators.dispatch("name_of_the_actuator_set", actuator_indices)  <- Has to be done before configure and start!

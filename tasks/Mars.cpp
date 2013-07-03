@@ -31,6 +31,7 @@ Mars::Mars(std::string const& name)
     , multisimPlugin(0)
 {
     Mars::taskInterface = this;
+    setlocale(LC_ALL,"C"); //Make sure english Encodings are used
 }
 
 Mars::Mars(std::string const& name, RTT::ExecutionEngine* engine)
@@ -38,6 +39,7 @@ Mars::Mars(std::string const& name, RTT::ExecutionEngine* engine)
     , multisimPlugin(0)
 {
     Mars::taskInterface = this;
+    setlocale(LC_ALL,"C"); //Make sure english Encodings are used
 }
 
 Mars::~Mars()
@@ -65,6 +67,7 @@ simulation::Mars* Mars::getTaskInterface(){
 
 void* Mars::startMarsFunc(void* argument)
 {
+    setlocale(LC_ALL,"C"); //Make sure english Encodings are used
     MarsArguments* marsArguments = static_cast<MarsArguments*>(argument);
 
     Mars* mars = marsArguments->mars;

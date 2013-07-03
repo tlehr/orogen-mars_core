@@ -7,11 +7,13 @@ using namespace simulation;
 MarsPlugin::MarsPlugin(std::string const& name)
     : MarsPluginBase(name) ,PluginInterface(0), sim(0), simTime(0.0)
 {
+    setlocale(LC_ALL,"C"); //Make sure english Encodings are used
 }
 
 MarsPlugin::MarsPlugin(std::string const& name, RTT::ExecutionEngine* engine)
     : MarsPluginBase(name, engine) ,PluginInterface(0), sim(0), simTime(0.0)
 {
+    setlocale(LC_ALL,"C"); //Make sure english Encodings are used
 }
 
 MarsPlugin::~MarsPlugin()

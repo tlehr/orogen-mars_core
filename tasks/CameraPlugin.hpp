@@ -34,7 +34,8 @@ namespace simulation {
         double lastUpdateTime;
         double lastGrabTime;
         mars::sim::CameraSensor *camera;
-        double fps;
+        double frameDelay;
+        bool isPeriodic;
     private:
         virtual void postGraphicsUpdate(void );
         virtual void update(mars::interfaces::sReal time_ms);
@@ -117,9 +118,9 @@ namespace simulation {
     
         /**
          * This method gets called every time when the sensor has new data
-         * AND an amount of time, matching fps has passed.
+         * AND an amount of time, matching frameDelay has passed.
          * Note that the simualtor runs with 100 Herz and that you
-         * should choose the fps accordingly.
+         * should choose the frameDelay accordingly.
          * */
         virtual void getData();
     };

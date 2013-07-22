@@ -1,44 +1,56 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.hpp */
 
-#ifndef SIMULATION_MARSDEPTHCAMERA_TASK_HPP
-#define SIMULATION_MARSDEPTHCAMERA_TASK_HPP
+#ifndef SIMULATION_MARSHIGHRESRANGEFINDER_TASK_HPP
+#define SIMULATION_MARSHIGHRESRANGEFINDER_TASK_HPP
 
-#include "simulation/MarsDepthCameraBase.hpp"
+#include "simulation/MarsHighResRangeFinderBase.hpp"
 
 namespace simulation {
 
-    /*! \class MarsDepthCamera 
-     * Used coordinate system: For both the scene frame and the image plane
-     * the x-axis points right. The the y-axis of the scene frame points downwards, 
-     * the one of the image plane upwards. And the z-axis of the scene frame points towards the 
-     * image plane.
+    /*! \class MarsHighResRangeFinder 
+     * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
+     * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
+     * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
+     * 
+     * \details
+     * The name of a TaskContext is primarily defined via:
+     \verbatim
+     deployment 'deployment_name'
+         task('custom_task_name','simulation::MarsHighResRangeFinder')
+     end
+     \endverbatim
+     *  It can be dynamically adapted when the deployment is called with a prefix argument. 
      */
-    class MarsDepthCamera : public MarsDepthCameraBase
+    class MarsHighResRangeFinder : public MarsHighResRangeFinderBase
     {
-	friend class MarsDepthCameraBase;
+	friend class MarsHighResRangeFinderBase;
     protected:
-        base::samples::DistanceImage *image;
-        RTT::extras::ReadOnlyPointer<base::samples::DistanceImage> ro_ptr;
-
-
+        double pixel_per_rad_horizontal;
+        double pixel_per_rad_vertical;
+        double lower_pixel;
+        double upper_pixel;
+        double left_pixel;
+        double right_pixel;
+        double v_steps;
+        double h_steps;
 
     public:
-        /** TaskContext constructor for MarsDepthCamera
+        /** TaskContext constructor for MarsHighResRangeFinder
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
          * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
          */
-        MarsDepthCamera(std::string const& name = "simulation::MarsDepthCamera");
+        MarsHighResRangeFinder(std::string const& name = "simulation::MarsHighResRangeFinder");
 
-        /** TaskContext constructor for MarsDepthCamera 
+        /** TaskContext constructor for MarsHighResRangeFinder 
          * \param name Name of the task. This name needs to be unique to make it identifiable for nameservices. 
          * \param engine The RTT Execution engine to be used for this task, which serialises the execution of all commands, programs, state machines and incoming events for a task. 
          * 
          */
-        MarsDepthCamera(std::string const& name, RTT::ExecutionEngine* engine);
+        MarsHighResRangeFinder(std::string const& name, RTT::ExecutionEngine* engine);
 
-        /** Default deconstructor of MarsDepthCamera
+        /** Default deconstructor of MarsHighResRangeFinder
          */
-         ~MarsDepthCamera();
+         ~MarsHighResRangeFinder();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the
@@ -97,7 +109,11 @@ namespace simulation {
          * before calling start() again.
          */
         void cleanupHook();
-
+        
+        /**
+         * Requests the distance image by calling MarsDepthCamera::getData() 
+         * and generates the pointcloud using the image data.
+         */
         virtual void getData();
     };
 }

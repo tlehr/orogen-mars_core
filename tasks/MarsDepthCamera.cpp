@@ -24,15 +24,15 @@ MarsDepthCamera::~MarsDepthCamera()
 bool MarsDepthCamera::configureHook()
 {
     
-    if (! RTT::TaskContext::configureHook())
+    if (! MarsDepthCameraBase::configureHook())
         return false;
     return true;
 }
 
 bool MarsDepthCamera::startHook()
 {
-    
-    if (! RTT::TaskContext::startHook())
+        std::cout << "MarsDepthCamera startHook" <<  std::endl;
+    if (! MarsDepthCameraBase::startHook())
         return false;
     image = new base::samples::DistanceImage(width, height);
     image->setSize(width, height);
@@ -42,22 +42,22 @@ bool MarsDepthCamera::startHook()
 
 void MarsDepthCamera::updateHook()
 {
-    RTT::TaskContext::updateHook();
+    MarsDepthCameraBase::updateHook();
 }
 
 void MarsDepthCamera::errorHook()
 {
-    RTT::TaskContext::errorHook();
+    MarsDepthCameraBase::errorHook();
 }
 
 void MarsDepthCamera::stopHook()
 {
-    RTT::TaskContext::stopHook();
+    MarsDepthCameraBase::stopHook();
 }
 
 void MarsDepthCamera::cleanupHook()
 {
-    RTT::TaskContext::cleanupHook();
+    MarsDepthCameraBase::cleanupHook();
 }
 
 void MarsDepthCamera::getData()
@@ -77,6 +77,6 @@ void MarsDepthCamera::getData()
     image->time = base::Time::fromSeconds(lastUpdateTime);
     
     ro_ptr.reset(image);
+    
     _distance_image.write(ro_ptr);
 }
-

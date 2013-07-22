@@ -81,10 +81,6 @@ task_context "CameraPlugin" do
     subclasses "MarsPlugin"
     property('name', '/std/string').
 	doc('name of the camera in the scene file')
-
-    property('fps', 'int',10).
-        doc 'frames per second'
-
 end
 
 task_context "MarsCamera" do
@@ -97,8 +93,35 @@ end
 task_context "MarsDepthCamera" do
     subclasses "CameraPlugin"
     needs_configuration
-
+    
     output_port 'distance_image', ro_ptr('base::samples::DistanceImage')
+end
+
+task_context "MarsHighResRangeFinder" do
+    subclasses "MarsDepthCamera"
+    needs_configuration
+    
+    property('left_limit', 'double', -Math::PI/4.0).
+        doc('Left limit of the vertical opening angle in radians')
+    property('right_limit', 'double', Math::PI/4.0).
+        doc('Right limit of the vertical opening angle in radians')
+    property('resolution_vertical', 'double', Math::PI/180.0).
+        doc('Vertical angular resolution in radians')    
+           
+    property('upper_limit', 'double', Math::PI/4.0).
+        doc('Upper limit of the horizontal opening angle in radians')
+    property('lower_limit', 'double', -Math::PI/4.0).
+        doc('Lower limit of the horizontal opening angle in radians')
+    property('resolution_horizontal', 'double', Math::PI/180.0).
+        doc('Vertical angular resolution in radians')    
+        
+    property('minimum_distance', 'double', 1.0).
+        doc('Smaller distances (meter) are discarded')
+    property('maximum_distance', 'double', 80.0).
+        doc('Larger distances (meter) are discarded')   
+
+    output_port('pointcloud', '/base/samples/Pointcloud').
+        doc 'Created by using the distance image of the MarsDepthCamera'
 end
 
 # E.g. (ruby script): Two actuators 'rear_left' and 'rear_right'.

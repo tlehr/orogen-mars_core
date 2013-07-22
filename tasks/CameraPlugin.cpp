@@ -9,12 +9,28 @@
 using namespace simulation;
 
 CameraPlugin::CameraPlugin(std::string const& name)
-    : CameraPluginBase(name)
+    : CameraPluginBase(name),
+        sensor_id(0.0),
+        width(0),
+        height(0),
+        lastUpdateTime(0),
+        lastGrabTime(0),
+        camera(NULL),
+        frameDelay(0),
+        isPeriodic(false)
 {
 }
 
 CameraPlugin::CameraPlugin(std::string const& name, RTT::ExecutionEngine* engine)
-    : CameraPluginBase(name, engine)
+    : CameraPluginBase(name, engine),
+        sensor_id(0.0),
+        width(0),
+        height(0),
+        lastUpdateTime(0),
+        lastGrabTime(0),
+        camera(NULL),
+        frameDelay(0),
+        isPeriodic(false)
 {
 }
 
@@ -36,6 +52,8 @@ bool CameraPlugin::configureHook()
 
 bool CameraPlugin::startHook()
 {
+
+    
     if (! simulation::MarsPlugin::startHook())
         return false;
     
@@ -56,13 +74,19 @@ bool CameraPlugin::startHook()
     
     control->graphics->addGraphicsUpdateInterface(this);
     
-    fps = 1.0 / fps * 1000;
+    // Used in postGraphicsUpdate() to trigger the updateHook every 'frameDelay' ms. 
+    frameDelay = 1000 / camera->getConfig().updateRate;
+    
+    RTT::base::ActivityInterface* activity = this->getActivity();
+    isPeriodic = activity->isPeriodic();
     return true;
 }
 
 void CameraPlugin::updateHook()
 {
     simulation::MarsPlugin::updateHook();
+    
+    getData();
 }
 
 void CameraPlugin::errorHook()
@@ -91,12 +115,17 @@ void CameraPlugin::update(mars::interfaces::sReal time_ms)
 
 void CameraPlugin::postGraphicsUpdate(void )
 {
-    if(lastUpdateTime - lastGrabTime < fps)
-	return;
+    // Frame rate is defined by the update rate of the module.
+    if(isPeriodic)
+        return;
+
+    if((lastUpdateTime - lastGrabTime) < frameDelay)
+	    return;
+
+    // Triggers the updateHook/image request every 'frameDelay' ms.
+	trigger(); 
     
     lastGrabTime = lastUpdateTime;
-    
-    getData();
 }
 
 void CameraPlugin::getData(){

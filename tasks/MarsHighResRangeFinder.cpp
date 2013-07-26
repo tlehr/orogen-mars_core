@@ -149,21 +149,6 @@ void MarsHighResRangeFinder::getData()
         // Request image and store it within the base distance image.
         (*it)->camera_sensor->getDepthImage((*it)->image->data);
         base::samples::DistanceImage* image = (*it)->image;
-        std::cout << "width" << image->width << "height" << image->height << "scale_x" << image->scale_x << "scale_y" << image->scale_y << "center_x" << image->center_x << "center_y" << image->center_y << std::endl;
-        	uint16_t width;
-	/// height (y) value in pixels
-	uint16_t height;
-
-	typedef float scalar;
-	/// scale value to apply to the x axis
-	scalar scale_x;
-	/// scale value to apply to the y axis
-	scalar scale_y;
-
-	/// center offset to apply to the x axis
-	scalar center_x;
-	/// center offset to apply to the y axis
-	scalar center_y;
         
         for(double y = (*it)->lower_pixel; y < (*it)->upper_pixel; y += (*it)->v_steps) {
             for(double x = (*it)->left_pixel; x < (*it)->right_pixel; x += (*it)->h_steps) {

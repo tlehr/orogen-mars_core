@@ -8,31 +8,116 @@
 namespace simulation {
 
     /*! \class MarsHighResRangeFinder 
-     * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
-     * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
-     * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
-     * 
-     * \details
-     * The name of a TaskContext is primarily defined via:
-     \verbatim
-     deployment 'deployment_name'
-         task('custom_task_name','simulation::MarsHighResRangeFinder')
-     end
-     \endverbatim
-     *  It can be dynamically adapted when the deployment is called with a prefix argument. 
+     * Allows to simulate 360° laserscanners using distance images to increase performance.
+     * At the moment each camera sensor in MARS provides an opening angle of 90°, so 
+     * four cameras are required to cover the complete 360°. Initially a single camera
+     * is used to create the pointcloud and with 'addCamera()' further cameras can be
+     * added. The following example shows how to start this sensor 
+     * using two cameras in ruby:
+     *   \code
+     *   velodyne = TaskContext.get 'mars_velodyne'
+     *   velodyne.name = 'velodyne'
+     *   velodyne.configure
+     *   velodyne.start   
+     *   velodyne.addCamera('velodyne90',90);
+     *   \endcode
+     * See the documentation of addCamera() for a scene file example.\n
+     * The z-axis of the image scene coordinate system points towards the image plane,
+     * the x-axis points right and the y-axis down.
      */
     class MarsHighResRangeFinder : public MarsHighResRangeFinderBase
     {
 	friend class MarsHighResRangeFinderBase;
     protected:
-        double pixel_per_rad_horizontal;
-        double pixel_per_rad_vertical;
-        double lower_pixel;
-        double upper_pixel;
-        double left_pixel;
-        double right_pixel;
-        double v_steps;
-        double h_steps;
+        struct Camera {
+            /**
+             * Stores the informations of all cameras which are used to simulate this sensor.
+             * \param id Id of the sensor in MARS.
+             * \param cam New CameraSensor which has been added.
+             * \param rot_y Used to rotate all scene points which have been extracted from the image
+             * to match the orientation of the camera. Pass the same rotation which has been used 
+             * in the scene file for the orientation_offset-yaw-value of the camera. In the 
+             * 'velodyne90' example below that would be 90.
+             */
+            Camera(long id, mars::sim::CameraSensor* cam, double rot_y) : 
+                    sensor_id(id), camera_sensor(cam), name()
+            {
+                width = camera_sensor->getConfig().width;
+                height = camera_sensor->getConfig().height;
+                image = new base::samples::DistanceImage(width, height);
+                image->setSize(width, height);
+                camera_sensor->getCameraInfo(&cam_info);
+                image->setIntrinsic(cam_info.scale_x, cam_info.scale_y, 
+                        cam_info.center_x, cam_info.center_y );
+                cam_sensor_info = camera_sensor->getConfig();
+                // Degree to rad.
+                // INVERTS ROTATION, has to be done to match the viewing direction of the MARS camera.
+                rot_y = (-rot_y / 180.0) * M_PI;
+                Eigen::AngleAxis<double> rot(rot_y, Eigen::Vector3d(0.0, 1.0, 0.0));
+                orientation = rot;
+            }
+            
+            ~Camera() {
+                delete image; image = NULL;
+            }
+            
+            long sensor_id;
+            mars::sim::CameraSensor* camera_sensor;
+            int width;
+            int height;
+            mars::interfaces::cameraStruct cam_info;
+            mars::sim::CameraConfigStruct cam_sensor_info;
+            base::samples::DistanceImage* image;
+            // Rotation of the camera around the y-axis within the camera frame.
+            Eigen::Quaternion<double, Eigen::DontAlign> orientation;
+            
+            double pixel_per_rad_horizontal;
+            double pixel_per_rad_vertical;
+            double lower_pixel;
+            double upper_pixel;
+            double left_pixel;
+            double right_pixel;
+            double v_steps;
+            double h_steps;
+            std::string name;
+        };
+    
+        std::vector<Camera*> cameras;
+        
+        /**
+         * Loads another camera from the scene file which will be used for pointcloud creation.
+         * Within the scene file the yaw angle has to be used to create a full 360° sensor.\n
+         * E.g. the following scene file shows the front and the left camera.\n
+         *   \code
+         *   <sensor name="velodyne" type="CameraSensor">
+         *     <index>1</index>
+         *     <rate>10</rate>
+         *     <attached_node>1</attached_node>
+         *     <depth_image>1.0</depth_image>
+         *     <show_cam hud_idx="1">1.0</show_cam>
+         *     <position_offset x="-0.03838" y="0.00122" z="0.527"/>
+         *     <orientation_offset yaw="0" pitch="0" roll="0"/>
+         *   </sensor>
+         *   <sensor name="velodyne90" type="CameraSensor">
+         *     <index>2</index>
+         *     <rate>10</rate>
+         *     <attached_node>1</attached_node>
+         *     <depth_image>1.0</depth_image>
+         *     <show_cam hud_idx="2">1.0</show_cam>
+         *     <position_offset x="-0.03838" y="0.00122" z="0.527"/>
+         *     <orientation_offset yaw="90" pitch="0" roll="0"/>
+         *   </sensor>
+         *   \endcode
+         * \param name Name of the camera within the scene file. In the example above it would be 'velodyne90'.
+         * \param orientation Orientation of the camera around the y-axis within the camera frame.
+         */
+        virtual bool addCamera(::std::string const & name, double orientation);
+        
+        /**
+         * Calculates which pixel will be converted into scene points in regard to the 
+         * opening angle and the scan resolution.
+         */
+        void calcCamParameters(Camera* camera);
 
     public:
         /** TaskContext constructor for MarsHighResRangeFinder

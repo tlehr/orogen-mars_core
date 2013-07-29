@@ -124,7 +124,7 @@ task_context "MarsHighResRangeFinder" do
         doc('Adds another camera which will be used for pointcloud creation').
         returns("bool").
         argument('name', 'std::string', "Name of the camera within the scene file").
-        argument('orientation', 'double', "To get a full 360° view you have to add four 90°-cameras with 0°, 90°, 180° and 270°") 
+        argument('orientation', 'double', "To get a full 360 degree view you have to add four 90-cameras with 0, 90, 180 and 270") 
 
     output_port('pointcloud', '/base/samples/Pointcloud').
         doc 'Created by using the distance image of the MarsDepthCamera'

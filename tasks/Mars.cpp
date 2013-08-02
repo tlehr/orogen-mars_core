@@ -290,6 +290,12 @@ void* Mars::startMarsFunc(void* argument)
     // Synchronize with configureHook
     marsArguments->initialized = true;
     app->exec();
+   
+    
+    delete Mars::graphicsTimer;
+    delete libManager;
+    delete app;
+    std::cout << "Qapplication ended" << std::endl;
 
     return 0;
 }
@@ -496,7 +502,17 @@ void Mars::errorHook()
 
 void Mars::stopHook()
 {
+    /*
     std::cout << "STOP HOOK" << std::endl;
+    for(unsigned int i=0;i<plugins.size();i++){
+        plugins[i]->handleMarsShudown();
+    }
+    simulatorInterface->exitMars();
+
+    std::cout << "STOP HOOK quitting qapp" << std::endl;
+    QCoreApplication::quit(); //Quitting QApplication too
+    std::cout << "STOP HOOK quitting qapp finish" << std::endl;
+    */
 }
         
 void Mars::registerPlugin(MarsPlugin* plugin){
@@ -510,7 +526,8 @@ void Mars::unregisterPlugin(MarsPlugin* plugin){
 void Mars::cleanupHook()
 {
     std::cout << "CLEANUP HOOK" << std::endl;
-    
+   
+
     for(unsigned int i=0;i<plugins.size();i++){
         plugins[i]->handleMarsShudown();
     }
@@ -518,17 +535,20 @@ void Mars::cleanupHook()
 
     simulatorInterface->exitMars();
     while( simulatorInterface->isSimRunning()) ;
-
-
-    delete libManager;
     
-    libManager->releaseLibrary("mars_sim");
-    libManager->releaseLibrary("mars_gui");
-    libManager->releaseLibrary("mars_graphics");
-    libManager->releaseLibrary("gui_core");
+    QCoreApplication::quit(); //Quitting QApplication too
+
+    std::cout << "CLEANUP HOOK quitting qapp finish" << std::endl;
+
+   // delete libManager;
+    
+//    libManager->releaseLibrary("mars_sim");
+//    libManager->releaseLibrary("mars_gui");
+//    libManager->releaseLibrary("mars_graphics");
+//    libManager->releaseLibrary("gui_core");
 
 
-    if(multisimPlugin) delete multisimPlugin;
+ //   if(multisimPlugin) delete multisimPlugin;
 }
 /*
 bool Mars::recover(){

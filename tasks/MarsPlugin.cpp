@@ -94,6 +94,7 @@ bool MarsPlugin::connect()
     {
         sim = Mars::getSimulatorInterface();
         if( !sim ){
+            std::cerr << "MarsPlugin: could not get singleton instance of simulator interface." << std::endl;
             RTT::log(RTT::Error) << "MarsPlugin: could not get singleton instance of simulator interface." << std::endl;
             return false;
         }

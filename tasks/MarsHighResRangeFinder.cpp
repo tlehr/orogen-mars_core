@@ -141,6 +141,7 @@ void MarsHighResRangeFinder::getData()
 {	
     Eigen::Matrix<double, 3, 1> scene_p;
     base::samples::Pointcloud pointcloud;
+    pointcloud.time = getTime();
     size_t x_t = 0, y_t = 0;
     int counter = 0;
     std::vector<Camera*>::iterator it = cameras.begin();

@@ -8,9 +8,9 @@
 namespace simulation {
 
     /*! \class MarsHighResRangeFinder 
-     * Allows to simulate 360° laserscanners using distance images to increase performance.
-     * At the moment each camera sensor in MARS provides an opening angle of 90°, so 
-     * four cameras are required to cover the complete 360°. Initially a single camera
+     * Allows to simulate 360deg laserscanners using distance images to increase performance.
+     * At the moment each camera sensor in MARS provides an opening angle of 90deg, so 
+     * four cameras are required to cover the complete 360deg. Initially a single camera
      * is used to create the pointcloud and with 'addCamera()' further cameras can be
      * added. The following example shows how to start this sensor 
      * using two cameras in ruby:
@@ -86,7 +86,7 @@ namespace simulation {
         
         /**
          * Loads another camera from the scene file which will be used for pointcloud creation.
-         * Within the scene file the yaw angle has to be used to create a full 360° sensor.\n
+         * Within the scene file the yaw angle has to be used to create a full 360deg sensor.\n
          * E.g. the following scene file shows the front and the left camera.\n
          *   \code
          *   <sensor name="velodyne" type="CameraSensor">

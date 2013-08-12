@@ -35,6 +35,10 @@ task_context "Mars" do
 
         property("show_coordinate_system","bool",false).
             dynamic
+        
+        property("reaction_to_physics_error","/std/string","shutdown").
+            doc("Possible Values: abort (killing sim), reset (ressing scene and simulation), warn (keep simulation running an print warnings), shutdown (stop physics but keep mars-running and set this tas to the error state)").
+            dynamic
 
         property('initial_scene', '/std/string').
 	    doc('the full path to the initial scene, this is needed because operations are not accessible during configuration within syskit (deadlock)')

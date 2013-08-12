@@ -132,5 +132,6 @@ void MarsPlugin::receiveData(
 }
 
 void MarsPlugin::handleMarsShudown(){
+    fprintf(stderr,"Shutting down %s, because mars instance is shutting down\n",getName().c_str());
     exception(LOST_MARS_CONNECTION);
 }

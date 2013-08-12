@@ -32,6 +32,7 @@ Mars::Mars(std::string const& name)
 {
     Mars::taskInterface = this;
     setlocale(LC_ALL,"C"); //Make sure english Encodings are used
+    app = 0;
 }
 
 Mars::Mars(std::string const& name, RTT::ExecutionEngine* engine)
@@ -39,11 +40,13 @@ Mars::Mars(std::string const& name, RTT::ExecutionEngine* engine)
     , multisimPlugin(0)
 {
     Mars::taskInterface = this;
+    app = 0;
     setlocale(LC_ALL,"C"); //Make sure english Encodings are used
 }
 
 Mars::~Mars()
 {
+    delete app;
 }
 
 
@@ -96,8 +99,11 @@ void* Mars::startMarsFunc(void* argument)
     // Prepare Qt Application Thread which is required  
     // for core simulation and gui
     int argc = count + 1;
-    QApplication* app = new QApplication(argc, argv);
-    app->setStyle(new QPlastiqueStyle);
+    if(!Mars::getTaskInterface()->app){
+        //Initialize Qapplication only once! and keep the instance
+        Mars::getTaskInterface()->app = new QApplication(argc, argv);
+        Mars::getTaskInterface()->app->setStyle(new QPlastiqueStyle);
+    }
 
     setlocale(LC_ALL,"C");
     struct lconv* locale = localeconv();
@@ -289,13 +295,25 @@ void* Mars::startMarsFunc(void* argument)
     
     // Synchronize with configureHook
     marsArguments->initialized = true;
-    app->exec();
+    Mars::getTaskInterface()->app->exec();
    
-    
+   
+    libManager->releaseLibrary("mars_graphics");
+    libManager->releaseLibrary("main_gui");
+    libManager->releaseLibrary("mars_gui");
+    libManager->releaseLibrary("mars_sim");
+    libManager->releaseLibrary("cfg_manager");
+   
+    //Workaround release waht whereever is acquired
+    libManager->releaseLibrary("data_broker");
+    libManager->releaseLibrary("avalonplugin");
+    libManager->releaseLibrary("mars_sim");
+    libManager->releaseLibrary("main_gui");
+
     delete Mars::graphicsTimer;
     delete libManager;
-    delete app;
-    std::cout << "Qapplication ended" << std::endl;
+    //Do not delete the QApplication it does not like it to be restarted
+    std::cout << "Qapplication exec ended" << std::endl;
 
     return 0;
 }
@@ -338,6 +356,23 @@ bool Mars::setShow_coordinate_system(bool value)
 	return(simulation::MarsBase::setShow_coordinate_system(value));
 }
 
+bool Mars::setReaction_to_physics_error(::std::string const & value)
+{
+	//TODO Add your code here 
+        if(!simulatorInterface){
+            fprintf(stderr,"Mars is not running could not set reaction to physics error");
+            return false;
+        }
+        if(value == "abort" || value == "reset" || value == "warn" || value == "shutdown"){
+            simulatorInterface->getControlCenter()->cfg->setPropertyValue("Simulator", "onPhysicsError","value", value);
+        }else{
+            fprintf(stderr,"Could not ser rection to physics: Possible Values: abort (killing sim), reset (ressing scene and simulation), warn (keep simulation running an print warnings), shutdown (stop physics but keep mars-running and set this tas to the error state)");
+            return false;
+        }
+        
+        //Call the base function, DO-NOT Remove
+	return(simulation::MarsBase::setReaction_to_physics_error(value));
+}
 
 char** Mars::setOptions(const std::vector<Option>& options)
 {

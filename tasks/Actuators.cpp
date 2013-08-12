@@ -136,6 +136,8 @@ void Actuators::errorHook()
 
 
 void Actuators::update(double time) {
+        if(!isRunning()) return; //Seems Plugin is set up but not active yet, we are not sure that we are initialized correctly so retuning
+
 	mars::utils::Quaternion vehicle_rot = control->nodes->getRotation(vehicle_id);
 	mars::utils::Vector tmp1, tmp2;
 	for(unsigned int i=0; i<amount_of_actuators;++i) {

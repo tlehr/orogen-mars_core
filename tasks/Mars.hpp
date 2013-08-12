@@ -6,6 +6,8 @@
 #include <mars/data_broker/ReceiverInterface.h>
 #include "MarsPlugin.hpp"  
 
+class QApplication;
+
 /** From MARS */
 //
 namespace mars{
@@ -63,6 +65,7 @@ namespace simulation {
     {
 	friend class MarsBase;
     protected:
+        QApplication* app; 
     	static mars::app::GraphicsTimer *graphicsTimer;
 	static mars::interfaces::SimulatorInterface* simulatorInterface;
 	static simulation::Mars* taskInterface;
@@ -89,6 +92,11 @@ namespace simulation {
         /* Dynamic Property setter of show_coordinate_system
          */
         virtual bool setShow_coordinate_system(bool value);
+        
+        /* Dynamic Property setter of reaction_to_physics_error
+         */
+        virtual bool setReaction_to_physics_error(::std::string const & value);
+
     
         
         // GraphicsTimer will be later called with the marsGraphics reference

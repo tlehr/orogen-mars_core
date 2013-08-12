@@ -342,6 +342,39 @@ task_context "Sonar" do
     output_port("sonar_beam","base::samples::SonarBeam").
         doc('top sonar beam')
 end
+
+
+task_context "MarsAltimeter" do
+    subclasses "MarsPlugin"
+    property('node_name', 'std/string')
+	doc 'the name of the vehicle in the scene file'
+    
+    needs_configuration
+
+    output_port("ground_distance", "/base/samples/RigidBodyState").
+        doc('current ground distance simulating echo sounder')
+end
+
+task_context "AuvController" do
+    subclasses "MarsPlugin"
+    property('node_name', 'std/string')
+	doc 'the name of the vehicle in the scene file'
+    
+    needs_configuration
+
+    property('position','/base/Vector3d').
+        dynamic
+    
+    property('orientation','/base/Quaterniond').
+        dynamic
+    
+    property('cob','/base/Vector3d').
+        doc('Point where the Buoyancy should be applied')
+
+    property('buoyancy_force','double')
+    
+
+end
     
 #
 #deployment "simulation" do

@@ -5,6 +5,7 @@
 
 #include "Mars.hpp"
 #include "simulation/MarsServoBase.hpp"
+#include <mars/sim/SimMotor.h>
 
 namespace simulation {
 
@@ -30,15 +31,14 @@ namespace simulation {
     protected:
 //	ServoPlugin* plugin;
         int motor_id;
-        double motor_pos;
-        double target_pos;
+        mars::sim::SimMotor* motor;
         double desired_velocity;
         base::samples::RigidBodyState upper2lower;
         double last_angle;
         double target_angle;
 
-	bool set_angle( double angle );
-	double get_angle();
+        bool set_angle( double angle );
+        double get_angle();
         void update( double time );
 
     public:
@@ -57,7 +57,7 @@ namespace simulation {
 
         /** Default deconstructor of MarsServo
          */
-	~MarsServo();
+        ~MarsServo();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the

@@ -72,6 +72,8 @@ void AuvController::cleanupHook()
 }
 
 void AuvController::update(double time_ms){
+        if(!isRunning()) return; //Seems Plugin is set up but not active yet, we are not sure that we are initialized correctly so retuning
+        
         //set new position if requested
         if(position_updated)
         {

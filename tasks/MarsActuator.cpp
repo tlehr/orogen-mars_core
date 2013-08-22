@@ -164,6 +164,7 @@ bool MarsActuator::startHook()
     
 
 void MarsActuator::update(double delta_t){
+        if(!isRunning()) return; //Seems Plugin is set up but not active yet, we are not sure that we are initialized correctly so retuning
 	for(int i=0;i<plugins.size();i++){
             plugins[i]->update(delta_t);
         }

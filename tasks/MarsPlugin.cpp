@@ -110,7 +110,8 @@ bool MarsPlugin::connect()
     // get controlcenter
     control = sim->getControlCenter();
     Mars::getTaskInterface()->registerPlugin(this);
-    
+
+    return true;
 }
 
 void MarsPlugin::disconnect()

@@ -26,10 +26,16 @@ MarsPlugin::~MarsPlugin()
 bool MarsPlugin::configureHook()
 {
     if (! RTT::TaskContext::configureHook())
+    {
+        RTT::log(RTT::Warning) << "MarsPlugin: configure failed." << RTT::endlog();
         return false;
+    }
     
     if(!connect())
+    {
+        RTT::log(RTT::Warning) << "MarsPlugin: establishing connection with Mars failed. Configure hook returning false." << RTT::endlog();
         return false;
+    }
 
     control->dataBroker->registerSyncReceiver(this, "mars_sim", "simTime", 1);
     return true;

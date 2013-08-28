@@ -140,6 +140,10 @@ end
 # actuators = TaskContext.get 'mars_actuator'
 # actuators.names = actuator_names
 # actuators.dispatch("name_of_the_actuator_set", actuator_indices)  <- Has to be done before configure and start!
+# 
+# DEPRECATION: don't use this anymore since its based on the old base/actuators types
+# use Joints instead
+#
 task_context "MarsActuator" do
     subclasses "MarsPlugin"
     
@@ -158,6 +162,18 @@ task_context "MarsActuator" do
 	doc('Array of names of the motor in the scene file. The names get mapped to motor ids starting from zero')
 
     port_driven
+end
+
+task_context "Joints" do
+    subclasses "MarsPlugin"
+
+    property('names', 'std/vector</std/string>').
+	doc('Array of names of the motor in the scene file. The names get mapped to motor ids starting from zero')
+
+    output_port( "status", "base/samples/Joints" ).
+	doc "status values for the joints"
+    input_port( "cmd", "base/commands/Joints" ).
+	doc "command values for the joints"
 end
 
 task_context "MarsServo" do
@@ -294,6 +310,10 @@ task_context "MarsIMU" do
         doc 'provides timestamped IMUReading samples containing the complete pose'
 end
 
+# 
+# this is not a very good name, since this seems to be very specific to
+# underwater thrusters. Maybe call it Thrusters?
+#
 task_context "Actuators" do
     subclasses "MarsPlugin"
     needs_configuration

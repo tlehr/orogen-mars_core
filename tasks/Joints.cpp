@@ -73,6 +73,10 @@ void Joints::update(double delta_t)
 	state.effort = motor->getTorque();
 	status[i] = state;
     }
+
+    // and write it to the output port
+    status.time = getTime();
+    _status.write( status );
 }
 
 /// The following lines are template definitions for the various state machine
@@ -90,6 +94,7 @@ bool Joints::configureHook()
     // and resize the input/output structures
     cmd.resize( mars_ids.names.size() );
     status.resize( mars_ids.names.size() );
+    status.names = _names.value();
 
     return true;
 }

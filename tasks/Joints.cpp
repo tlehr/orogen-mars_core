@@ -25,16 +25,15 @@ Joints::~Joints()
 void Joints::init()
 {
     // for each of the names, get the mars motor id
-    BOOST_FOREACH( std::string name, mars_ids.names )
+    for( size_t i=0; i<mars_ids.names.size(); ++i )
     {
+	std::string &name( mars_ids.names[i] );
         int marsMotorId = control->motors->getID( name );
         if( marsMotorId )
-	    mars_ids.elements.push_back( marsMotorId );
+	    mars_ids.elements[i].mars_id = marsMotorId;
 	else
 	    throw std::runtime_error("there is no motor by the name of " + name);
     }
-
-    assert( mars_ids.names.size() == mars_ids.elements.size() );
 }
 
 void Joints::update(double delta_t)
@@ -45,12 +44,13 @@ void Joints::update(double delta_t)
 	for( size_t i=0; i<cmd.size(); ++i )
 	{
 	    // for each command input look up the name in the mars_ids structure
+	    JointConversion conv = mars_ids[cmd.names[i]];
 	    mars::sim::SimMotor *motor = 
-		control->motors->getSimMotor( mars_ids[cmd.names[i]] );
+		control->motors->getSimMotor( conv.mars_id );
 	    if( cmd[i].hasPosition() )
-		motor->setValue( cmd[i].position );
+		motor->setValue( conv.toMars( cmd[i].position ) );
 	    if( cmd[i].hasSpeed() )
-		motor->setVelocity( cmd[i].speed );
+		motor->setVelocity( conv.toMars( cmd[i].speed ) );
 	    if( cmd[i].hasEffort() )
 	    {
 		LOG_WARN_S << "Effort command ignored";
@@ -63,14 +63,15 @@ void Joints::update(double delta_t)
     }
 
     // in any case read out the status
-    for( size_t i=0; i<mars_ids.size(); ++i )
+    for( size_t i=0; i<status.size(); ++i )
     {
-	mars::sim::SimMotor *motor = control->motors->getSimMotor( mars_ids[i] );
+	JointConversion conv = mars_ids[status.names[i]];
+	mars::sim::SimMotor *motor = control->motors->getSimMotor( conv.mars_id );
 
 	base::JointState state;
-	state.position = motor->getValue();
-	state.speed = motor->getVelocity();
-	state.effort = motor->getTorque();
+	state.position = conv.fromMars( motor->getValue() );
+	state.speed = conv.fromMars( motor->getVelocity() );
+	state.effort = conv.fromMars( motor->getTorque() );
 	status[i] = state;
     }
 
@@ -88,12 +89,34 @@ bool Joints::configureHook()
     if (! JointsBase::configureHook())
         return false;
 
-    // copy the joint names 
+    size_t num_joints = _names.value().size();
+
+    // test if scaling is valid
+    if( !_scaling.value().empty() && _scaling.value().size() != num_joints )
+    {
+	LOG_ERROR_S << "The scaling property needs to be empty or of the same size as names.";
+	return false;
+    }
+    if( !_offset.value().empty() && _offset.value().size() != num_joints )
+    {
+	LOG_ERROR_S << "The offset property needs to be empty or of the same size as names.";
+	return false;
+    }
+
+    // fill the joint structure 
+    mars_ids.resize( num_joints );
     mars_ids.names = _names.value();
+    for( size_t i=0; i<num_joints; i++ )
+    {
+	if( !_scaling.value().empty() )
+	    mars_ids.elements[i].scaling = _scaling.value()[i];
+	if( !_offset.value().empty() )
+	    mars_ids.elements[i].offset = _offset.value()[i];
+    }
 
     // and resize the input/output structures
-    cmd.resize( mars_ids.names.size() );
-    status.resize( mars_ids.names.size() );
+    cmd.resize( num_joints);
+    status.resize( num_joints );
     status.names = _names.value();
 
     return true;

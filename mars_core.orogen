@@ -169,6 +169,10 @@ task_context "Joints" do
 
     property('names', 'std/vector</std/string>').
 	doc('Array of names of the motor in the scene file. The names get mapped to motor ids starting from zero')
+    property('scaling', 'std/vector<double>').
+	doc('Optional array of scale values that are applied to the mars joint values. Needs to be empty or the same size as names.')
+    property('offset', 'std/vector<double>').
+	doc('Optional array of offset values that added to the scaled mars joint values. Needs to be empty or the same size as names.')
 
     output_port( "status", "base/samples/Joints" ).
 	doc "status values for the joints"

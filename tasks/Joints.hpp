@@ -25,7 +25,25 @@ namespace simulation {
     {
 	friend class JointsBase;
     protected:
-	base::NamedVector<int> mars_ids;
+	struct JointConversion
+	{
+	    JointConversion()
+		: mars_id(-1), scaling(1.0), offset(0.0) {}
+
+	    double fromMars( double v )
+	    {
+		return v * scaling + offset;
+	    }
+	    double toMars( double v )
+	    {
+		return (v - offset) / scaling;
+	    }
+
+	    int mars_id;
+	    double scaling;
+	    double offset;
+	};
+	base::NamedVector<JointConversion> mars_ids;
 
 	base::samples::Joints status;
 	base::commands::Joints cmd;

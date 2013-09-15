@@ -45,6 +45,9 @@ bool MarsPlugin::startHook()
 {
     if (! RTT::TaskContext::startHook())
         return false;
+
+    startTime = base::Time::now();
+
     return true;
 }
 
@@ -83,8 +86,8 @@ void MarsPlugin::init()
  */
 base::Time MarsPlugin::getTime()
 {
-    //return base::Time::fromSeconds( simTime );
-    return base::Time::now();
+    return startTime + base::Time::fromMilliseconds( simTime );
+    //return base::Time::now();
 }
 
 double MarsPlugin::getSimTime(){

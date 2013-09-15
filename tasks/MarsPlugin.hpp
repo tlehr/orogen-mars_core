@@ -33,7 +33,7 @@ namespace simulation {
         mars::interfaces::SimulatorInterface *sim;
 //        mars::interfaces::ControlCenter *control;
         double simTime;
-
+	base::Time startTime;
 
 
     public:

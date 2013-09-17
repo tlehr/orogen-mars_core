@@ -43,6 +43,9 @@ task_context "Mars" do
         property('initial_scene', '/std/string').
 	    doc('the full path to the initial scene, this is needed because operations are not accessible during configuration within syskit (deadlock)')
 	
+	    property('initial_scenes', '/std/vector</std/string>').
+	    doc('the full path to the initial scene, this is needed because operations are not accessible during configuration within syskit (deadlock)')
+	
         property('config_dir', '/std/string',"#{ENV['AUTOPROJ_PROJECT_BASE']}/install/configuration/mars_default").
 	    doc('the full path to the main configuration folder')
 

@@ -476,6 +476,13 @@ bool Mars::configureHook()
         printf("name: %s",_initial_scene.get().c_str());
         simulatorInterface->loadScene(_initial_scene.get(), std::string("initial"),true,true);
     }
+    std::vector<std::string> sceneNames = _initial_scenes.get();
+    if(!sceneNames.empty()){
+		for (std::vector< std::string >::iterator scene = sceneNames.begin(); scene != sceneNames.end();scene++){
+			printf("name: %s",scene->c_str());
+			simulatorInterface->loadScene(*scene, *scene,true,true);
+		}
+    }
     
     return updateDynamicProperties();
 }

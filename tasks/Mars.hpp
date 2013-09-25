@@ -39,6 +39,18 @@ class SimulationTime
     double msElapsed;
 
 public:
+    SimulationTime()
+	: startTime( base::Time::now() )
+    {
+    }
+
+    /** @brief set the start time
+     */
+    void setStartTime( base::Time startTime )
+    {
+	this->startTime = startTime;
+    }	
+
     /** @return the simulation time, which is offset by t
      * the time the simulation was started
      */
@@ -54,8 +66,6 @@ public:
     {
 	boost::mutex::scoped_lock lock( timeLock );
 	msElapsed = ms;
-	if( startTime == base::Time() )
-	    startTime = base::Time::now();
 	simulationTime = startTime + base::Time::fromMilliseconds( msElapsed );
     }
 

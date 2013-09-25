@@ -31,10 +31,6 @@ namespace simulation {
 	friend class MarsPluginBase;
     protected:
         mars::interfaces::SimulatorInterface *sim;
-//        mars::interfaces::ControlCenter *control;
-        double simTime;
-	base::Time startTime;
-
 
     public:
         /** TaskContext constructor for MarsPlugin
@@ -112,8 +108,25 @@ namespace simulation {
          */
         void cleanupHook();
 
+	/**
+	 * @brief provides the simulation time to be used as timestamps 
+	 *
+	 * Returns the simulation time, which is a combination of the wall time 
+	 * when the simulation was started, and the simulation time elapsed since then.
+	 *
+	 * Use ONLY this time for setting the timestamps of the output data
+	 *
+	 * @return the simulation time to be used as timestamps
+	 */
         base::Time getTime();
+
+	/**
+	 * @brief return the simulation time in ms since the start of the simulation
+	 *
+	 * @note do not use this for generating timestamps
+	 */
         double getSimTime();
+
         bool connect();
         void disconnect();
         virtual void reset();

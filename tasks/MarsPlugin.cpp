@@ -5,13 +5,13 @@
 using namespace simulation;
 
 MarsPlugin::MarsPlugin(std::string const& name)
-    : MarsPluginBase(name) ,PluginInterface(0), sim(0), simTime(0.0)
+    : MarsPluginBase(name) ,PluginInterface(0), sim(0)
 {
     setlocale(LC_ALL,"C"); //Make sure english Encodings are used
 }
 
 MarsPlugin::MarsPlugin(std::string const& name, RTT::ExecutionEngine* engine)
-    : MarsPluginBase(name, engine) ,PluginInterface(0), sim(0), simTime(0.0)
+    : MarsPluginBase(name, engine) ,PluginInterface(0), sim(0)
 {
     setlocale(LC_ALL,"C"); //Make sure english Encodings are used
 }
@@ -37,7 +37,6 @@ bool MarsPlugin::configureHook()
         return false;
     }
 
-    control->dataBroker->registerSyncReceiver(this, "mars_sim", "simTime", 1);
     return true;
 }
 
@@ -45,8 +44,6 @@ bool MarsPlugin::startHook()
 {
     if (! RTT::TaskContext::startHook())
         return false;
-
-    startTime = base::Time::now();
 
     return true;
 }
@@ -72,26 +69,22 @@ void MarsPlugin::cleanupHook()
     RTT::TaskContext::cleanupHook();
 }
         
-void MarsPlugin::update(double delta_t){
+void MarsPlugin::update(double delta_t)
+{
 }
     
 void MarsPlugin::init()
 {
-    // register for sim time
-    control->dataBroker->registerSyncReceiver(this, "mars_sim", "simTime", 1);
 }
 
-
-/** get the simulation time
- */
 base::Time MarsPlugin::getTime()
 {
-    return startTime + base::Time::fromMilliseconds( simTime );
-    //return base::Time::now();
+    return Mars::simTime.get();
 }
 
-double MarsPlugin::getSimTime(){
-    return simTime; 
+double MarsPlugin::getSimTime()
+{
+    return Mars::simTime.getElapsedMs();
 }
 
 bool MarsPlugin::connect()
@@ -138,7 +131,6 @@ void MarsPlugin::receiveData(
         const mars::data_broker::DataPackage& package,
         int id) 
 {
-    package.get("simTime", &simTime);
 }
 
 void MarsPlugin::handleMarsShudown(){

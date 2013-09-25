@@ -5,6 +5,7 @@
 #include <vector>
 #include <mars/data_broker/ReceiverInterface.h>
 #include "MarsPlugin.hpp"  
+#include <boost/thread/mutex.hpp>
 
 class QApplication;
 
@@ -26,7 +27,46 @@ namespace mars{
     };
 };
 
+class SimulationTime
+{
+    /** lock for simulation time */
+    boost::mutex timeLock;
+    /** time offset to use for the simulation time */
+    base::Time startTime;
+    /** simulation time including offset */
+    base::Time simulationTime;
+    /** time elapsed in ms since start of simulation */ 
+    double msElapsed;
 
+public:
+    /** @return the simulation time, which is offset by t
+     * the time the simulation was started
+     */
+    base::Time get()
+    {
+	boost::mutex::scoped_lock lock( timeLock );
+	return simulationTime;
+    }
+
+    /** set the time since the simulation was started in ms
+     */
+    void setElapsedMs( double ms )
+    {
+	boost::mutex::scoped_lock lock( timeLock );
+	msElapsed = ms;
+	if( startTime == base::Time() )
+	    startTime = base::Time::now();
+	simulationTime = startTime + base::Time::fromMilliseconds( msElapsed );
+    }
+
+    /** @return the time in milliseconds since the start of the simulation
+     */
+    double getElapsedMs()
+    {
+	boost::mutex::scoped_lock lock( timeLock );
+	return msElapsed;
+    }
+};
 
 namespace simulation {
 
@@ -72,8 +112,7 @@ namespace simulation {
 	static void* startMarsFunc(void *);
         static std::string configDir;
 	static bool marsRunning;
-    //    unsigned int dbSimTimeId; //Id for the simulation time
-        double simTime;
+
 	pthread_t thread_info; 
 	static mars::lib_manager::LibManager* libManager;
 
@@ -108,6 +147,7 @@ namespace simulation {
 	 */
 	static mars::interfaces::SimulatorInterface* getSimulatorInterface();
 	static simulation::Mars* getTaskInterface();
+	static SimulationTime simTime;
 
         Mars(std::string const& name = "simulation::Mars");
         Mars(std::string const& name, RTT::ExecutionEngine* engine);

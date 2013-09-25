@@ -25,6 +25,7 @@ mars::interfaces::SimulatorInterface *Mars::simulatorInterface = 0;
 simulation::Mars *Mars::taskInterface = 0;
 mars::app::GraphicsTimer *Mars::graphicsTimer = 0;
 mars::lib_manager::LibManager* Mars::libManager = 0; 
+SimulationTime Mars::simTime;
 
 Mars::Mars(std::string const& name)
     : MarsBase(name)
@@ -63,7 +64,7 @@ mars::interfaces::SimulatorInterface* Mars::getSimulatorInterface()
 {
     return simulatorInterface;
 }
-	
+
 simulation::Mars* Mars::getTaskInterface(){
     return taskInterface;
 }
@@ -289,7 +290,6 @@ void* Mars::startMarsFunc(void* argument)
     if(marsArguments->add_floor){
         mars->simulatorInterface->getControlCenter()->nodes->createPrimitiveNode("Boden",mars::interfaces::NODE_TYPE_PLANE,false,mars::utils::Vector(0,0,0.0),mars::utils::Vector(600,600,0));
     }
-//    mars->dbSimTimeId = simulatorInterface->getControlCenter()->dataBroker->getDataID("mars_sim", "simTime");
     assert(mars->simulatorInterface->getControlCenter()->dataBroker->registerTriggeredReceiver(mars,"mars_sim", "simTime","mars_sim/postPhysicsUpdate",1));
     
     
@@ -533,8 +533,9 @@ void Mars::updateHook()
         exception(PHYSICS_ERROR);
  //       QCoreApplication::quit(); //Quitting QApplication too
     }
-    //_time.write(simulatorInterface->getControlCenter()->dataBroker->getDataPackage(dbSimTimeId)[0].d);
-    _time.write(simTime);
+
+
+    _time.write( simTime.getElapsedMs() );
 }
 
 void Mars::errorHook()
@@ -612,7 +613,8 @@ void Mars::receiveData(
         const data_broker::DataPackage& package,
         int id) 
 {
-    package.get("simTime", &simTime);
-    //printf("Recive Data aufgrufen!!\n");
-    //trigger();
+    double ms;
+    package.get("simTime", &ms);
+    // update the simulation time
+    simTime.setElapsedMs( ms );
 }

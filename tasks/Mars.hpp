@@ -40,8 +40,8 @@ class SimulationTime
 
 public:
     SimulationTime()
-	: startTime( base::Time::now() )
     {
+	setStartTime( base::Time::now() );
     }
 
     /** @brief set the start time
@@ -49,6 +49,7 @@ public:
     void setStartTime( base::Time startTime )
     {
 	this->startTime = startTime;
+	setElapsedMs( 0 );
     }	
 
     /** @return the simulation time, which is offset by t

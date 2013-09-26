@@ -59,7 +59,8 @@ bool MarsServo::startHook()
     if (! MarsServoBase::startHook())
         return false;
     
-    _rotation_axis.value() = base::Vector3d::UnitX();
+    // Why did you add this Matthias!?
+    //_rotation_axis.value() = base::Vector3d::UnitX();
     upper2lower.initSane();
     upper2lower.position.setZero();
     upper2lower.sourceFrame = _upper_frame.value();

@@ -84,6 +84,8 @@ struct ActuatorPlugin
 	base::actuators::MotorState ms;
 	ms.current =  motor->getTorque();
 	ms.position = motor->getValue();
+	ms.positionExtern = motor->getActualPosition();
+	ms.pwm = motor->getVelocity();
 	ms.positionExtern = 0;
 	ms.pwm = 0;
 	task->setNewActuatorStatus(actuatorId, base::Time::fromSeconds(time), ms);	    

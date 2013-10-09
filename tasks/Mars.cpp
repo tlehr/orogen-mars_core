@@ -33,6 +33,7 @@ Mars::Mars(std::string const& name)
 {
     Mars::taskInterface = this;
     setlocale(LC_ALL,"C"); //Make sure english Encodings are used
+    setenv("LANG","C",true);
     app = 0;
 }
 
@@ -43,6 +44,7 @@ Mars::Mars(std::string const& name, RTT::ExecutionEngine* engine)
     Mars::taskInterface = this;
     app = 0;
     setlocale(LC_ALL,"C"); //Make sure english Encodings are used
+    setenv("LANG","C",true);
 }
 
 Mars::~Mars()
@@ -72,6 +74,7 @@ simulation::Mars* Mars::getTaskInterface(){
 void* Mars::startMarsFunc(void* argument)
 {
     setlocale(LC_ALL,"C"); //Make sure english Encodings are used
+    setenv("LANG","C",true);
     MarsArguments* marsArguments = static_cast<MarsArguments*>(argument);
 
     Mars* mars = marsArguments->mars;
@@ -107,6 +110,7 @@ void* Mars::startMarsFunc(void* argument)
     }
 
     setlocale(LC_ALL,"C");
+    setenv("LANG","C",true);
     struct lconv* locale = localeconv();
     RTT::log(RTT::Info) << "Active locale (LC_ALL): " << RTT::endlog();
       
@@ -292,6 +296,10 @@ void* Mars::startMarsFunc(void* argument)
     }
     assert(mars->simulatorInterface->getControlCenter()->dataBroker->registerTriggeredReceiver(mars,"mars_sim", "simTime","mars_sim/postPhysicsUpdate",1));
     
+    // if we have a main gui, show it
+    if(marsArguments->realtime_calc){
+    	mars->simulatorInterface->getControlCenter()->cfg->setPropertyValue("Simulator", "realtime calc", "value", marsArguments->realtime_calc);
+    }
     
     // Synchronize with configureHook
     marsArguments->initialized = true;
@@ -434,6 +442,7 @@ bool Mars::configureHook()
     argument.initialized = false;
     argument.add_floor = _add_floor.get();
     argument.failed_to_init=false;
+    argument.realtime_calc = _realtime_calc.get();
 
     int ret = pthread_create(&thread_info, NULL, startMarsFunc, &argument);
     if(ret)
@@ -484,6 +493,10 @@ bool Mars::configureHook()
 		}
     }
     
+    if (_start_sim.get()){
+    	simulatorInterface->StartSimulation();
+    }
+
     return updateDynamicProperties();
 }
 

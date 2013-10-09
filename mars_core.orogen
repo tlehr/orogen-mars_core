@@ -61,6 +61,12 @@ task_context "Mars" do
         property('raw_options', '/std/vector<simulation::Option>').
             doc('forward the original mars arguments, such as -c 1600 for setting the ode port - option consists of name, here: -c and parameter: here 1600')
 
+		property('realtime_calc', 'bool', false).
+            doc('if true, simulation runs in real time or slower, but not faster')
+		
+		property('start_sim', 'bool', false).
+			doc('starts the simulation after loading the initial scene(s)')
+
         # Add a task context
         # operation('addPlugin').
         #       returns('int').

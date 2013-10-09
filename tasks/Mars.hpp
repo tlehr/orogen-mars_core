@@ -93,6 +93,7 @@ namespace simulation {
             bool initialized;
             bool add_floor;
             bool failed_to_init;
+            bool realtime_calc;
             // Raw command line option can be passed to mars
             // using this option vector
             std::vector<Option> raw_options;
@@ -147,8 +148,8 @@ namespace simulation {
          */
         virtual bool setReaction_to_physics_error(::std::string const & value);
 
-    
         
+
         // GraphicsTimer will be later called with the marsGraphics reference
         // which can be also NULL for a disabled gui
         mars::graphics::GraphicsManager* marsGraphics;

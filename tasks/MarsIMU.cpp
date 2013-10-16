@@ -73,6 +73,8 @@ void MarsIMU::update( double time )
     rbs.targetFrame = _world_frame.value();
     rbs.orientation = control->nodes->getRotation( node_id ).normalized();
     rbs.cov_orientation = base::Matrix3d::Ones() * 1e-6;
+    rbs.velocity = control->nodes->getLinearVelocity( node_id );
+    rbs.angular_velocity = control->nodes->getAngularVelocity( node_id);
 
     _orientation_samples.write( rbs );
     

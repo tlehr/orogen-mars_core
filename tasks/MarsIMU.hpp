@@ -30,6 +30,7 @@ namespace simulation {
     protected:
         long node_id;
         base::samples::RigidBodyState rbs;
+        base::samples::IMUSensors imusens;
         void update( double time );
 
 

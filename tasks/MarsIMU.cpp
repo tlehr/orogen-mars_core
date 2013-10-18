@@ -78,6 +78,10 @@ void MarsIMU::update( double time )
 
     _orientation_samples.write( rbs );
     
+    imusens.acc = control->nodes->getLinearAcceleration( node_id );
+    imusens.gyro = control->nodes->getAngularVelocity( node_id);
+    _calibrated_sensors.write( imusens );
+
     rbs.position = control->nodes->getPosition( node_id );
     _pose_samples.write( rbs );
 }

@@ -5,6 +5,7 @@
 #include <mars/sim/SimMotor.h>
 #include <mars/interfaces/sim/MotorManagerInterface.h>
 #include <base/Logging.hpp>
+#include <base/samples/RigidBodyState.hpp>
 
 using namespace simulation;
 
@@ -39,7 +40,7 @@ void Joints::init()
 void Joints::update(double delta_t)
 {
     // if there was a command, write it to the simulation
-    if( _cmd.read( cmd ) == RTT::NewData )
+    if( _command.read( cmd ) == RTT::NewData )
     {
 	for( size_t i=0; i<cmd.size(); ++i )
 	{
@@ -77,7 +78,7 @@ void Joints::update(double delta_t)
 
     // and write it to the output port
     status.time = getTime();
-    _status.write( status );
+    _status_samples.write( status );
 }
 
 /// The following lines are template definitions for the various state machine

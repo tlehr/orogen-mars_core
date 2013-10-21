@@ -12,6 +12,7 @@ using_library "QtGui", :typekit => false
 
 import_types_from "tasks/MarsControl.hpp"
 import_types_from "servoTypes.hpp"
+import_types_from "base"
 
 using_library "actuator_dispatcher"
 
@@ -183,9 +184,9 @@ task_context "Joints" do
     property('offset', 'std/vector<double>').
 	doc('Optional array of offset values that added to the scaled mars joint values. Needs to be empty or the same size as names.')
 
-    output_port( "status", "base/samples/Joints" ).
+    output_port( "status_samples", "base/samples/Joints" ).
 	doc "status values for the joints"
-    input_port( "cmd", "base/commands/Joints" ).
+    input_port( "command", "base/commands/Joints" ).
 	doc "command values for the joints"
 end
 

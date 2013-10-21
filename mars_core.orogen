@@ -183,11 +183,22 @@ task_context "Joints" do
 	doc('Optional array of scale values that are applied to the mars joint values. Needs to be empty or the same size as names.')
     property('offset', 'std/vector<double>').
 	doc('Optional array of offset values that added to the scaled mars joint values. Needs to be empty or the same size as names.')
+    # optional configuration for the rigid_body_states 
+    # this module will generate on the 
+    property "joint_transform", "base/JointTransformVector"
 
     output_port( "status_samples", "base/samples/Joints" ).
 	doc "status values for the joints"
     input_port( "command", "base/commands/Joints" ).
 	doc "command values for the joints"
+
+    # if the joint_transform configuration is set, this port
+    # will output the joints in form of RigidBodyStates
+    #
+    # note: you will need a buffered connection if multiple joints
+    # are served by this module in order to not miss any transforms
+    output_port "transforms", "base/samples/RigidBodyState"
+
 end
 
 task_context "MarsServo" do

@@ -79,6 +79,16 @@ void Joints::update(double delta_t)
     // and write it to the output port
     status.time = getTime();
     _status_samples.write( status );
+    
+    // see if we have configuration for the joint_transforms 
+    // and the output port for it is connected
+    std::vector<base::samples::RigidBodyState> rbs;
+    if( !_joint_transform.value().empty() && _transforms.connected() )
+    {
+        _joint_transform.value().setRigidBodyStates( status, rbs );
+        for( size_t i=0; i < rbs.size(); ++i )
+            _transforms.write( rbs[i] );
+    }
 }
 
 /// The following lines are template definitions for the various state machine

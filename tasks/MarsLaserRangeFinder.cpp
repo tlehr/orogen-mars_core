@@ -53,7 +53,7 @@ void  MarsLaserRangeFinder::update( double time )
     scan.time = getTime();
     std::vector<double> ranges = sensor->getSensorData();
     scan.ranges.resize( ranges.size() );
-    scan.minRange = 10;
+    scan.minRange = _min_range.get() * 1000;
     scan.maxRange = sensor->getConfig().maxDistance * 1000;
     for( size_t i=0; i<ranges.size(); i++ )
     {

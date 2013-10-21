@@ -294,6 +294,9 @@ task_context "MarsLaserRangeFinder" do
     property('merge_count', 'int', 1).
         doc 'how much ranges measurement to merge into one single reported measurement'
 
+    property('min_range', 'double', 0.0).
+        doc("Minimum valid range of the laser range finder")
+
     output_port('scans', 'base/samples/LaserScan').
         max_sizes('remission' => 2000, 'ranges' => 2000).
         doc "the laser scans themselves"

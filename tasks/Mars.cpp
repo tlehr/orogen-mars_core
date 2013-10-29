@@ -551,6 +551,7 @@ void Mars::updateHook()
 
 
     _time.write( simTime.getElapsedMs() );
+    _simulated_time.write(simTime.get());
 }
 
 void Mars::errorHook()

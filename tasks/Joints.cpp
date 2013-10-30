@@ -79,8 +79,8 @@ void Joints::update(double delta_t)
 	mars::sim::SimMotor *motor = control->motors->getSimMotor( conv.mars_id );
 
 	base::JointState state;
-	state.position = conv.fromMars( motor->getValue() );
-	state.speed = conv.fromMars( motor->getVelocity() );
+	state.position = conv.fromMars( motor->getActualPosition() );
+	state.speed = conv.fromMars( motor->getJoint()->getVelocity() );
 	state.effort = conv.fromMars( motor->getTorque() );
 	status[i] = state;
     }

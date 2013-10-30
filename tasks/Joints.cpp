@@ -42,30 +42,40 @@ void Joints::update(double delta_t)
     // if there was a command, write it to the simulation
     if( _command.read( cmd ) == RTT::NewData )
     {
-	for( size_t i=0; i<cmd.size(); ++i )
+	for( size_t i=0; i<mars_ids.size(); ++i )
 	{
+            
 	    // for each command input look up the name in the mars_ids structure
-	    JointConversion conv = mars_ids[cmd.names[i]];
+	    JointConversion conv = mars_ids[i];
+            
+            //ignore the case that the input data stream has not commands for our other joints
+            std::vector<std::string>::const_iterator it = std::find(cmd.names.begin(), cmd.names.end(), mars_ids.names[i]);
+            if (it == cmd.names.end())
+                continue;
+
+            base::JointState &curCmd(cmd[mars_ids.names[i]]);
+
 	    mars::sim::SimMotor *motor = 
 		control->motors->getSimMotor( conv.mars_id );
-	    if( cmd[i].hasPosition() )
+                
+	    if( curCmd.hasPosition() )
             {
                 //set maximum speed that is allowed for turning
-                if(cmd[i].hasSpeed())
-                    motor->setMaximumVelocity(conv.toMars(cmd[i].speed) );
+                if(curCmd.hasSpeed())
+                    motor->setMaximumVelocity(conv.toMars(curCmd.speed) );
 
-                motor->setValue( conv.toMars( cmd[i].position ) );
+                motor->setValue( conv.toMars( curCmd.position ) );
             }
             else
             {
-                if( cmd[i].hasSpeed() )
-                    motor->setVelocity( conv.toMars( cmd[i].speed ) );
+                if( curCmd.hasSpeed() )
+                    motor->setVelocity( conv.toMars( curCmd.speed ) );
             }
-	    if( cmd[i].hasEffort() )
+	    if( curCmd.hasEffort() )
 	    {
 		LOG_WARN_S << "Effort command ignored";
 	    }
-	    if( cmd[i].hasRaw() )
+	    if( curCmd.hasRaw() )
 	    {
 		LOG_WARN_S << "Raw command ignored";
 	    }

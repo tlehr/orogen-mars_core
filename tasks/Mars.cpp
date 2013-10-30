@@ -548,10 +548,6 @@ void Mars::updateHook()
         exception(PHYSICS_ERROR);
  //       QCoreApplication::quit(); //Quitting QApplication too
     }
-
-
-    _time.write( simTime.getElapsedMs() );
-    _simulated_time.write(simTime.get());
 }
 
 void Mars::errorHook()
@@ -633,4 +629,8 @@ void Mars::receiveData(
     package.get("simTime", &ms);
     // update the simulation time
     simTime.setElapsedMs( ms );
+
+    //update the time output ports
+    _time.write( simTime.getElapsedMs() );
+    _simulated_time.write(simTime.get());
 }

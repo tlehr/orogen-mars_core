@@ -110,7 +110,7 @@ bool MarsPlugin::connect()
 
     // register as plugin
     mars::interfaces::pluginStruct newplugin;
-    newplugin.name = "RockPlugin";
+    newplugin.name = provides()->getName();
     newplugin.p_interface = dynamic_cast<mars::interfaces::PluginInterface*>(this);
     newplugin.p_destroy = 0;
     sim->addPlugin(newplugin);

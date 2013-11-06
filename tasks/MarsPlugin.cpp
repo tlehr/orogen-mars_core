@@ -30,6 +30,12 @@ bool MarsPlugin::configureHook()
         RTT::log(RTT::Warning) << "MarsPlugin: configure failed." << RTT::endlog();
         return false;
     }
+    
+    if(!connect())
+    {
+        RTT::log(RTT::Warning) << "MarsPlugin: establishing connection with Mars failed. Configure hook returning false." << RTT::endlog();
+        return false;
+    }
 
     return true;
 }
@@ -38,12 +44,6 @@ bool MarsPlugin::startHook()
 {
     if (! RTT::TaskContext::startHook())
         return false;
-
-    if(!connect())
-    {
-        RTT::log(RTT::Warning) << "MarsPlugin: establishing connection with Mars failed. Configure hook returning false." << RTT::endlog();
-        return false;
-    }
 
     return true;
 }
@@ -94,17 +94,11 @@ bool MarsPlugin::connect()
         disconnect();
     else
     {
-        int count = 0;
         sim = Mars::getSimulatorInterface();
-        while( !sim ){
-        	sim = Mars::getSimulatorInterface();
-        	if (++count > 10){
-                    std::cerr << "MarsPlugin: could not get singleton instance of simulator interface." << std::endl;
-                    RTT::log(RTT::Error) << "MarsPlugin: could not get singleton instance of simulator interface." << std::endl;
-                    return false;
-        	}
-        	std::cerr << "MarsPlugin: could not get singleton retry in 5 secs." << std::endl;
-        	sleep(5);
+        if( !sim ){
+            std::cerr << "MarsPlugin: could not get singleton instance of simulator interface." << std::endl;
+            RTT::log(RTT::Error) << "MarsPlugin: could not get singleton instance of simulator interface." << std::endl;
+            return false;
         }
     }
 

@@ -13,6 +13,7 @@ using_library "QtGui", :typekit => false
 import_types_from "tasks/MarsControl.hpp"
 import_types_from "servoTypes.hpp"
 import_types_from "base"
+import_types_from 'velodyne_lidar/MultilevelLaserScan.h'
 
 using_library "actuator_dispatcher"
 
@@ -117,17 +118,17 @@ task_context "MarsHighResRangeFinder" do
     needs_configuration
     
     property('left_limit', 'double', -Math::PI/4.0).
-        doc('Left limit of the vertical opening angle in radians')
+        doc('Left limit of the horizontal opening angle in radians')
     property('right_limit', 'double', Math::PI/4.0).
-        doc('Right limit of the vertical opening angle in radians')
-    property('resolution_vertical', 'double', Math::PI/180.0).
-        doc('Vertical angular resolution in radians')    
+        doc('Right limit of the horizontal opening angle in radians')
+    property('resolution_horizontal', 'double', Math::PI/180.0).
+        doc('Horizontal angular resolution in radians')    
            
     property('upper_limit', 'double', Math::PI/4.0).
-        doc('Upper limit of the horizontal opening angle in radians')
+        doc('Upper limit of the vertical opening angle in radians')
     property('lower_limit', 'double', -Math::PI/4.0).
-        doc('Lower limit of the horizontal opening angle in radians')
-    property('resolution_horizontal', 'double', Math::PI/180.0).
+        doc('Lower limit of the vertical opening angle in radians')
+    property('resolution_vertical', 'double', Math::PI/180.0).
         doc('Vertical angular resolution in radians')    
         
     property('minimum_distance', 'double', 1.0).
@@ -143,6 +144,9 @@ task_context "MarsHighResRangeFinder" do
 
     output_port('pointcloud', '/base/samples/Pointcloud').
         doc 'Created by using the distance image of the MarsDepthCamera'
+        
+    output_port('laser_scans', '/velodyne_lidar/MultilevelLaserScan').
+        doc '3d scan using the MultilevelLaserScan format, '
 end
 
 # E.g. (ruby script): Two actuators 'rear_left' and 'rear_right'.

@@ -5,6 +5,9 @@
 
 #include "simulation/MarsHighResRangeFinderBase.hpp"
 
+// tmp
+#include "velodyne_lidar/MultilevelLaserScan.h"
+
 namespace simulation {
 
     /*! \class MarsHighResRangeFinder 
@@ -39,8 +42,8 @@ namespace simulation {
              * in the scene file for the orientation_offset-yaw-value of the camera. In the 
              * 'velodyne90' example below that would be 90.
              */
-            Camera(long id, mars::sim::CameraSensor* cam, double rot_y) : 
-                    sensor_id(id), camera_sensor(cam), name()
+            Camera(long id, mars::sim::CameraSensor* cam, double rot_y, std::string name_) : 
+                    sensor_id(id), camera_sensor(cam), name(name_)
             {
                 width = camera_sensor->getConfig().width;
                 height = camera_sensor->getConfig().height;
@@ -55,6 +58,7 @@ namespace simulation {
                 rot_y = (-rot_y / 180.0) * M_PI;
                 Eigen::AngleAxis<double> rot(rot_y, Eigen::Vector3d(0.0, 1.0, 0.0));
                 orientation = rot;
+                rotation_y = rot_y;
             }
             
             ~Camera() {
@@ -70,19 +74,21 @@ namespace simulation {
             base::samples::DistanceImage* image;
             // Rotation of the camera around the y-axis within the camera frame.
             Eigen::Quaternion<double, Eigen::DontAlign> orientation;
+            double rotation_y;
             
+            std::string name;
             double pixel_per_rad_horizontal;
             double pixel_per_rad_vertical;
             double lower_pixel;
             double upper_pixel;
             double left_pixel;
             double right_pixel;
-            double v_steps;
-            double h_steps;
-            std::string name;
+            double v_steps_pixel;
+            double h_steps_pixel;
         };
     
-        std::vector<Camera*> cameras;
+        std::vector<Camera*> mCameras;
+        bool mFirstCameraAdded;
         
         /**
          * Loads another camera from the scene file which will be used for pointcloud creation.
@@ -200,6 +206,9 @@ namespace simulation {
          * and generates the pointcloud using the image data.
          */
         virtual void getData();
+        
+    private:
+         
     };
 }
 

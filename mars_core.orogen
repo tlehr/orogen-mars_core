@@ -179,7 +179,9 @@ task_context "Joints" do
     subclasses "MarsPlugin"
 
     property('names', 'std/vector</std/string>').
-	doc('Array of names of the motor in the scene file. The names get mapped to motor ids starting from zero')
+        doc('Array of names of the motor in the scene file. The names get mapped to motor ids starting from zero')
+    property('name_remap', 'std/vector</std/string>').
+        doc('If this array is set the joints will be renamed for the external interface')
     property('scaling', 'std/vector<double>').
 	doc('Optional array of scale values that are applied to the mars joint values. Needs to be empty or the same size as names.')
     property('offset', 'std/vector<double>').

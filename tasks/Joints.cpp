@@ -26,12 +26,12 @@ Joints::~Joints()
 void Joints::init()
 {
     // for each of the names, get the mars motor id
-    for( size_t i=0; i<mars_ids.names.size(); ++i )
+    for( size_t i=0; i<mars_ids.size(); ++i )
     {
-	std::string &name( mars_ids.names[i] );
+	std::string &name( mars_ids[i].marsName );
         int marsMotorId = control->motors->getID( name );
         if( marsMotorId )
-	    mars_ids.elements[i].mars_id = marsMotorId;
+	    mars_ids[i].mars_id = marsMotorId;
 	else
 	    throw std::runtime_error("there is no motor by the name of " + name);
     }
@@ -49,11 +49,11 @@ void Joints::update(double delta_t)
 	    JointConversion conv = mars_ids[i];
             
             //ignore the case that the input data stream has not commands for our other joints
-            std::vector<std::string>::const_iterator it = std::find(cmd.names.begin(), cmd.names.end(), mars_ids.names[i]);
+            std::vector<std::string>::const_iterator it = std::find(cmd.names.begin(), cmd.names.end(), conv.externalName);
             if (it == cmd.names.end())
                 continue;
 
-            base::JointState &curCmd(cmd[mars_ids.names[i]]);
+            base::JointState &curCmd(status[i]);
 
 	    mars::sim::SimMotor *motor = 
 		control->motors->getSimMotor( conv.mars_id );
@@ -85,7 +85,7 @@ void Joints::update(double delta_t)
     // in any case read out the status
     for( size_t i=0; i<status.size(); ++i )
     {
-	JointConversion conv = mars_ids[status.names[i]];
+	JointConversion conv = mars_ids[i];
 	mars::sim::SimMotor *motor = control->motors->getSimMotor( conv.mars_id );
 
 	base::JointState state;
@@ -135,20 +135,33 @@ bool Joints::configureHook()
 
     // fill the joint structure 
     mars_ids.resize( num_joints );
-    mars_ids.names = _names.value();
+    cmd.resize( num_joints);
+    status.resize( num_joints );
+    std::vector<std::string> marsNames = _names.value();
+    status.names = _names.value();
+    std::vector<std::string> rename = _name_remap.get(); 
     for( size_t i=0; i<num_joints; i++ )
     {
 	if( !_scaling.value().empty() )
-	    mars_ids.elements[i].scaling = _scaling.value()[i];
+	    mars_ids[i].scaling = _scaling.value()[i];
 	if( !_offset.value().empty() )
-	    mars_ids.elements[i].offset = _offset.value()[i];
+	    mars_ids[i].offset = _offset.value()[i];
+        
+        mars_ids[i].marsName = marsNames[i];
+        
+        if(rename.empty() || rename[i].empty())
+        {
+            mars_ids[i].externalName = marsNames[i];
+            
+        }
+        else
+        {
+            status.names[i] = rename[i];
+            mars_ids[i].externalName = rename[i];            
+        }
     }
 
-    // and resize the input/output structures
-    cmd.resize( num_joints);
-    status.resize( num_joints );
-    status.names = _names.value();
-
+    
     return true;
 }
 bool Joints::startHook()

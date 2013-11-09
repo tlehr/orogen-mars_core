@@ -40,10 +40,12 @@ namespace simulation {
 	    }
 
 	    int mars_id;
+            std::string marsName;
+            std::string externalName;
 	    double scaling;
 	    double offset;
 	};
-	base::NamedVector<JointConversion> mars_ids;
+	std::vector<JointConversion> mars_ids;
 
 	base::samples::Joints status;
 	base::commands::Joints cmd;

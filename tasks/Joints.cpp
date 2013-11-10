@@ -52,8 +52,9 @@ void Joints::update(double delta_t)
             std::vector<std::string>::const_iterator it = std::find(cmd.names.begin(), cmd.names.end(), conv.externalName);
             if (it == cmd.names.end())
                 continue;
-
-            base::JointState &curCmd(status[i]);
+            }
+            
+            base::JointState &curCmd(cmd[*it]);
 
 	    mars::sim::SimMotor *motor = 
 		control->motors->getSimMotor( conv.mars_id );

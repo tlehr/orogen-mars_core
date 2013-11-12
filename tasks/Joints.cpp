@@ -50,7 +50,7 @@ void Joints::update(double delta_t)
             
             //ignore the case that the input data stream has not commands for our other joints
             std::vector<std::string>::const_iterator it = std::find(cmd.names.begin(), cmd.names.end(), conv.externalName);
-            if (it == cmd.names.end())
+            if (it == cmd.names.end()){
                 continue;
             }
             

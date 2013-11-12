@@ -21,5 +21,15 @@ namespace simulation {
 
    };
 
+   /**
+    * position offset parameter
+    */
+   struct Positions
+   {
+	   std::string nodename;
+	   float posx,posy,posz;
+	   float rotx,roty,rotz;
+   };
+
 }
 #endif // SIMULATION_MARS_CONTROL_HPP

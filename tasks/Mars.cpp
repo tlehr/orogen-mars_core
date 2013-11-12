@@ -1,6 +1,7 @@
 #include "Mars.hpp"
 #include <mars/sim/Simulator.h>
 #include <mars/utils/Thread.h>
+#include <mars/utils/mathUtils.h>
 #include <mars/interfaces/sim/SimulatorInterface.h>
 
 #include <simulation/tasks/MarsControl.hpp>
@@ -495,6 +496,55 @@ bool Mars::configureHook()
 		}
     }
     
+
+	std::vector<Positions> positions = _positions.get();
+    if(!positions.empty()){
+    	for (std::vector< Positions >::iterator offset = positions.begin(); offset != positions.end();offset++){
+    		printf("moving name: %s\n",offset->nodename.c_str());
+    		//simulatorInterface->loadScene(*scene, *scene,true,true);
+    		mars::interfaces::NodeManagerInterface* nodes = simulatorInterface->getControlCenter()->nodes;
+    		mars::interfaces::NodeId id = nodes->getID(offset->nodename);
+    		//mars::utils::Vector pos
+    		if (id){
+    			printf("found id : %li\n",id);
+				mars::interfaces::NodeData nodedata = nodes->getFullNode(id);
+
+				utils::Vector pos = nodes->getPosition(id);
+
+				printf("actual position %.2f %.2f %.2f\n", pos.x(),pos.y(),pos.z());
+				printf("offset position %.2f %.2f %.2f\n", offset->posx,offset->posy,offset->posz);
+
+				pos.x() = offset->posx;
+				pos.y() = offset->posy;
+				pos.z() = offset->posz;
+
+				mars::utils::Quaternion rot = nodes->getRotation(id);
+
+				mars::utils::Vector rotoff;
+
+				rotoff.x() =  offset->rotx;// * (M_PI/180.0);
+				rotoff.y() =  offset->roty;// * (M_PI/180.0);
+				rotoff.z() =  offset->rotz;// * (M_PI/180.0);
+
+				mars::utils::Quaternion newrot = mars::utils::eulerToQuaternion(rotoff);
+
+
+
+
+
+				printf("new position %.2f %.2f %.2f\n", pos.x(),pos.y(),pos.z());
+
+				//nodes->editNode(&nodedata, mars::interfaces::EDIT_NODE_POS);
+
+				nodes->setPosition(id, pos);
+				nodes->setRotation(id,newrot);
+
+    		}
+    	}
+
+    }
+
+
     if (_start_sim.get()){
     	simulatorInterface->StartSimulation();
     }

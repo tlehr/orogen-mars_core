@@ -544,6 +544,11 @@ bool Mars::configureHook()
 
     }
 
+    {//Setting the Step-with for the simulation
+    cfg_manager::cfgPropertyStruct c = simulatorInterface->getControlCenter()->cfg->getOrCreateProperty("Simulator", "calc_ms", _sim_step_size.get());
+    c.dValue = _sim_step_size.get();
+    simulatorInterface->getControlCenter()->cfg->setProperty(c);
+    }
 
     if (_start_sim.get()){
     	simulatorInterface->StartSimulation();
@@ -683,4 +688,16 @@ void Mars::receiveData(
     //update the time output ports
     _time.write( simTime.getElapsedMs() );
     _simulated_time.write(simTime.get());
+}
+
+bool Mars::setSim_step_size(double value)
+{
+    if(!isConfigured()){
+        //The configuration will be done within the configure hook later
+        return(simulation::MarsBase::setSim_step_size(value));
+    }
+    cfg_manager::cfgPropertyStruct c = simulatorInterface->getControlCenter()->cfg->getOrCreateProperty("Simulator", "calc_ms", value);
+    c.dValue = value;
+    simulatorInterface->getControlCenter()->cfg->setProperty(c);
+    return(simulation::MarsBase::setSim_step_size(value));
 }

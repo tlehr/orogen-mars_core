@@ -63,12 +63,16 @@ task_context "Mars" do
         property('controller_port', 'int').
             doc('set the controller port, e.g. 1600 for communication with monster')
 
+        property('sim_step_size', 'double',0.1).
+            dynamic.
+            doc('The Step-size that each mars-step calculates')
+
         property('raw_options', '/std/vector<simulation::Option>').
             doc('forward the original mars arguments, such as -c 1600 for setting the ode port - option consists of name, here: -c and parameter: here 1600')
 
 		property('realtime_calc', 'bool', false).
             doc('if true, simulation runs in real time or slower, but not faster')
-		
+
 		property('start_sim', 'bool', false).
 			doc('starts the simulation after loading the initial scene(s)')
 

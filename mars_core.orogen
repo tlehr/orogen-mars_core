@@ -36,7 +36,7 @@ task_context "Mars" do
 
         property("show_coordinate_system","bool",false).
             dynamic
-        
+
         property("reaction_to_physics_error","/std/string","shutdown").
             doc("Possible Values: abort (killing sim), reset (ressing scene and simulation), warn (keep simulation running an print warnings), shutdown (stop physics but keep mars-running and set this tas to the error state)").
             dynamic
@@ -44,13 +44,13 @@ task_context "Mars" do
 
         property('initial_scene', '/std/string').
 	    doc('the full path to the initial scene, this is needed because operations are not accessible during configuration within syskit (deadlock)')
-	
+
 	    property('initial_scenes', '/std/vector</std/string>').
 	    doc('the full path to the initial scene, this is needed because operations are not accessible during configuration within syskit (deadlock)')
 
         property('positions', 'std/vector<simulation/Positions>' ).
 	    doc('override positions in the scene (scn) file, e.g. move the terrain to create different experiment setups without changing the scene file itself')
-	
+
         property('config_dir', '/std/string',"#{ENV['AUTOPROJ_PROJECT_BASE']}/install/configuration/mars_default").
 	    doc('the full path to the main configuration folder')
 
@@ -84,7 +84,7 @@ task_context "Mars" do
         # method removePlugin(input: TaskContext) return bool
 
         input_port('control_action', '/simulation/Control')
-        
+
         output_port('time', 'double')
         output_port('simulated_time', '/base/Time')
 
@@ -97,7 +97,7 @@ task_context "MarsPlugin" do
     needs_configuration
 
     error_states "LOST_MARS_CONNECTION"
-    
+
 end
 
 task_context "CameraPlugin" do
@@ -123,26 +123,26 @@ end
 task_context "MarsHighResRangeFinder" do
     subclasses "CameraPlugin"
     needs_configuration
-    
+
     property('left_limit', 'double', -Math::PI/4.0).
         doc('Left limit of the vertical opening angle in radians')
     property('right_limit', 'double', Math::PI/4.0).
         doc('Right limit of the vertical opening angle in radians')
     property('resolution_vertical', 'double', Math::PI/180.0).
-        doc('Vertical angular resolution in radians')    
-           
+        doc('Vertical angular resolution in radians')
+
     property('upper_limit', 'double', Math::PI/4.0).
         doc('Upper limit of the horizontal opening angle in radians')
     property('lower_limit', 'double', -Math::PI/4.0).
         doc('Lower limit of the horizontal opening angle in radians')
     property('resolution_horizontal', 'double', Math::PI/180.0).
-        doc('Vertical angular resolution in radians')    
-        
+        doc('Vertical angular resolution in radians')
+
     property('minimum_distance', 'double', 1.0).
         doc('Smaller distances (meter) are discarded')
     property('maximum_distance', 'double', 80.0).
-        doc('Larger distances (meter) are discarded')   
-        
+        doc('Larger distances (meter) are discarded')
+
     operation('addCamera').
         doc('Adds another camera which will be used for pointcloud creation').
         returns("bool").
@@ -165,7 +165,7 @@ end
 #
 task_context "MarsActuator" do
     subclasses "MarsPlugin"
-    
+
     operation('dispatch').
         doc('creates an output port of actuator status and an input port for setting actuator commands').
         returns("bool").
@@ -176,7 +176,7 @@ task_context "MarsActuator" do
         doc "commands for a set of actuators set up by #dispatch"
     dynamic_output_port(/status_\w+/, "base/actuators/Status").
         doc "status of a set of actuators set up by #dispatch"
-    
+
     property('names', 'std/vector</std/string>').
 	doc('Array of names of the motor in the scene file. The names get mapped to motor ids starting from zero')
 
@@ -225,7 +225,7 @@ task_context "MarsLaserRangeFinder" do
     subclasses "MarsPlugin"
 
     needs_configuration
-    
+
     property('remission_values',  'bool', 0).
         doc 'include remission values in output if set to true and available in the device'
     property('start_step',  'int', -1).
@@ -276,22 +276,22 @@ end
 task_context "Actuators" do
     subclasses "MarsPlugin"
     needs_configuration
-    
+
     property('node_name', 'std/string')
 	doc 'the name of the vehicle in the scene file'
-	
+
     property('amount_of_actuators', 'int')
 	doc 'the amount of actuators the vehicle has'
-	
+
     property('maximum_thruster_force', 'std/vector<double>')
 	doc 'The maximum thruster foce for each actuator. Is also used as a factor. The size of the vector must equal to amount_of_actuators'
-	
+
     property('thruster_position', 'std/vector</base/Vector3d>')
 	doc 'Positions of the thrusters on the vehicle. The size of the vector must equal to amount_of_actuators'
-	
+
     property('thruster_direction', 'std/vector</base/Vector3d>')
 	doc 'Directions of the thruster force on the vehicle. The size of the vector must equal to amount_of_actuators'
-	
+
     input_port("command", "base/actuators/Command").
         doc("actuator command").
         needs_buffered_connection
@@ -302,10 +302,10 @@ end
 task_context "Sonar" do
     subclasses "MarsPlugin"
     needs_configuration
-    
+
     property('node_name', 'std/string').
 	doc 'the name of the vehicle in the scene file'
-        
+
     property("left_limit","double").dynamic.
 	doc 'maximum left angle'
     property("right_limit","double").dynamic.
@@ -316,8 +316,8 @@ task_context "Sonar" do
 	doc 'maximum distance of the sonar beam'
     property("ping_pong_mode","bool").dynamic.
         doc('if true ping pong mode is activated')
-	    
-	
+
+
     output_port("sonar_beam","base::samples::SonarBeam").
         doc('top sonar beam')
 end
@@ -327,7 +327,7 @@ task_context "MarsAltimeter" do
     subclasses "MarsPlugin"
     property('node_name', 'std/string')
 	doc 'the name of the vehicle in the scene file'
-    
+
     needs_configuration
 
     output_port("ground_distance", "/base/samples/RigidBodyState").
@@ -338,23 +338,23 @@ task_context "AuvController" do
     subclasses "MarsPlugin"
     property('node_name', 'std/string')
 	doc 'the name of the vehicle in the scene file'
-    
+
     needs_configuration
 
     property('position','/base/Vector3d').
         dynamic
-    
+
     property('orientation','/base/Quaterniond').
         dynamic
-    
+
     property('cob','/base/Vector3d').
         doc('Point where the Buoyancy should be applied')
 
     property('buoyancy_force','double')
-    
+
 
 end
-    
+
 #
 #deployment "simulation" do
 #        sim = task('mars_simulation', 'simulation::Mars')

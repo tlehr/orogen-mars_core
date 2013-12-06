@@ -147,22 +147,22 @@ bool Joints::configureHook()
 	    mars_ids[i].scaling = _scaling.value()[i];
 	if( !_offset.value().empty() )
 	    mars_ids[i].offset = _offset.value()[i];
-        
+
         mars_ids[i].marsName = marsNames[i];
-        
+
         if(rename.empty() || rename[i].empty())
         {
             mars_ids[i].externalName = marsNames[i];
-            
+
         }
         else
         {
             status.names[i] = rename[i];
-            mars_ids[i].externalName = rename[i];            
+            mars_ids[i].externalName = rename[i];
         }
     }
 
-    
+
     return true;
 }
 bool Joints::startHook()

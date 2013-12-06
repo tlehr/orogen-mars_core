@@ -420,6 +420,7 @@ bool Mars::configureHook()
         throw std::runtime_error("Config directory is not set! Can not start mars");     
     }
 
+
     //check if the environemnt was sourced more than once and the path has more than one entry
     int pos = _config_dir.get().rfind(":/");
     if(pos != _config_dir.get().size()-1)
@@ -562,6 +563,7 @@ bool Mars::startHook()
 {
     // Simulation should be either started manually, 
     // or by using the control_action input_port
+    //
     return true;
 }
 

@@ -548,8 +548,8 @@ bool Mars::configureHook()
     }
 
     {//Setting the Step-with for the simulation
-    cfg_manager::cfgPropertyStruct c = simulatorInterface->getControlCenter()->cfg->getOrCreateProperty("Simulator", "calc_ms", _sim_step_size.get());
-    c.dValue = _sim_step_size.get();
+    cfg_manager::cfgPropertyStruct c = simulatorInterface->getControlCenter()->cfg->getOrCreateProperty("Simulator", "calc_ms", _sim_step_size.get()*1000.0);
+    c.dValue = _sim_step_size.get()*1000.0;
     simulatorInterface->getControlCenter()->cfg->setProperty(c);
     }
 
@@ -708,6 +708,8 @@ void Mars::receiveData(
 
 bool Mars::setSim_step_size(double value)
 {
+    //convert to ms
+    value *= 1000.0;
     if(!isConfigured()){
         //The configuration will be done within the configure hook later
         return(simulation::MarsBase::setSim_step_size(value));

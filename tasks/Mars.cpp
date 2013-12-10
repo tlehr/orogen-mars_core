@@ -369,16 +369,18 @@ bool Mars::setShow_coordinate_system(bool value)
 
 bool Mars::setReaction_to_physics_error(::std::string const & value)
 {
-	//TODO Add your code here 
-        if(!simulatorInterface){
-            fprintf(stderr,"Mars is not running could not set reaction to physics error");
-            return false;
-        }
-        if(value == "abort" || value == "reset" || value == "warn" || value == "shutdown"){
-            simulatorInterface->getControlCenter()->cfg->setPropertyValue("Simulator", "onPhysicsError","value", value);
-        }else{
-            fprintf(stderr,"Could not ser rection to physics: Possible Values: abort (killing sim), reset (ressing scene and simulation), warn (keep simulation running an print warnings), shutdown (stop physics but keep mars-running and set this tas to the error state)");
-            return false;
+	//TODO Add your code here
+        if(isConfigured()){
+            if(!simulatorInterface){
+                fprintf(stderr,"Mars is not running could not set reaction to physics error");
+                return false;
+            }
+            if(value == "abort" || value == "reset" || value == "warn" || value == "shutdown"){
+                simulatorInterface->getControlCenter()->cfg->setPropertyValue("Simulator", "onPhysicsError","value", value);
+            }else{
+                fprintf(stderr,"Could not ser rection to physics: Possible Values: abort (killing sim), reset (ressing scene and simulation), warn (keep simulation running an print warnings), shutdown (stop physics but keep mars-running and set this tas to the error state)");
+                return false;
+            }
         }
         
         //Call the base function, DO-NOT Remove
@@ -549,6 +551,17 @@ bool Mars::configureHook()
     cfg_manager::cfgPropertyStruct c = simulatorInterface->getControlCenter()->cfg->getOrCreateProperty("Simulator", "calc_ms", _sim_step_size.get());
     c.dValue = _sim_step_size.get();
     simulatorInterface->getControlCenter()->cfg->setProperty(c);
+    }
+
+
+    {
+    std::string value = _reaction_to_physics_error.get();
+    if(value == "abort" || value == "reset" || value == "warn" || value == "shutdown"){
+        simulatorInterface->getControlCenter()->cfg->setPropertyValue("Simulator", "onPhysicsError","value", value);
+    }else{
+        fprintf(stderr,"Wront selection for physic error setting\n");
+        return false;
+    }
     }
 
     if (_start_sim.get()){

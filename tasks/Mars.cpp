@@ -599,6 +599,7 @@ void Mars::updateHook()
     }
 
     if(simulatorInterface->hasSimFault()){
+        std::cerr << "Simulation detected a Physics error, stopping all plugins and go to Exception state" << std::endl;
         for(unsigned int i=0;i<plugins.size();i++){
             plugins[i]->handleMarsShudown();
         }

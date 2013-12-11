@@ -126,9 +126,9 @@ void MarsCamera::getData()
         image_src = marsImage.data()+width*i;
         for(int i2=0;i2<width;++i2)
         {
-            *(image_dst++) = image_src->b;
-            *(image_dst++) = image_src->g;
             *(image_dst++) = image_src->r;
+            *(image_dst++) = image_src->g;
+            *(image_dst++) = image_src->b;
             ++image_src;
         }
     }

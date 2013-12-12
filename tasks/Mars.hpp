@@ -153,6 +153,8 @@ namespace simulation {
         // GraphicsTimer will be later called with the marsGraphics reference
         // which can be also NULL for a disabled gui
         mars::graphics::GraphicsManager* marsGraphics;
+        
+        virtual bool setSim_step_size(double value);
 
     public:
 	/** get the singleton instance of the simulator interface

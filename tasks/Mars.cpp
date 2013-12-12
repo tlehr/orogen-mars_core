@@ -369,16 +369,18 @@ bool Mars::setShow_coordinate_system(bool value)
 
 bool Mars::setReaction_to_physics_error(::std::string const & value)
 {
-	//TODO Add your code here 
-        if(!simulatorInterface){
-            fprintf(stderr,"Mars is not running could not set reaction to physics error");
-            return false;
-        }
-        if(value == "abort" || value == "reset" || value == "warn" || value == "shutdown"){
-            simulatorInterface->getControlCenter()->cfg->setPropertyValue("Simulator", "onPhysicsError","value", value);
-        }else{
-            fprintf(stderr,"Could not ser rection to physics: Possible Values: abort (killing sim), reset (ressing scene and simulation), warn (keep simulation running an print warnings), shutdown (stop physics but keep mars-running and set this tas to the error state)");
-            return false;
+	//TODO Add your code here
+        if(isConfigured()){
+            if(!simulatorInterface){
+                fprintf(stderr,"Mars is not running could not set reaction to physics error");
+                return false;
+            }
+            if(value == "abort" || value == "reset" || value == "warn" || value == "shutdown"){
+                simulatorInterface->getControlCenter()->cfg->setPropertyValue("Simulator", "onPhysicsError","value", value);
+            }else{
+                fprintf(stderr,"Could not ser rection to physics: Possible Values: abort (killing sim), reset (ressing scene and simulation), warn (keep simulation running an print warnings), shutdown (stop physics but keep mars-running and set this tas to the error state)");
+                return false;
+            }
         }
         
         //Call the base function, DO-NOT Remove
@@ -419,6 +421,7 @@ bool Mars::configureHook()
         RTT::log(RTT::Error) << "Config directory is not set! Cannot start mars." << RTT::endlog();
         throw std::runtime_error("Config directory is not set! Can not start mars");     
     }
+
 
     //check if the environemnt was sourced more than once and the path has more than one entry
     int pos = _config_dir.get().rfind(":/");
@@ -546,6 +549,22 @@ bool Mars::configureHook()
 
     }
 
+    {//Setting the Step-with for the simulation
+    cfg_manager::cfgPropertyStruct c = simulatorInterface->getControlCenter()->cfg->getOrCreateProperty("Simulator", "calc_ms", _sim_step_size.get()*1000.0);
+    c.dValue = _sim_step_size.get()*1000.0;
+    simulatorInterface->getControlCenter()->cfg->setProperty(c);
+    }
+
+
+    {
+    std::string value = _reaction_to_physics_error.get();
+    if(value == "abort" || value == "reset" || value == "warn" || value == "shutdown"){
+        simulatorInterface->getControlCenter()->cfg->setPropertyValue("Simulator", "onPhysicsError","value", value);
+    }else{
+        fprintf(stderr,"Wront selection for physic error setting\n");
+        return false;
+    }
+    }
 
     if (_start_sim.get()){
     	simulatorInterface->StartSimulation();
@@ -559,6 +578,7 @@ bool Mars::startHook()
 {
     // Simulation should be either started manually, 
     // or by using the control_action input_port
+    //
     return true;
 }
 
@@ -594,6 +614,7 @@ void Mars::updateHook()
     }
 
     if(simulatorInterface->hasSimFault()){
+        std::cerr << "Simulation detected a Physics error, stopping all plugins and go to Exception state" << std::endl;
         for(unsigned int i=0;i<plugins.size();i++){
             plugins[i]->handleMarsShudown();
         }
@@ -685,4 +706,18 @@ void Mars::receiveData(
     //update the time output ports
     _time.write( simTime.getElapsedMs() );
     _simulated_time.write(simTime.get());
+}
+
+bool Mars::setSim_step_size(double value)
+{
+    //convert to ms
+    value *= 1000.0;
+    if(!isConfigured()){
+        //The configuration will be done within the configure hook later
+        return(simulation::MarsBase::setSim_step_size(value));
+    }
+    cfg_manager::cfgPropertyStruct c = simulatorInterface->getControlCenter()->cfg->getOrCreateProperty("Simulator", "calc_ms", value);
+    c.dValue = value;
+    simulatorInterface->getControlCenter()->cfg->setProperty(c);
+    return(simulation::MarsBase::setSim_step_size(value));
 }

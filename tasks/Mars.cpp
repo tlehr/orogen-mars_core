@@ -533,11 +533,13 @@ bool Mars::configureHook()
 
 
 				printf("new position %.2f %.2f %.2f\n", pos.x(),pos.y(),pos.z());
+        nodedata.pos = pos;
+        nodedata.rot = newrot;
 
-				//nodes->editNode(&nodedata, mars::interfaces::EDIT_NODE_POS);
+				nodes->editNode(&nodedata, mars::interfaces::EDIT_NODE_POS | mars::interfaces::EDIT_NODE_MOVE_ALL);
 
-				nodes->setPosition(id, pos);
-				nodes->setRotation(id,newrot);
+				// nodes->setPosition(id, pos);
+				// nodes->setRotation(id,newrot);
 
     		}
     	}

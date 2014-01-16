@@ -70,11 +70,11 @@ struct ActuatorPlugin
 		    throw std::runtime_error("No clue how to implementent PWM in mars");
 		    break;
 		case base::actuators::DM_SPEED:
-			motor->setType(MOTOR_TYPE_DC);
+			motor->setType(mars::interfaces::MOTOR_TYPE_DC);
 		    motor->setVelocity(value);
 		    break;
 		case base::actuators::DM_POSITION:
-			motor->setType(MOTOR_TYPE_PID);
+			motor->setType(mars::interfaces::MOTOR_TYPE_PID);
 		    motor->setValue( value );
 		    break;
 		default:

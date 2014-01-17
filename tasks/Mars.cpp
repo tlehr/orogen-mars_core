@@ -540,7 +540,7 @@ bool Mars::configureHook()
         nodedata.rot = newrot;
 
 				nodes->editNode(&nodedata, mars::interfaces::EDIT_NODE_POS | mars::interfaces::EDIT_NODE_MOVE_ALL);
-
+				nodes->editNode(&nodedata, mars::interfaces::EDIT_NODE_ROT | mars::interfaces::EDIT_NODE_MOVE_ALL);
 				// nodes->setPosition(id, pos);
 				// nodes->setRotation(id,newrot);
 

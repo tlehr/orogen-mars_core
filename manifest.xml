@@ -19,4 +19,6 @@ The mars-core module provides the base for other modules that require the simula
   <export>
     <cpp cflags="" lflags="" />
   </export>
+  <tags>needs_opt</tags>
+
 </package>

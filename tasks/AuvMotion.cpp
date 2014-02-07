@@ -49,7 +49,7 @@ bool AuvMotion::startHook()
     if (! AuvMotionBase::startHook())
         return false;
     
-    Actuators::startHook(); //Initialize superclass
+    ForceApplier::startHook(); //Initialize superclass
 
     //Initialize Thruster coefficient matrix
     TCM = base::MatrixXd(6,amount_of_actuators);
@@ -59,7 +59,7 @@ bool AuvMotion::startHook()
 	TCM(j, i) = thruster_direction[i][j];
       }
       
-      //Calculate the angular thruster force, according to the position and direction
+      //Calculate the angular thruster force, according to the position and direction of the thruster
       TCM(3, i) = thruster_position[i].y() * thruster_direction[i].z() + 
 		    (-thruster_position[i].z() * thruster_direction[i].y());
       
@@ -70,8 +70,23 @@ bool AuvMotion::startHook()
 		    thruster_position[i].x() * thruster_direction[i].y();
     }
     
-    linearDamp = _linear_damp.get();
-    squareDamp = _square_damp.get();
+    if( (_linear_damp.get().array() > base::Vector6d::Zero().array() ).all() )
+    {
+      linearDamp = _linear_damp.get();
+    }
+    else{
+      std::cout << "All linear damping coefficient need to be set (>0)" << std::endl;
+      return false;
+    }
+    
+    if( (_square_damp.get().array() >= base::Vector6d::Zero().array() ).all() )
+    {
+      squareDamp = _square_damp.get();
+    }
+    else{
+      std::cout << "All linear damping coefficient need to be set (>=0)" << std::endl;
+      return false;
+    }        
     
     if(_thruster_coefficients.get().size() == amount_of_actuators){
       thruster_coefficients = _thruster_coefficients.get();
@@ -79,7 +94,7 @@ bool AuvMotion::startHook()
       std::cout << "Thruster coefficients not set." << std::endl;
       return false;
     }
-      
+    
     centerOfBuoyancy = _cob;
     voltage = _voltage;
     
@@ -89,7 +104,7 @@ void AuvMotion::updateHook()
 {
     AuvMotionBase::updateHook();
     
-    Actuators::updateHook();
+    ForceApplier::updateHook();
 }
 void AuvMotion::errorHook()
 {

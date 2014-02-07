@@ -391,7 +391,7 @@ task_context "AuvMotion" do
 	  For basic functions, all properties need to be set.
 	  For more information about the model, see: Fossen, T.I.: Guidance and control of ocean vehicles")
 
-    subclasses "Actuators"
+    subclasses "ForceApplier"
     
     property("linear_damp", "/base/Vector6d").
       doc("Linear damping coefficients, in 6 degrees of freedom")    

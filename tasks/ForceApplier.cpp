@@ -91,7 +91,7 @@ void ForceApplier::updateHook()
 
         //check that the drive mode is pwm
         for(unsigned i = 0; i < command.size() ; i++)
-            if(command[i].isRaw())
+            if(!command[i].isRaw())
                 throw std::runtime_error("Simulation does only support Joints with RAW commands");
 
         pthread_mutex_lock(&node_update_mutex);

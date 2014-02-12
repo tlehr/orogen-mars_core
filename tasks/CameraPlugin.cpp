@@ -47,6 +47,8 @@ bool CameraPlugin::configureHook()
 {
     if (! simulation::MarsPlugin::configureHook())
         return false;
+    
+    
     return true;
 }
 
@@ -68,7 +70,8 @@ bool CameraPlugin::startHook()
 	std::cerr << "CameraPlugin: Given sensor name is not a camera";
         return false;
     }
-
+    
+    camera->activateRendering();
     width = camera->getConfig().width;
     height = camera->getConfig().height;
     
@@ -99,6 +102,7 @@ void CameraPlugin::errorHook()
 void CameraPlugin::stopHook()
 {
     simulation::MarsPlugin::stopHook();
+    camera->deactivateRendering();
 }
 
 

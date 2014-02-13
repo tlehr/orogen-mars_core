@@ -133,7 +133,7 @@ void MarsCamera::getData()
         }
     }
     //set attributes
-    image->time = base::Time::fromSeconds(lastUpdateTime);
+    image->time = getTime();
     image->received_time = image->time;
     image->frame_status = base::samples::frame::STATUS_VALID;
     

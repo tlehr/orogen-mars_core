@@ -51,6 +51,7 @@ bool AuvMotion::startHook()
     
     ForceApplier::startHook(); //Initialize superclass
 
+    
     //Initialize Thruster coefficient matrix
     TCM = base::MatrixXd(6,amount_of_actuators);
     

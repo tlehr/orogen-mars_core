@@ -36,6 +36,7 @@ Mars::Mars(std::string const& name)
     setlocale(LC_ALL,"C"); //Make sure english Encodings are used
     setenv("LANG","C",true);
     app = 0;
+    _gravity.set(Eigen::Vector3d(0,0,-9.81));
 }
 
 Mars::Mars(std::string const& name, RTT::ExecutionEngine* engine)
@@ -566,9 +567,7 @@ bool Mars::configureHook()
     }
     }
 
-    if (_start_sim.get()){
-    	simulatorInterface->StartSimulation();
-    }
+    setGravity_internal(_gravity.get());
 
     return updateDynamicProperties();
 }
@@ -579,6 +578,9 @@ bool Mars::startHook()
     // Simulation should be either started manually, 
     // or by using the control_action input_port
     //
+    if (_start_sim.get()){
+    	simulatorInterface->StartSimulation();
+    }
     return true;
 }
 
@@ -707,6 +709,22 @@ void Mars::receiveData(
     _time.write( simTime.getElapsedMs() );
     _simulated_time.write(simTime.get());
 }
+
+bool Mars::setGravity_internal(::base::Vector3d const & value){
+ simulatorInterface->setGravity(value);
+}
+
+bool Mars::setGravity(::base::Vector3d const & value)
+{
+ if(!isConfigured()){
+     //The configuration will be done within the configure hook later
+     return(simulation::MarsBase::setGravity(value));
+ }
+ 
+ setGravity_internal(value);
+ return(simulation::MarsBase::setGravity(value));
+}
+
 
 bool Mars::setSim_step_size(double value)
 {

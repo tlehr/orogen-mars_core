@@ -155,6 +155,8 @@ namespace simulation {
         mars::graphics::GraphicsManager* marsGraphics;
         
         virtual bool setSim_step_size(double value);
+        virtual bool setGravity(::base::Vector3d const & value);
+        virtual bool setGravity_internal(::base::Vector3d const & value);
 
     public:
 	/** get the singleton instance of the simulator interface

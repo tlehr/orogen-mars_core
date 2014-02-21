@@ -38,6 +38,8 @@ task_context "Mars" do
 
         property('add_floor',"/bool",false)
 
+        property('gravity',"/base/Vector3d").dynamic
+
         property("show_coordinate_system","bool",false).
             dynamic
 

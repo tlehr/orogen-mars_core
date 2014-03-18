@@ -50,6 +50,7 @@ void MarsLaserRangeFinder::stopHook()
 
 void  MarsLaserRangeFinder::update( double time )
 {
+    if(!isRunning()) return; //Seems Plugin is set up but not active yet, we are not sure that we are initialized correctly so retuning
     scan.time = getTime();
     std::vector<double> ranges = sensor->getSensorData();
     scan.ranges.resize( ranges.size() );

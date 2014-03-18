@@ -68,6 +68,7 @@ void MarsIMU::stopHook()
 
 void MarsIMU::update( double time )
 {
+    if(!isRunning()) return; //Seems Plugin is set up but not active yet, we are not sure that we are initialized correctly so retuning
     rbs.time = getTime();
     rbs.sourceFrame = _imu_frame.value();
     rbs.targetFrame = _world_frame.value();

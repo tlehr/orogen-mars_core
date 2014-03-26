@@ -95,8 +95,14 @@ void ForceApplier::updateHook()
                 throw std::runtime_error("Simulation does only support Joints with RAW commands");
 
         pthread_mutex_lock(&node_update_mutex);
-        for(unsigned int i=0;i<amount_of_actuators;i++)
-            thruster_force[i] = command[i].raw;
+        for(unsigned int i=0;i<amount_of_actuators;i++){
+            if(_joint_names.get().size() == amount_of_actuators){
+                //Getting the right joint by the name for the index
+                thruster_force[i] = command.getElementByName(_joint_names.get()[i]).raw;
+            }else{
+                thruster_force[i] = command[i].raw;
+            }
+        }
         pthread_mutex_unlock(&node_update_mutex);
 
         /*// write actuator status

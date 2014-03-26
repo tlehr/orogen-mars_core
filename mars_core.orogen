@@ -321,7 +321,10 @@ task_context "ForceApplier" do
 	
     property('thruster_position', 'std/vector</base/Vector3d>')
 	doc 'Positions of the thrusters on the vehicle. The size of the vector must equal to amount_of_actuators'
-	
+
+    property('joint_names','std/vector</string>').
+        doc 'The names of the joints, array indexes must equal to the positions'
+
     property('thruster_direction', 'std/vector</base/Vector3d>')
 	doc 'Directions of the thruster force on the vehicle. The size of the vector must equal to amount_of_actuators'
 	

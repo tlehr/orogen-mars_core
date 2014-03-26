@@ -48,7 +48,7 @@ void Joints::update(double delta_t)
             
 	    // for each command input look up the name in the mars_ids structure
 	    JointConversion conv = mars_ids[i];
-            
+
             //ignore the case that the input data stream has not commands for our other joints
             std::vector<std::string>::const_iterator it = std::find(cmd.names.begin(), cmd.names.end(), conv.externalName);
             if (it == cmd.names.end()){
@@ -57,9 +57,9 @@ void Joints::update(double delta_t)
             
             base::JointState &curCmd(cmd[*it]);
 
-	    mars::sim::SimMotor *motor = 
+	    mars::sim::SimMotor *motor =
 		control->motors->getSimMotor( conv.mars_id );
-                
+
 	    if( curCmd.hasPosition() )
             {
                 //set maximum speed that is allowed for turning
@@ -135,32 +135,67 @@ bool Joints::configureHook()
 	return false;
     }
 
+    std::vector< simulation::ParallelKinematic > parallel_kinematics = _parallel_kinematics.value();
+
+
     // fill the joint structure 
     mars_ids.resize( num_joints );
     cmd.resize( num_joints);
     status.resize( num_joints );
-    std::vector<std::string> marsNames = _names.value();
-    status.names = _names.value();
-    std::vector<std::string> rename = _name_remap.get(); 
-    for( size_t i=0; i<num_joints; i++ )
-    {
-	if( !_scaling.value().empty() )
-	    mars_ids[i].scaling = _scaling.value()[i];
-	if( !_offset.value().empty() )
-	    mars_ids[i].offset = _offset.value()[i];
 
+
+    std::vector<std::string> marsNames = _names.value();
+
+
+    //set proper status names (by parallel kinematics)
+    //status.resize( num_joints - parallel_kinematics.size());
+    if (parallel_kinematics.empty()){
+    	printf("no parallels\n");
+    }else{
+    	printf("parallel kinematic_configuretion:\n");
+	    for (std::vector< simulation::ParallelKinematic >::iterator it = parallel_kinematics.begin();it != parallel_kinematics.end();it++){
+	    	printf("%s -> %s, %s\n",it->externalName.c_str(),it->internalName1.c_str(),it->internalName2.c_str());
+	    }
+    }
+
+
+
+    status.names = _names.value();
+
+
+
+    std::vector<std::string> rename = _name_remap.get(); 
+    for( size_t i=0; i<mars_ids.size(); i++ )
+    {
+		if( !_scaling.value().empty() ){
+			mars_ids[i].scaling = _scaling.value()[i];
+		}
+
+		if( !_offset.value().empty() ){
+			mars_ids[i].offset = _offset.value()[i];
+		}
         mars_ids[i].marsName = marsNames[i];
 
-        if(rename.empty() || rename[i].empty())
-        {
-            mars_ids[i].externalName = marsNames[i];
+		if(rename.empty() || rename[i].empty())
+		{
+			mars_ids[i].externalName = marsNames[i];
 
+		}else
+		{
+			status.names[i] = rename[i];
+			mars_ids[i].externalName = rename[i];
+		}
+
+        if (!parallel_kinematics.empty()){
+    	    //if (marsNames[i] in _parallel_kinematics )
+
+    	    for (std::vector< simulation::ParallelKinematic >::iterator it = parallel_kinematics.begin();it != parallel_kinematics.end();it++){
+    	    	if (mars_ids[i].marsName == it->internalName1 || mars_ids[i].marsName == it->internalName2){
+    	    		mars_ids[i].externalName = it->externalName;
+    	    	}
+    	    }
         }
-        else
-        {
-            status.names[i] = rename[i];
-            mars_ids[i].externalName = rename[i];
-        }
+
     }
 
 

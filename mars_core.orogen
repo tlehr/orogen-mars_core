@@ -12,6 +12,7 @@ using_library "QtGui", :typekit => false
 
 import_types_from "tasks/MarsControl.hpp"
 import_types_from "servoTypes.hpp"
+import_types_from "jointTypes.hpp"
 import_types_from "base"
 
 using_library "actuator_dispatcher"
@@ -196,6 +197,8 @@ task_context "Joints" do
         doc('Array of names of the motor in the scene file. The names get mapped to motor ids starting from zero')
     property('name_remap', 'std/vector</std/string>').
         doc('If this array is set the joints will be renamed for the external interface')
+    property('parallel_kinematics', 'std/vector<simulation/ParallelKinematic>').
+        doc('maps a single joint command to two joints to control parallel kinematics simulated by two joints')
     property('scaling', 'std/vector<double>').
 	doc('Optional array of scale values that are applied to the mars joint values. Needs to be empty or the same size as names.')
     property('offset', 'std/vector<double>').

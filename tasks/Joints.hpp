@@ -50,6 +50,9 @@ namespace simulation {
 	base::samples::Joints status;
 	base::commands::Joints cmd;
 
+	std::vector< simulation::ParallelKinematic > parallel_kinematics;
+
+
     public:
         virtual void init();
         virtual void update(double delta_t);

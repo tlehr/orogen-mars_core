@@ -87,14 +87,31 @@ void Joints::update(double delta_t)
     // in any case read out the status
     for( size_t i=0; i<status.size(); ++i )
     {
-	JointConversion conv = mars_ids[i];
-	mars::sim::SimMotor *motor = control->motors->getSimMotor( conv.mars_id );
+   	JointConversion conv;
+
+
+
+    if (parallel_kinematics.empty()){
+    	conv = mars_ids[i];
+    }else{
+    	//mars_id does not fit the index of status,
+    	//find the conv by status name
+    	for (std::vector<JointConversion>::iterator it = mars_ids.begin();it != mars_ids.end();it++){
+    		if (it->externalName == status.names[i]){
+    			conv = *it;
+    			break;
+    		}
+    	}
+
+    }
+    mars::sim::SimMotor *motor = control->motors->getSimMotor( conv.mars_id );
 
 	base::JointState state;
 	state.position = conv.fromMars( motor->getActualPosition() );
 	state.speed = conv.fromMars( motor->getJoint()->getVelocity() );
 	state.effort = conv.fromMars( motor->getTorque() );
-	status[i] = state;
+
+	status[conv.externalName] = state;
     }
 
     // and write it to the output port
@@ -141,7 +158,7 @@ bool Joints::configureHook()
     // fill the joint structure 
     mars_ids.resize( num_joints );
     cmd.resize( num_joints);
-    status.resize( num_joints );
+    status.resize( num_joints - parallel_kinematics.size() );
 
 
     std::vector<std::string> marsNames = _names.value();
@@ -149,19 +166,35 @@ bool Joints::configureHook()
 
     //set proper status names (by parallel kinematics)
     //status.resize( num_joints - parallel_kinematics.size());
+
+    //set names
     if (parallel_kinematics.empty()){
-    	printf("no parallels\n");
+    	status.names = _names.value();
     }else{
     	printf("parallel kinematic_configuretion:\n");
 	    for (std::vector< simulation::ParallelKinematic >::iterator it = parallel_kinematics.begin();it != parallel_kinematics.end();it++){
 	    	printf("%s -> %s, %s\n",it->externalName.c_str(),it->internalName1.c_str(),it->internalName2.c_str());
 	    }
+	    std::vector<std::string> externalNames;
+	    //set names for status
+	    bool is_parallel = false;
+	    for (std::vector<std::string>::iterator name = marsNames.begin(); name != marsNames.end();name++){
+	    	is_parallel = false;
+	    	for (std::vector< simulation::ParallelKinematic >::iterator parallel = parallel_kinematics.begin();parallel != parallel_kinematics.end();parallel++){
+	    		if (*name == parallel->internalName1){
+	    			externalNames.push_back(parallel->externalName);
+	    			is_parallel = true;
+	    		}else if(*name == parallel->internalName2){
+	    			//second is NOT used for status data
+	    			is_parallel = true;
+	    		}
+	    	}
+	    	if (!is_parallel){
+	    		externalNames.push_back(*name);
+	    	}
+	    }
+	    status.names = externalNames;
     }
-
-
-
-    status.names = _names.value();
-
 
 
     std::vector<std::string> rename = _name_remap.get(); 

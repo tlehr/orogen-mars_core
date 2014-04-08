@@ -42,6 +42,7 @@ public:
     SimulationTime()
     {
 	setStartTime( base::Time::now() );
+	simulationTime = startTime;
     }
 
     /** @brief set the start time

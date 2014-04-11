@@ -37,12 +37,12 @@ class SimulationTime
     base::Time simulationTime;
     /** time elapsed in ms since start of simulation */ 
     double msElapsed;
-
+    /** Check wether the time is initialized or not */
+    bool initialized;
 public:
     SimulationTime()
     {
-	setStartTime( base::Time::now() );
-	simulationTime = startTime;
+        initialized = false;
     }
 
     /** @brief set the start time
@@ -50,7 +50,9 @@ public:
     void setStartTime( base::Time startTime )
     {
 	this->startTime = startTime;
-	setElapsedMs( 0 );
+	msElapsed = 0 ;
+        simulationTime = startTime;
+        initialized = true;
     }	
 
     /** @return the simulation time, which is offset by t
@@ -59,13 +61,21 @@ public:
     base::Time get()
     {
 	boost::mutex::scoped_lock lock( timeLock );
-	return simulationTime;
+	if(!initialized){
+            //This prevent some wiered states in the timestamp estimator if the simulation is
+            //not completly setup so far.
+            return base::Time::now();
+        }
+        return simulationTime;
     }
 
     /** set the time since the simulation was started in ms
      */
     void setElapsedMs( double ms )
     {
+        if(!initialized){
+	    setStartTime( base::Time::now() );
+        }
 	boost::mutex::scoped_lock lock( timeLock );
 	msElapsed = ms;
 	simulationTime = startTime + base::Time::fromMilliseconds( msElapsed );

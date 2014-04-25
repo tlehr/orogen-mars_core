@@ -41,7 +41,7 @@ void Joints::update(double delta_t)
 {
     if(!isRunning()) return; //Seems Plugin is set up but not active yet, we are not sure that we are initialized correctly so retuning
     // if there was a command, write it to the simulation
-    if( _command.read( cmd ) == RTT::NewData )
+    while( _command.read( cmd ) == RTT::NewData )
     {
 	for( size_t i=0; i<mars_ids.size(); ++i )
 	{

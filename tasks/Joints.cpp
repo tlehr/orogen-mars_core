@@ -85,7 +85,7 @@ void Joints::update(double delta_t)
     }
 
     // in any case read out the status
-    for( size_t i=0; i<status.size(); ++i )
+    for( size_t i=0; i<mars_ids.size(); ++i )
     {
    	JointConversion conv;
 
@@ -171,7 +171,7 @@ bool Joints::configureHook()
     if (parallel_kinematics.empty()){
     	status.names = _names.value();
     }else{
-    	printf("parallel kinematic_configuretion:\n");
+    	printf("parallel kinematic_configuration:\n");
 	    for (std::vector< simulation::ParallelKinematic >::iterator it = parallel_kinematics.begin();it != parallel_kinematics.end();it++){
 	    	printf("%s -> %s, %s\n",it->externalName.c_str(),it->internalName1.c_str(),it->internalName2.c_str());
 	    }
@@ -221,7 +221,6 @@ bool Joints::configureHook()
 
         if (!parallel_kinematics.empty()){
     	    //if (marsNames[i] in _parallel_kinematics )
-
     	    for (std::vector< simulation::ParallelKinematic >::iterator it = parallel_kinematics.begin();it != parallel_kinematics.end();it++){
     	    	if (mars_ids[i].marsName == it->internalName1 || mars_ids[i].marsName == it->internalName2){
     	    		mars_ids[i].externalName = it->externalName;

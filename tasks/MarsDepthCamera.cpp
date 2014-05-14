@@ -74,7 +74,8 @@ void MarsDepthCamera::getData()
     //TODO camera might be rotated
 
     //set attributes
-    image->time = base::Time::fromSeconds(lastUpdateTime);
+    //image->time = base::Time::fromSeconds(lastUpdateTime);
+    image->time = getTime();
     
     ro_ptr.reset(image);
     

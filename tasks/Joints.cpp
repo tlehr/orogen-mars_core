@@ -108,7 +108,7 @@ void Joints::update(double delta_t)
 
 	base::JointState state;
 	state.position = conv.fromMars( motor->getActualPosition() );
-	state.speed = conv.fromMars( motor->getJoint()->getVelocity() );
+	state.speed = motor->getJoint()->getVelocity();
 	state.effort = conv.fromMars( motor->getTorque() );
 
 	status[conv.externalName] = state;

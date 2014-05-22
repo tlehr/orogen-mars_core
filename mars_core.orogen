@@ -263,8 +263,8 @@ task_context "MarsIMU" do
 	doc "The name of the imu frame."
     property("world_frame", "std/string", "world").
 	doc "The name of the world frame."
-	property('move_node', 'simulation/Positions' ).
-	    doc('override positions in the scene (scn) file, e.g. always to to (0,0,0)')
+	property('rotate_node_relative', '/std/vector<double>' ).
+	    doc('if the robot is moved my mars (yaml), rotation of the IMU may be wrong and can be set here (in degrees)')
 	
 
     output_port('orientation_samples', '/base/samples/RigidBodyState').

@@ -47,26 +47,20 @@ bool MarsIMU::startHook()
 
     rbs.initSane();
     rbs.position.setZero();
-    if (_move_node.ready()){
+    if (_rotate_node_relative.get().size() == 3){
 
-    	mars::utils::Vector pos;
-		mars::utils::Vector rotoff;
 
-		rotoff.x() =  _move_node.get().rotx;
-		rotoff.y() =  _move_node.get().roty;
-		rotoff.z() =  _move_node.get().rotz;
+		mars::utils::Vector rotoff;// = _rotate_node_relative.get();
 
-		pos.x() = _move_node.get().posx;
-		pos.y() = _move_node.get().posy;
-		pos.z() = _move_node.get().posz;
+		rotoff.x() =  _rotate_node_relative.get()[0];
+		rotoff.y() =  _rotate_node_relative.get()[1];
+		rotoff.z() =  _rotate_node_relative.get()[2];
 
 
 		mars::interfaces::NodeData nodedata = control->nodes->getFullNode(node_id);
 
-		nodedata.pos = pos;
-		nodedata.rot = mars::utils::eulerToQuaternion(rotoff);
+		nodedata.rot = mars::utils::eulerToQuaternion(rotoff) * nodedata.rot;
 
-		control->nodes->editNode(&nodedata, mars::interfaces::EDIT_NODE_POS);
 		control->nodes->editNode(&nodedata, mars::interfaces::EDIT_NODE_ROT);
 
     }

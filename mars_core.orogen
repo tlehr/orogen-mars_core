@@ -263,6 +263,9 @@ task_context "MarsIMU" do
 	doc "The name of the imu frame."
     property("world_frame", "std/string", "world").
 	doc "The name of the world frame."
+	property('move_node', 'simulation/Positions' ).
+	    doc('override positions in the scene (scn) file, e.g. always to to (0,0,0)')
+	
 
     output_port('orientation_samples', '/base/samples/RigidBodyState').
         doc 'provides timestamped IMUReading samples containing the orientation estimate as reported by the IMU.'

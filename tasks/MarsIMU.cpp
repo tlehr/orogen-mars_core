@@ -4,10 +4,11 @@
 #include "MarsPlugin.hpp"
 #include <mars/interfaces/sim/MotorManagerInterface.h>
 #include <mars/interfaces/sim/NodeManagerInterface.h>
+#include <mars/utils/mathUtils.h>
 
 using namespace simulation;
 
-    MarsIMU::MarsIMU(std::string const& name)
+MarsIMU::MarsIMU(std::string const& name)
     : MarsIMUBase(name)
 {
 }
@@ -46,6 +47,29 @@ bool MarsIMU::startHook()
 
     rbs.initSane();
     rbs.position.setZero();
+    if (_move_node.ready()){
+
+    	mars::utils::Vector pos;
+		mars::utils::Vector rotoff;
+
+		rotoff.x() =  _move_node.get().rotx;
+		rotoff.y() =  _move_node.get().roty;
+		rotoff.z() =  _move_node.get().rotz;
+
+		pos.x() = _move_node.get().posx;
+		pos.y() = _move_node.get().posy;
+		pos.z() = _move_node.get().posz;
+
+
+		mars::interfaces::NodeData nodedata = control->nodes->getFullNode(node_id);
+
+		nodedata.pos = pos;
+		nodedata.rot = mars::utils::eulerToQuaternion(rotoff);
+
+		control->nodes->editNode(&nodedata, mars::interfaces::EDIT_NODE_POS);
+		control->nodes->editNode(&nodedata, mars::interfaces::EDIT_NODE_ROT);
+
+    }
 
     return true;
 }

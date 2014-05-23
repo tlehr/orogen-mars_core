@@ -263,9 +263,16 @@ task_context "MarsIMU" do
 	doc "The name of the imu frame."
     property("world_frame", "std/string", "world").
 	doc "The name of the world frame."
-	property('rotate_node_relative', '/std/vector<double>' ).
-	    doc('if the robot is moved my mars (yaml), rotation of the IMU may be wrong and can be set here (in degrees)')
-	
+    property('rotate_node_relative', '/std/vector<double>' ).
+	doc('if the robot is moved my mars (yaml), rotation of the IMU may be wrong and can be set here (in degrees)')	
+    property("position_sigma", "double", 0.0).
+	doc "Standard deviation of the position, that will be applied to the measurement."
+    property("orientation_sigma", "double", 0.0).
+	doc "Standard deviation of the orientation, that will be applied to the measurement."
+    property("velocity_sigma", "double", 0.0).
+	doc "Standard deviation of the velocity, that will be applied to the measurement."
+    property("angular_velocity_sigma", "double", 0.0).
+	doc "Standard deviation of the angular velocity, that will be applied to the measurement."
 
     output_port('orientation_samples', '/base/samples/RigidBodyState').
         doc 'provides timestamped IMUReading samples containing the orientation estimate as reported by the IMU.'

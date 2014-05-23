@@ -47,6 +47,7 @@ bool MarsIMU::startHook()
 
     rbs.initSane();
     rbs.position.setZero();
+
     if (_rotate_node_relative.get().size() == 3){
 
 
@@ -64,6 +65,11 @@ bool MarsIMU::startHook()
 		control->nodes->editNode(&nodedata, mars::interfaces::EDIT_NODE_ROT);
 
     }
+    
+    translation_noise = boost::random::normal_distribution<double>(0.0, _position_sigma.get());
+    rotation_noise = boost::random::normal_distribution<double>(0.0, _orientation_sigma.get());
+    velocity_noise = boost::random::normal_distribution<double>(0.0, _velocity_sigma.get());
+    angular_velocity_noise = boost::random::normal_distribution<double>(0.0, _angular_velocity_sigma.get());
 
     return true;
 }
@@ -87,23 +93,54 @@ void MarsIMU::stopHook()
 void MarsIMU::update( double time )
 {
     if(!isRunning()) return; //Seems Plugin is set up but not active yet, we are not sure that we are initialized correctly so retuning
+    
     rbs.time = getTime();
     rbs.sourceFrame = _imu_frame.value();
     rbs.targetFrame = _world_frame.value();
     rbs.orientation = control->nodes->getRotation( node_id ).normalized();
-    rbs.cov_orientation = base::Matrix3d::Ones() * 1e-6;
-    rbs.velocity = control->nodes->getLinearVelocity( node_id );
-    rbs.angular_velocity = control->nodes->getAngularVelocity( node_id);
+    rbs.cov_orientation = base::Matrix3d::Identity() * std::max(std::pow(rotation_noise.sigma(), 2), 1e-6);
+    if( rotation_noise.sigma() > 0.0 )
+    {
+	// apply noise to orientation
+	base::Orientation orientation_error = Eigen::AngleAxisd(rotation_noise(rnd_generator), Eigen::Vector3d::UnitX())*
+						Eigen::AngleAxisd(rotation_noise(rnd_generator), Eigen::Vector3d::UnitY()) *
+						Eigen::AngleAxisd(rotation_noise(rnd_generator), Eigen::Vector3d::UnitZ());
+	rbs.orientation = orientation_error * rbs.orientation;
+    }
 
+    rbs.velocity = control->nodes->getLinearVelocity( node_id );
+    rbs.cov_velocity = base::Matrix3d::Identity() * std::max(std::pow(velocity_noise.sigma(), 2), 1e-6);
+    if( velocity_noise.sigma() > 0.0 )
+    {
+	// apply noise to velocity
+	rbs.velocity = rbs.velocity + base::Vector3d(velocity_noise(rnd_generator), velocity_noise(rnd_generator), velocity_noise(rnd_generator));
+    }
+    
+    rbs.angular_velocity = control->nodes->getAngularVelocity( node_id);
+    rbs.cov_angular_velocity = base::Matrix3d::Identity() * std::max(std::pow(angular_velocity_noise.sigma(), 2), 1e-6);
+    if( angular_velocity_noise.sigma() > 0.0 )
+    {
+	// apply noise to angular velocity
+	rbs.angular_velocity = rbs.angular_velocity + base::Vector3d(angular_velocity_noise(rnd_generator), angular_velocity_noise(rnd_generator), angular_velocity_noise(rnd_generator));
+    }
+    
     _orientation_samples.write( rbs );
+    
+    rbs.position = control->nodes->getPosition( node_id );
+    rbs.cov_position = base::Matrix3d::Identity() * std::max(std::pow(translation_noise.sigma(), 2), 1e-6);
+    if( translation_noise.sigma() > 0.0 )
+    {
+	// apply noise to position
+	rbs.position = rbs.position + base::Vector3d(translation_noise(rnd_generator), translation_noise(rnd_generator), translation_noise(rnd_generator));
+    }
+    
+    _pose_samples.write( rbs );
+    
     
     imusens.time = getTime();
     imusens.acc = control->nodes->getLinearAcceleration( node_id );
     imusens.gyro = control->nodes->getAngularVelocity( node_id);
     _calibrated_sensors.write( imusens );
 
-    rbs.position = control->nodes->getPosition( node_id );
-
-    _pose_samples.write( rbs );
 }
 

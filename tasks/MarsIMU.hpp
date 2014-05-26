@@ -33,11 +33,11 @@ namespace simulation {
         long node_id;
         base::samples::RigidBodyState rbs;
         base::samples::IMUSensors imusens;
-	boost::random::mt19937 rnd_generator;
-	boost::random::normal_distribution<double> translation_noise;
-	boost::random::normal_distribution<double> rotation_noise;
-	boost::random::normal_distribution<double> velocity_noise;
-	boost::random::normal_distribution<double> angular_velocity_noise;
+	boost::mt19937 rnd_generator;
+	boost::normal_distribution<double> translation_noise;
+	boost::normal_distribution<double> rotation_noise;
+	boost::normal_distribution<double> velocity_noise;
+	boost::normal_distribution<double> angular_velocity_noise;
         void update( double time );
 
 

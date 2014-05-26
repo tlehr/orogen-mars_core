@@ -66,10 +66,10 @@ bool MarsIMU::startHook()
 
     }
     
-    translation_noise = boost::random::normal_distribution<double>(0.0, _position_sigma.get());
-    rotation_noise = boost::random::normal_distribution<double>(0.0, _orientation_sigma.get());
-    velocity_noise = boost::random::normal_distribution<double>(0.0, _velocity_sigma.get());
-    angular_velocity_noise = boost::random::normal_distribution<double>(0.0, _angular_velocity_sigma.get());
+    translation_noise = boost::normal_distribution<double>(0.0, _position_sigma.get());
+    rotation_noise = boost::normal_distribution<double>(0.0, _orientation_sigma.get());
+    velocity_noise = boost::normal_distribution<double>(0.0, _velocity_sigma.get());
+    angular_velocity_noise = boost::normal_distribution<double>(0.0, _angular_velocity_sigma.get());
 
     return true;
 }

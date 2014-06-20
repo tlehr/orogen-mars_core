@@ -87,31 +87,29 @@ void Joints::update(double delta_t)
     // in any case read out the status
     for( size_t i=0; i<mars_ids.size(); ++i )
     {
-   	JointConversion conv;
+   	JointConversion *conv = NULL;
 
+        if (parallel_kinematics.empty()){
+            conv = &(mars_ids[i]);
+        }else{
+            //mars_id does not fit the index of status,
+            //find the conv by status name
+            for (std::vector<JointConversion>::iterator it = mars_ids.begin();it != mars_ids.end();it++){
+                    if (it->externalName == status.names[i]){
+                            conv = &(*it);
+                            break;
+                    }
+            }
 
-
-    if (parallel_kinematics.empty()){
-    	conv = mars_ids[i];
-    }else{
-    	//mars_id does not fit the index of status,
-    	//find the conv by status name
-    	for (std::vector<JointConversion>::iterator it = mars_ids.begin();it != mars_ids.end();it++){
-    		if (it->externalName == status.names[i]){
-    			conv = *it;
-    			break;
-    		}
-    	}
-
-    }
-    mars::sim::SimMotor *motor = control->motors->getSimMotor( conv.mars_id );
+        }
+        mars::sim::SimMotor *motor = control->motors->getSimMotor( conv->mars_id );
 
 	base::JointState state;
-	state.position = conv.fromMars( motor->getActualPosition() );
+	state.position = conv->updateAbsolutePosition( motor->getActualPosition() );
 	state.speed = motor->getJoint()->getVelocity();
-	state.effort = conv.fromMars( motor->getTorque() );
+	state.effort = conv->fromMars( motor->getTorque() );
 
-	status[conv.externalName] = state;
+	status[conv->externalName] = state;
     }
 
     // and write it to the output port
@@ -155,6 +153,7 @@ bool Joints::configureHook()
     std::vector< simulation::ParallelKinematic > parallel_kinematics = _parallel_kinematics.value();
 
 
+    mars_ids.clear();
     // fill the joint structure 
     mars_ids.resize( num_joints );
     cmd.resize( num_joints);

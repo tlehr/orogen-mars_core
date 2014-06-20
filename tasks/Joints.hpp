@@ -28,7 +28,7 @@ namespace simulation {
 	struct JointConversion
 	{
 	    JointConversion()
-		: mars_id(-1), scaling(1.0), offset(0.0) {}
+		: mars_id(-1), scaling(1.0), offset(0.0), absolutePosition(0), lastPosition(0), gotPosition(false) {}
 
 	    double fromMars( double v )
 	    {
@@ -39,11 +39,45 @@ namespace simulation {
 		return (v - offset) / scaling;
 	    }
 
+            double updateAbsolutePosition( double v )
+            {
+                if(!gotPosition)
+                {
+                    gotPosition = true;
+                    absolutePosition = v;
+                    lastPosition = v;
+                }
+                
+                double diff = v- lastPosition;
+                
+                if(diff > M_PI)
+                {
+                    diff -= 2* M_PI;
+                }
+                if(diff < -M_PI)
+                {
+                    diff += 2* M_PI;
+                }
+                
+                absolutePosition += diff;
+                
+                lastPosition = v;
+                
+                return absolutePosition;
+            }
+            double getAbsolutePosition()
+            {
+                return absolutePosition;
+            }
+	    
 	    int mars_id;
             std::string marsName;
             std::string externalName;
 	    double scaling;
 	    double offset;
+            double absolutePosition;
+            double lastPosition;
+            bool gotPosition;
 	};
 	std::vector<JointConversion> mars_ids;
 

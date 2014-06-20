@@ -19,7 +19,7 @@ using_library "actuator_dispatcher"
 
 #Disable default deployments, most of the time stand_alone deployments are useless
 #since the simulation needs plugins within the same deployment to work
-self.define_default_deployments = false
+#self.define_default_deployments = false
 
 # Core orogen module that brings up the mars simulation and
 # makes it accessible as a orogen module

@@ -221,6 +221,19 @@ task_context "Joints" do
 
 end
 
+task_context "ForceTorque6DOF" do
+	
+	subclasses "MarsPlugin"
+	
+	output_port("force", "std/vector< /base/Vector3d >")
+	
+	output_port("torque", "std/vector< /base/Vector3d >")
+	
+	property('names', 'std/vector</std/string>').
+        doc('Array of names of the ft sensors in the scene file.')
+	
+end
+
 task_context "MarsTrigger" do
     subclasses "MarsPlugin"
 
@@ -430,6 +443,8 @@ task_context "AuvMotion" do
       doc("Buoyancy force applied to the vehicle")
 
 end
+
+
 
 #
 #deployment "simulation" do

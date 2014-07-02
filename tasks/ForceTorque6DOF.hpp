@@ -118,6 +118,7 @@ namespace simulation {
     private:
         std::vector< std::string > mars_names;
         std::vector<int> mars_ids;
+        std::vector< base::samples::Wrench > wrenches;
 
     };
 }

@@ -41,10 +41,8 @@ void ForceTorque6DOF::update(double delta_t)
 {
     if(!isRunning()) return;
 
-	std::vector< base::Vector3d > force;
-	std::vector< base::Vector3d > torque;
-	force.resize(mars_ids.size());
-	torque.resize(mars_ids.size());
+    //normally this should not result in a resize
+	wrenches.resize(mars_ids.size());
 
     for( size_t i=0; i<mars_ids.size(); ++i ){
     	mars::interfaces::BaseSensor* base = control->sensors->getSimSensor(mars_ids[i]);
@@ -52,21 +50,21 @@ void ForceTorque6DOF::update(double delta_t)
     		mars::sim::Joint6DOFSensor* sensor = dynamic_cast<mars::sim::Joint6DOFSensor*>(base);
 			if (sensor){
 				//printf("sensor %s found\n",mars_names[i].c_str());
-				mars::utils::Vector marsforce,marstorque;
-				sensor->getForceData(&marsforce);
-				sensor->getTorqueData(&marstorque);
-
+				base::samples::Wrench wrench;
 				//mars::utils::Vector is the same typedef as base::Vector3d
-				//so we can assign directly
-				force[i] = marsforce;
-				torque[i] = marstorque;
+				//so we can use the base::Vector3d directly
+				sensor->getForceData(&wrench.force);
+				sensor->getTorqueData(&wrench.torque);
+
+				wrench.time = getTime();
+
+				wrenches[i] = wrench;
 			}
     	}
     }
 
     //TODO: convert to new wrench base type, when available
-    _force.write(force);
-    _torque.write(torque);
+    _wrenches.write(wrenches);
 
 }
 
@@ -86,6 +84,8 @@ bool ForceTorque6DOF::configureHook()
     mars_ids.resize(num_sensors);
     mars_names.clear();
     mars_names = _names.value();
+
+	wrenches.resize(num_sensors);
 
     return true;
 }

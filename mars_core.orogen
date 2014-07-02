@@ -225,9 +225,7 @@ task_context "ForceTorque6DOF" do
 	
 	subclasses "MarsPlugin"
 	
-	output_port("force", "std/vector< /base/Vector3d >")
-	
-	output_port("torque", "std/vector< /base/Vector3d >")
+	output_port("wrenches", "std/vector< /base/samples/Wrench >")
 	
 	property('names', 'std/vector</std/string>').
         doc('Array of names of the ft sensors in the scene file.')

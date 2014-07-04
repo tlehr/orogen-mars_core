@@ -58,7 +58,7 @@ task_context "Mars" do
         property('positions', 'std/vector<simulation/Positions>' ).
 	    doc('override positions in the scene (scn) file, e.g. move the terrain to create different experiment setups without changing the scene file itself')
 
-        property('config_dir', '/std/string',"#{ENV['AUTOPROJ_PROJECT_BASE']}/install/configuration/mars_default").
+        property('config_dir', '/std/string',"#{ENV['AUTOPROJ_CURRENT_ROOT']}/install/configuration/mars_default").
 	    doc('the full path to the main configuration folder')
 
         property('distributed_simulation', 'bool').

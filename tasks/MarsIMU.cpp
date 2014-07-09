@@ -116,7 +116,7 @@ void MarsIMU::update( double time )
 	rbs.velocity = rbs.velocity + base::Vector3d(velocity_noise(rnd_generator), velocity_noise(rnd_generator), velocity_noise(rnd_generator));
     }
     
-    rbs.angular_velocity =  Eigen::AngleAxisd(-base::getYaw(rbs.orientation), Eigen::Vector3d::UnitZ()) * control->nodes->getAngularVelocity( node_id);
+    rbs.angular_velocity =  rbs.orientation.inverse() * control->nodes->getAngularVelocity( node_id);
     rbs.cov_angular_velocity = base::Matrix3d::Identity() * std::max(std::pow(angular_velocity_noise.sigma(), 2), 1e-6);
     if( angular_velocity_noise.sigma() > 0.0 )
     {
